@@ -46,5 +46,23 @@ class UserManager{
 //SOLID PRENSIP UYUMLU KOD
 //Bir class bir göreve özgü
 class UserValidator{bool isValid(String email, String password) => true;}
-
 class UserRepository{void saveToDatabase(User user){/*db işlemleri*/}}
+
+
+//OPEN / CLOSE PRINCIPLE
+
+//soyut arayüz
+abstract class PaymentMethod{
+    void pay(double amount);
+}
+
+
+class CreditCardPayment implements PaymentMethod{
+    @override void pay(double amaount) => print('$amaount TL KREDİ KARTI ILE ODEME ALINDI');
+}
+
+class ApplePayment implements PaymentMethod{
+     @override void pay(double amaount) => print('$amaount TL APPLE PAY ILE ODEME ALINDI');
+}
+
+
