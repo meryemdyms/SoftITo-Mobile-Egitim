@@ -28,3 +28,23 @@ void processCustomers(List<Customer> customers){
         }
     }
 }
+
+
+//SOLID PRENSIP IHLALI hem veri tutuyor hem db yazıyor vb,
+//Tek class içinde birçok işlem
+
+class UserManager{
+    void registerUser(String email, String password){
+        //1.Validasyon yap
+        //2.SQL/Firebase kaydet
+        //3.SMTO üzerinden hoş geldin maili at
+        //4.Hata olursa log yaz
+    }
+}
+
+
+//SOLID PRENSIP UYUMLU KOD
+//Bir class bir göreve özgü
+class UserValidator{bool isValid(String email, String password) => true;}
+
+class UserRepository{void saveToDatabase(User user){/*db işlemleri*/}}
