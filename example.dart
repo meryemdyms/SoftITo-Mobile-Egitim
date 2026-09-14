@@ -91,3 +91,31 @@ void testRectangle(Rectangle r){
     //beklenen davranış bozuldu! LISKOV IHLALI
     assert(r.area == 20);
     }
+
+
+//Şişkin arayüz
+abstract class SmartDevice{
+    void printDocument();
+    void scanDocument();
+    void sendFax();
+
+}
+
+//Normal bir ev yazıcısı (fax çekemez)
+class BasicPrinter implements SmartDevice{
+    @override void printDocument()=>print('Yazdırılıyor');
+    @override void scanDocument()=>print('Tranıyor');
+    @override void sendFax()=>throw UnimlementedError('fax ozelligim yok');//ISP IHLALI
+
+}
+
+//ISP UYUMLU
+abstractclass Printer{void printDocument();}
+abstractclass Scanner{void scanDocument();}
+abstractclass FaxMachine{void sendFax();}
+
+//işime yaramıcak olanı direk almadım ssiteme yük bindirmedim
+class BasicPrinterClean implements Printer,Scanner{
+    @override void printDocument()=>print('Yazdırılıyor');
+    @override void scanDocument()=>print('Tranıyor');
+}
