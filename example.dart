@@ -119,3 +119,23 @@ class BasicPrinterClean implements Printer,Scanner{
     @override void printDocument()=>print('Yazdırılıyor');
     @override void scanDocument()=>print('Tranıyor');
 }
+
+
+//DI
+abstract class AuthRemote{
+    Future<String> login(String email, String password);
+}
+
+class FirebaseAuthService implements AuthRemote{
+    @override Future<String> login(String email,String password)async=>"MOCKTOKEN_SUCCESS";
+}
+
+class LoginViewModel{
+    final AuthRemote authSource;
+    LoginViewModel({required this.authSource})
+
+    Future<void> handleLogin(String email,String pass)async{
+        final token=await authSource.login(email,pass);
+        print('giris basarili: $token');
+    }
+}
