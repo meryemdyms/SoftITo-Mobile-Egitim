@@ -7,19 +7,22 @@ class Urun {
 
   Urun(this.id, this.ad, this.fiyat, this.stok, this.tip);
 
-  double kargoUcretiHesapla() {
-    return 29.90;
-  }
+  
 }
 
+abstract class KargoUcret{double kargoUcretiHesapla()=>29.90;}
+
+//Eğer kargo ücreti hesaplamamız gerekse kargoUcreti de implements ederdik ama ihtiyacımız yok direk hiç çağırmıyoruz
 class DijitalUrun extends Urun {
   DijitalUrun(String id, String ad, double fiyat, int stok)
       : super(id, ad, fiyat, stok, "DIJITAL");
 
+
+/*ISP ihlali
   @override
   double kargoUcretiHesapla() {
     throw Exception("Dijital urunlerde kargo hesaplanamaz!");
-  }
+  }*/
 }
 
 abstract class ISiparisIslemleri {
