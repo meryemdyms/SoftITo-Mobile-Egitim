@@ -25,30 +25,87 @@ class DijitalUrun extends Urun {
   }*/
 }
 
-abstract class ISiparisIslemleri {
+//SOLID ihlali. Bir class sadece kendiyle alakalı methotları barındırmalı ve tek iş yapmalı
+/*abstract class ISiparisIslemleri {
   void siparisKaydet(String orderId, double tutar);
   void odemeYap(String tip, double tutar);
   void kargoGonder(String orderId, String adres);
   void mailGonder(String email, String mesaj);
   void smsGonder(String tel, String mesaj);
   void faturaYazdir(String orderId);
+}*/
+
+abstract class ISiparisKayit {
+  void siparisKaydet(String orderId, double tutar);
 }
 
-class SqliteVeritabani {
-  void kaydet(String sql) {
+abstract class IOdeme {
+  void odemeYap(String tip, double tutar);
+}
+
+abstract class IKargo {
+  void kargoGonder(String orderId, String adres);
+}
+
+abstract class IMail {
+  void mailGonder(String email, String mesaj);
+}
+
+abstract class ISms {
+  void smsGonder(String tel, String mesaj);
+}
+
+abstract class IFatura {
+  void faturaYazdir(String orderId);
+}
+
+class SqliteVeritabani implements ISiparisKayit {
+ @override
+  void siparisKaydet(String orderId, double tutar) {
     print("DB calistirildi: " + sql);
   }
 }
 
-class SmtpMailServisi {
-  void mailAt(String to, String body) {
+class SmtpMailServisi implements IMail {
+  @override
+  void mailGonder(String email, String mesaj) {
     print("SMTP Mail gonderildi: " + to);
   }
 }
 
-class NetgsmSmsServisi {
-  void smsYolla(String gsm, String text) {
+class NetgsmSmsServisi implements ISms {
+  @override
+  void smsGonder(String tel, String mesaj) {
     print("SMS iletildi: " + gsm);
+  }
+}
+
+class OdemeServisi implements IOdeme {
+  @override
+  void odemeYap(String tip, double tutar) {
+    if (tip == "KREDI_KARTI") {
+      print("$tutar TL Kredi kartindan POS ile cekildi.");
+    } else if (tip == "HAVALE") {
+      print("$tutar TL Havale kontrol edildi.");
+    } else if (tip == "KAPIDA_ODEME") {
+      print("$tutar TL Kapida odeme tahsil edilecek.");
+    } else if (tip == "CRYPTO") {
+      print("$tutar TL USDT transferi onaylandi.");
+    }
+  }
+}
+
+class KargoServisi implements IKargo {
+  @override
+  void kargoGonder(String orderId, String adres) {
+    print("MNG Kargo takip fis basildi: $adres");
+  }
+}
+
+class FaturaServisi implements IFatura {
+  @override
+  void faturaYazdir(String orderId) {
+    print("Fatura PDF cikarildi: $orderId");
   }
 }
 
