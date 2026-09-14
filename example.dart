@@ -66,3 +66,28 @@ class ApplePayment implements PaymentMethod{
 }
 
 
+//
+class Rectangle{
+    double width = 0;
+    double height = 0;
+
+    void setWidth(double w) => width = w;
+    void setHeight(double h) => height = h;
+    double get area => width * height;
+}
+
+//LISKIV IHLALI
+class Square extends Rectangle{
+    @override void setWidth(double w){width=w; height=w}//kare olduğu için boyu eşitlendi
+     @override void setHeight(double h){width=h; height=h}//kare olduğu için boyu eşitlendi
+}
+
+//TEST FONKSİYONU
+void testRectangle(Rectangle r){
+    r.setWidth(5);
+    r.setHeight(4);
+    //üst sınıf kuralına göre alan 5*4=20 olmalıdır
+    //parametre olarak square gönderilirse 4*4=16
+    //beklenen davranış bozuldu! LISKOV IHLALI
+    assert(r.area == 20);
+    }
