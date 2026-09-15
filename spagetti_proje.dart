@@ -50,7 +50,7 @@ abstract class ISiparisKayit {
 }
 
 abstract class IOdeme {
-  void odemeYap(String tip, double tutar);
+  void odemeYap( double tutar);
 }
 
 abstract class IKargo {
@@ -72,36 +72,50 @@ abstract class IFatura {
 class SqliteVeritabani implements ISiparisKayit {
  @override
   void siparisKaydet(String orderId, double tutar) {
-    print("DB calistirildi: + $orderId - $tutar");
+    print("DB calistirildi: $orderId - $tutar");
   }
 }
 
 class SmtpMailServisi implements IMail {
   @override
   void mailGonder(String email, String mesaj) {
-    print("SMTP Mail gonderildi:  + $email");
+    print("SMTP Mail gonderildi: $email");
   }
 }
 
 class NetgsmSmsServisi implements ISms {
   @override
   void smsGonder(String tel, String mesaj) {
-    print("SMS iletildi: + $tel");
+    print("SMS iletildi:$tel");
   }
 }
 
-class OdemeServisi implements IOdeme {
+//ocp prensip ihlali düzeltildi. Kod değişime kapalı genişlemeye açık hale geldi
+class KrediKartiOdeme implements IOdeme {
   @override
-  void odemeYap(String tip, double tutar) {
-    if (tip == "KREDI_KARTI") {
-      print("$tutar TL Kredi kartindan POS ile cekildi.");
-    } else if (tip == "HAVALE") {
-      print("$tutar TL Havale kontrol edildi.");
-    } else if (tip == "KAPIDA_ODEME") {
-      print("$tutar TL Kapida odeme tahsil edilecek.");
-    } else if (tip == "CRYPTO") {
-      print("$tutar TL USDT transferi onaylandi.");
-    }
+  void odemeYap(double tutar) {
+    print("$tutar TL Kredi kartindan POS ile cekildi.");
+  }
+}
+
+class HavaleOdeme implements IOdeme {
+  @override
+  void odemeYap(double tutar) {
+    print("$tutar TL Havale kontrol edildi.");
+  }
+}
+
+class KapidaOdeme implements IOdeme {
+  @override
+  void odemeYap(double tutar) {
+    print("$tutar TL Kapida odeme tahsil edilecek.");
+  }
+}
+
+class CryptoOdeme implements IOdeme {
+  @override
+  void odemeYap(double tutar) {
+    print("$tutar TL USDT transferi onaylandi.");
   }
 }
 
@@ -142,7 +156,6 @@ class SiparisYoneticisi {
   void siparisTamamla(
       String orderId,
       List<Urun> sepet,
-      String odemeTipi,
       String musteriAdi,
       String email,
       String tel,
@@ -174,7 +187,7 @@ class SiparisYoneticisi {
     double kdv = toplam * 0.20;
     double sonTutar = toplam + kdv;
 
-    odeme.odemeYap(odemeTipi, sonTutar);
+    odeme.odemeYap(sonTutar);
 
     db.siparisKaydet(orderId, sonTutar);
 
@@ -198,7 +211,7 @@ class SiparisYoneticisi {
 void main() {
   var siparisci = SiparisYoneticisi(
     SqliteVeritabani(),
-  OdemeServisi(),
+  KrediKartiOdeme(),
   KargoServisi(),
   SmtpMailServisi(),
   NetgsmSmsServisi(),
@@ -213,7 +226,6 @@ void main() {
   siparisci.siparisTamamla(
     "SP-9921",
     sepet,
-    "KREDI_KARTI",
     "Selahaddin",
     "selahaddin@kodvance.com",
     "05551112233",
