@@ -46,3 +46,9 @@ Content-Type:application/json
 
 MÜLAKAT SORUSU CEVAP : GET idempotenttir, çünkü aynı istek birden fazla kez gönderildiğinde sistemin durumunu değiştirmez.
 POST idempotent değildir, çünkü aynı istek tekrarlandığında yeni kayıtlar veya tekrarlanan işlemler oluşturabilir.
+
+
+GÖREV 3: Clean Code & SOLID Prensip Teşhisi (25 Puan)
+Cevap1: SRP Kuralı bir sınıf sadece bir işten sorumlu olması gerekirken burda farklı görevlerin hepsi tek sınıfta toplanarak ihlal edilmiş.Yer alan methodların hepsi kendinden sorumlu sınıflar altında çağrılmalı
+
+Cevap2:OCP kuralına aykırıdır. Kodumuz gelişime açık değişime kapalı olmalıdır. Yeni bir özellik eklendiğinde sistem değişmeden özelliğe adapte olmalıdır
