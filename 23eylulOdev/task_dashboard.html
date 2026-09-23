@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+    <div class="dashboard">
+        <header>
+            <h1 class="welcome-title">Welcome back, Meryem!</h1>
+            <p class="welcome-text">Here's what's happening with your work today.</p>
+        </header>
+        <nav class="sidebar">
+            <div class="menu-item">
+                <div class="menu-icon">📊</div>
+                <div class="menu-text">Dashboard</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">✅</div>
+                <div class="menu-text">My Tasks</div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">📁</div>
+                <div class="menu-text">Projects </div>
+            </div>
+            <div class="menu-item">
+                <div class="menu-icon">🗓️</div>
+                <div class="menu-text">Calendar </div>
+            </div>
+        </nav>
+        <main class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total Projects</div>
+                    <div class="stat-icon">📁</div>
+                    <div class="stat-number">5</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Comleted Tasks</div>
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number">12</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Pending Tasks</div>
+                    <div class="stat-icon">🕒</div>
+                    <div class="stat-number">6</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Due This Week</div>
+                    <div class="stat-icon">🗓️</div>
+                    <div class="stat-number">4</div>
+                </div>
+            </div>
+
+
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <h2 class="tasks-title">My Tasks</h2>
+                    <button class="add-task-button">+ Add Task</button>
+                </div>
+
+                <div class="task-list">
+                    <div class="task-item">
+                        <input type="checkbox">
+                        <strong>Prepare Q2 report</strong>
+                        <span class="task-project">Finance App</span>
+                        <span class="task-date">Today</span>
+                    </div>
+
+                    <div class="task-item">
+                        <input type="checkbox">
+                        <strong class="task-name">Design homepage</strong>
+                        <span class="task-project">Website</span>
+                        <span class="task-date">Tomorrow</span>
+                    </div>
+
+                    <div class="task-item">
+                        <input type="checkbox">
+                        <strong class="task-name">Review onboarding flow</strong>
+                        <span class="task-project">Mobile App</span>
+                        <span class="task-date"> 25 Sep</span>
+                    </div>
+
+                    <div class="task-item">
+                        <input type="checkbox">
+                        <strong class="task-name">Team meeting notes</strong>
+                        <span class="task-project">Internal</span>
+                        <span class="task-date">26 Sep</span>
+                    </div>
+
+                    <div class="task-item">
+                        <input type="checkbox">
+                        <strong class="task-name">Plan marketing strategy</strong>
+                        <span class="task-project">Marketing</span>
+                        <span class="task-date">30 Sep</span>
+                    </div>
+                </div>
+        </main>
+    </div>
+</body>
+
+</html>
