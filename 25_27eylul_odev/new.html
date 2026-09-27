@@ -586,17 +586,66 @@
 
             })
 
-
-
-
-
         }
+
+        // SİPARİŞ SİLME
+
+            orderContainer.addEventListener("click", function (event) {
+
+                // Tıklanan eleman "Sil" butonu değilse işlem yapma
+                if (event.target.dataset.action !== "delete") {
+                    return;
+                }
+
+                // Tıklanan butonun ait olduğu sipariş kartını bul
+                const item = event.target.closest(".order-item");
+
+                // Siparişin id değerini al
+                const id = Number(item.dataset.id);
+
+                // Silinecek sipariş dışındaki siparişleri tut
+                orders = orders.filter(order => order.id !== id);
+
+                // Listeyi tekrar ekrana bas
+                renderOrders();
+
+            });
+
+            // YENİ ÜRÜN EKLEME
+
+            orderForm.addEventListener("submit", function (event) {
+
+                // Form gönderildiğinde sayfanın yenilenmesini engeller
+                event.preventDefault();
+
+                // Formdaki değerleri al
+                const name = document.getElementById("prodName").value.trim();
+                const category = document.getElementById("prodCat").value;
+                const price = Number(document.getElementById("prodPrice").value);
+
+                // Yeni ürün nesnesi oluştur
+                const newOrder = {
+                    id: Date.now(),
+                    name: name,
+                    category: category,
+                    price: price
+                };
+
+                // Yeni ürünü orders dizisine ekle
+                orders.push(newOrder);
+
+                // Formu temizle
+                orderForm.reset();
+
+                // Güncel listeyi tekrar ekrana bas
+                renderOrders();
+
+            });
 
         searchInput.addEventListener("input", renderOrders);// arama kutusuna her karakter girildiğinde renderOrders çalışsın
         categoryFilter.addEventListener("change", renderOrders);// kategori filtresi değiştiğinde renderOrders çalışsın
 
         renderOrders();// sayfa ilk yüklendiğinde listeyi bir kere çizmek için fonksiyonu çağırıyoruz
-</script>
     </script>
 
 
