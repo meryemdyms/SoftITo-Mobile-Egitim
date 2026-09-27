@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş & Gelir Kokpit Dashboard</title>
+    <style>
+        /*uygulamada kullanacağımız genel renkleri ve özellikleri değişken olarak tanımladık */
+        :root {
+            --bg: #f8f7f4;
+            --card: #ffffff;
+            --border: #e6e5df;
+            --text: #181716;
+            --muted: #6b6963;
+            --clay: #c85a32;
+            --clay-hover: #b04e29;
+            --font-main: 'Plus Jakarta Sans', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+
+        /* 
+        Tüm projelerimizin olmazsa olmaz kısmıdır.
+        Tasarıma temiz ve tutarlı başlamak için tüm ekranlarda isteğimiz dışı gelen boşluklara önlem alarak projeye başlamamızı sağlar
+        */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /*
+            Projemizdeki direk body etiketine css özelliği verdik
+            Backgroun,color,font-family değerlerimizi rootta tanımladığımız değişkenlerden kullandık
+            Üt ve alttan 36px sağ ve soldan 16px olcak şekilde iç boşluk verdik
+            Satır boşluklarımızı ayarladık
+
+        */
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-main);
+            padding: 36px 16px;
+            line-height: 1.5;
+        }
+
+        /*
+            kokpit yani ana dış div  classımıza css özellikleri verdik
+            max 960px olmasını ayarladık
+            Alt ve üstten 0 sağ ve soldan otomatik olcak şekilde dış boşluklarımızı ayarladık
+
+            NOTT!! auto özelliğini kullanabilmemiz için sabit bir genişliğimizin olması gereklidir
+
+        */
+        .kokpit {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        /* 
+        Header & KPI
+            Header sectionumuzun genel css özelliklerini tanımladık
+            Alttan iç ve dış boşluklarımızı ayarladık
+            border-bottom ile sadece alt kısam olcak şekilde çizgi ekledik
+
+         */
+        .header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /*
+            BEM kuralarına uygun olarak header'in tag kısmına css özelliklerini verdik
+            yazı boyutumuzu ayarladık
+            biz küçük yazsak bile yazının büyü harflere çevrilcek şekilde ayarlanmasını yaptık
+            harfler arasındaki boşluğu ayarladık
+            renk ve yazımızın kalınlığının ayarlamasını yaptık
+
+            NOT!!! em / px farkı : 
+            px sabit bir birimdir ekranda her zaman aynı fiziksel boyutta kalır
+            em göreceli bir birimdir.O elemanın (veya en yakın atasının) font-size değerine göre hesaplanır
+
+
+        */
+        .header__tag {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--clay);
+            font-weight: 700;
+        }
+
+        /*
+            header'in başlık kısmı için css özelliklerimizi verdik
+            yazı boyutumuzu,kalınlığını ayarladık
+            üst taraftan dış boşluğumuzu ayarladık
+        
+        */
+        .header__title {
+            font-size: 26px;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        /*
+            kpi-grid sectionumuzun dış classının css özelliklerini tanımladık
+            grid yapısını kullandık
+            sayfamızı yatayda 1fr lik 3 parçaya bölcek şekilde ayarladık
+            her bir gridimiz arasındaki boşluk hem yatay hem dikey  ve alt dış boşluk değerlerimizi ayarladık
+        */
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        /*
+            kpi-card içerisinde her bir gridimizi temsil eden kartlarımızın css özelliklerini verdik
+            arka plan rengini,kenar kalınlık ve rangini,kenar ovalliğini ve iç boşluklarını ayarladık
+        */
+        .kpi-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px 18px;
+        }
+
+        /*
+            class bazlı değil kpi-card'ın kapsadığı tüm gridlerimizi kapsayan spanlarımza css özelliğini tanımladık
+            yazı tipimizi,rengini ve alınlığını ayarladık
+        */
+        .kpi-card span {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        /*
+             class bazlı değil kpi-card'ın kapsadığı tüm gridlerimizi kapsayan h3 başlıklarımıza css özelliğini tanımladık
+             yazı boyutu,kalınlığı,tipi özelliklerini ve üst dış boşluk özelliklerini tanımladık
+        */
+        .kpi-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            margin-top: 4px;
+        }
+
+        /* Layout
+            main etiketimizin css özelliklerin tanımladık
+            grid olarak ayarladık 
+            yatayda 2 sütuna böldük: ilki sabit 320px, ikincisi kalan alanı kaplıyor
+            sütunlar arası boşluğu ayarladık
+        
+        */
+        .layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+        }
+
+        /*
+            768px ve altındaki (mobil/tablet) ekranlar için
+            .layout ve .kpi-grid'i tek sütuna (1fr) düşürerek
+            responsive (duyarlı) hale getirdik
+        */
+        @media (max-width: 768px) {
+
+            .layout,
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* Form & Panel */
+
+        /*
+            main içindeki panellerimizin css özelliklerini verdik
+            arka plan rengi,kenar kalınlığı,kenar ovalliği ve iç boşluk değerlerini ayarladık
+        */
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        /*
+            panel classımızın içerisindeki tüm h4 etiketlerimizin css özelliklerini ayarladık
+            yazı tipi,yazı kalınlığı,alt iç ve dış boşluk değererini ayarladık
+            başlığın altına çizgi ekledik
+        */
+        .panel h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /*
+            form içerisindeki field classımızın genel özelliğini ayarladık
+            dış alt başluk değerini verdik
+
+        */
+        .field {
+            margin-bottom: 12px;
+        }
+
+        /*
+            field classımızın içerisindeki label etiketlerinin özelliklerini tanımladık
+            display:block ile labelimizin kendi satırını kaplamasını sağladık (parent genişliğini kullanırı).Yanına başka eleman almaz
+            yazı boyutumuzui kalınlığımızı ve dış alt boşluğu ayarladık
+
+        */
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        /*
+            field classımız altındaki input ve select etiketlerinin özelliklerini verdik
+            genişliğin tamamını kullandık
+            iç boşluk,yazı bouutu,yazı tipi,arka plan rengi,kenar kalınlığı ve kenar ovalliği özelliklerimizi verdik
+        */
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 13px;
+            font-family: inherit;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        /*
+            field classımız altındaki input ve select alanlarına odaklanıldığında olcak olan css özelliklerini tanımladık
+            outline:none ile tarayıcının varsayılan olarak focus'ta gösterdiği (genelde mavi) çerçeveyi kaldırır
+            focus olunduğubda oluşçak olan kenar ve arka plan rengi özelliklerini verdik
+        */
+        .field input:focus,
+        .field select:focus {
+            outline: none;
+            border-color: var(--clay);
+            background: #fff;
+        }
+
+        /*
+            butonumuzun css özelliklerini verdik
+            genişliğin tamamını kullandık
+            arka plan rengini,yazı rengini,kenar kalınlığını,iç boşluğu,yazı boyutunu ve kalınlığını,kenar ovalliğini ve dış üst boşluğu ayarladık
+            üzerine mouse geldiğinde nasıl davranması gerektiğini ayarladık
+        */
+        .btn-submit {
+            width: 100%;
+            background: var(--clay);
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        /*
+            Butonumuzun üzerine gelindiğinde değişicek olan arka plan rengini ayarladık
+        */
+        .btn-submit:hover {
+            background: var(--clay-hover);
+        }
+
+        /* Liste & Filtre */
+
+        /*
+            filtreleme panelimizin css özelliklerini verdik
+            flex olarak ayarladık (elemanlar yan yana dizilsin diye)
+            elemanlar arası boşluk ve alt dış boşluk değerlerini ayarladık
+
+        */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        /*
+         listeleme kısmımızın css özelliklerini verdik
+         flex olarak alt atla listelencek şekilde ayarladık
+         elemanların aralarındaki boşlukları ayarladık
+        */
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /*
+        .order-item: tek bir sipariş satırının/kartının dış görünümünü tanımladık
+        arka plan, kenarlık ve köşe yuvarlaklığı verdik
+        iç boşluk ayarladık
+        flex ile içindekileri yatayda dizdik, aralarına eşit boşluk bıraktık (space-between)
+        ve dikeyde ortaladık (align-items: center)
+        */
+        .order-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /*
+        .order-item içindeki h5 (ürün adı gibi) başlığın yazı boyutu ve kalınlığını ayarladık
+        */
+        .order-item h5 {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /*
+        .order-item içindeki p (alt açıklama/detay metni) için
+        daha küçük font boyutu ve soluk (muted) renk verdik
+        */
+        .order-item p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /*
+        .meta-box: badge ve buton gibi küçük elemanları
+        yan yana, dikeyde ortalanmış ve aralarında boşlukla dizdik
+        */
+        .meta-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /*
+        .badge: ürün kategorisini gösteren etiketin genel/varsayılan stilini tanımladık
+        küçük font, hafif iç boşluk, yuvarlak köşe, kalın yazı
+        varsayılan renk ayarladık
+        font-mono ile kod/etiket görünümü kattık
+        */
+        .badge {
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-weight: 600;
+            background: #fef3c7;
+            color: #92400e;
+            font-family: var(--font-mono);
+        }
+
+        /*
+        .badge--mobilya: badge'in "mobilya" rengini ayarladık
+        */
+        .badge--mobilya {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        /*
+        .badge--aydinlatma: badge'in "aydınlatma"rengini ayarladık
+        */
+        .badge--aydinlatma {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        /*
+        .badge--seramik: badge'in "seramik" rengini ayarladık
+        */
+        .badge--seramik {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /*
+        .btn-del: silme butonunun varsayılan (pasif) hâli
+        şeffaf arka plan, ince kenarlık, soluk (muted) renk
+        küçük font ve iç boşluk, hafif yuvarlak köşe
+        cursor: pointer ile tıklanabilir olduğunu belli ettik
+        */
+        .btn-del {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /*
+        .btn-del:hover: fare üzerine gelince (hover)
+        arka planı ve kenarlığı kırmızıya çevirdik, yazıyı beyaz yaptık
+        böylece "silme" işleminin tehlikeli/dikkat gerektiren bir aksiyon olduğunu vurguladık
+        */
+        .btn-del:hover {
+            background: #ef4444;
+            color: #fff;
+            border-color: #ef4444;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="kokpit">
+        <header class="header">
+            <span class="header__tag">Sipariş Takip</span>
+            <h1 class="header__title">Sipariş Yönetim Kokpiti</h1>
+        </header>
+
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <span>Kayıtlı sipariş</span>
+                <h3 id="kpiCount">0</h3>
+            </div>
+            <div class="kpi-card">
+                <span>Toplam Sipariş Tutar</span>
+                <h3 id="kpiTotal">0 ₺</h3>
+            </div>
+            <div class="kpi-card">
+                <span>Ortalama Ürün Fiyatı</span>
+                <h3 id="kpiAvg">0 ₺</h3>
+            </div>
+        </section>
+
+        <main class="layout">
+            <section class="panel">
+                <h4>Yeni sipariş kaydı</h4>
+                <form id="orderForm">
+                    <div class="field">
+                        <label for="prodName">Ürün Adı</label>
+                        <input type="text" id="prodName" placeholder="Sehpa" required>
+                    </div>
+                    <div class="field">
+                        <label for="prodCat">Kategori</label>
+                        <select name="prodCat" id="prodCat">
+                            <option value="Mobilya">Mobilya</option>
+                            <option value="Aydınlatma">Aydınlatma</option>
+                            <option value="Mutfak">Mutfak</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="prodPrice">Fiyat</label>
+                        <input type="number" id="prodPrice" value="3250" min="100" step="50" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Siparişi Kaydet</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" class="field" style="margin-bottom: 0;"
+                        placeholder="Ürün Adına Göre Filtrele">
+                    <select id="categoryFilter" style="width: 130px; font-size: 12px;padding: 6px;">
+                        <option value="ALL">Tüm Kategoriler</option>
+                        <option value="Mobilya">Mobilya</option>
+                        <option value="Aydınlatma">Aydınlatma</option>
+                        <option value="Mutfak">Mutfak</option>
+                    </select>
+                </div>
+                <div id="orderContainer" class="order-list">
+                    <!--Dinamik olarak elemanlar buraya basılacak /  eklenecek-->
+                </div>
+            </section>
+
+
+
+
+        </main>
+
+
+
+
+    </div>
+
+    <script>
+
+        //nesnelerimizi tanımladık
+        let orders = [
+            { id: 1, name: "Sehpa", category: "Mobilya", price: 6500 },
+            { id: 2, name: "Abajür", category: "Aydınlatma", price: 7500 },
+            { id: 3, name: "Koltuk", category: "Mobilya", price: 8500 },
+            { id: 4, name: "Bulaşık Makinası", category: "Mutfak", price: 10000 },
+            { id: 5, name: "Ocak", category: "Mutfak", price: 15000 }
+        ];
+
+        //dom elementleri toplayalım
+        const orderContainer = document.getElementById('orderContainer');
+        const orderForm = document.getElementById('orderForm');
+        const searchInput = document.getElementById('searchInput');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const kpiCount = document.getElementById('kpiCount');
+        const kpiTotal = document.getElementById('kpiTotal');
+        const kpiAvg = document.getElementById('kpiAvg');
+
+
+        const updateKPIs = (dataList) => { // KPI kutularını güncelleyen fonksiyon, parametre olarak veri listesi alır
+            kpiCount.textContent = dataList.length; // listedeki eleman sayısını kpiCount'a yazıyoruz
+
+            if (dataList.length === 0) { // eğer liste boşsa
+                kpiTotal.textContent = "0 ₺"; // toplamı sıfır göster
+                kpiAvg.textContent = "0 ₺"; // ortalamayı sıfır göster
+                return;
+            }
+
+            //Toplam Tutar v(.reduce)
+            const total = dataList.reduce((acc, curr) => acc + curr.price, 0); // tüm price değerlerini topluyoruz, acc: birikmiş toplam, curr: mevcut eleman, 0: başlangıç değeri
+            kpiTotal.textContent = `${total.toLocaleString("tr-TR")} ₺`; // toplamı Türkçe formatta ve ₺ ile yazdırıyoruz
+
+            //Ortalama Fiyat (.reduce)
+            const avg = total / dataList.length;// toplamı eleman sayısına bölerek ortalamayı buluyoruz
+            kpiAvg.textContent = `${Math.round(avg).toLocaleString("tr-TR")} ₺`;// ortalamayı yuvarlayıp Türkçe formatta yazdırıyoruz
+
+        }
+
+        //Filtreleme bölümü (dinamik dom / Render Motoru)
+        //Arama kutusu veya kategori filtresi her değiştiğinde çağrılacak ana fonksiyon. Ekranı yeniden çiziyor.
+        const renderOrders = () => {
+            const term = searchInput.value.toLowerCase().trim();// arama kutusundaki metni küçük harfe çevirip baş/son boşlukları temizliyoruz
+            const selectedCat = categoryFilter.value;// seçili kategori değerini alıyoruz
+
+
+
+            //filtreleme bölümü
+            const filtered = orders.filter(order => {// orders dizisini şarta göre filtreleyip yeni dizi oluşturuyoruz
+                const matchesName = order.name.toLowerCase().includes(term);// ürün adı arama terimini içeriyor mu kontrol ediyoruz
+                const mathesCategory = selectedCat === "ALL" || order.category === selectedCat;// "ALL" seçiliyse ya da kategori eşleşiyorsa true
+                return matchesName && mathesCategory;// her iki şart da doğruysa ürünü filtrelenmiş listeye dahil et
+            });
+
+            orderContainer.innerHTML = "";// her yeniden çizimde önce ekranı temizliyoruz
+
+            if (filtered.length === 0) {// eğer filtreleme sonucu hiç ürün kalmadıysa
+                orderContainer.innerHTML = `
+                <div style="padding:24px; text-align:center; color:var(--muted);font-size:12px">
+                    Kriterlere Uygun Ürün Bulunamadı
+                    </div>
+                `;// kullanıcıya "sonuç yok" mesajı basıyoruz
+                updateKPIs([]);// KPI'ları boş dizi ile sıfırlıyoruz
+                return;// fonksiyondan çık, aşağıdaki döngü çalışmasın
+            }
+
+            //dinamik element üretim
+
+            filtered.forEach(order => {// filtrelenmiş her ürün için tek tek işlem yapıyoruz
+                const item = document.createElement("article");// yeni bir <article> elemanı oluşturuyoruz (henüz sayfada değil)
+                item.className = "order-item";// bu elemana order-item class'ını veriyoruz (stil için)
+                item.setAttribute("data-id", order.id);// elemana ürünün id'sini data-id olarak etiketliyoruz
+
+                // kategoriye göre hangi badge rengi class'ının kullanılacağını iç içe ternary ile belirliyoruz
+                const badgeClass = order.category === "Mobilya" ? "badge--mobilya" : order.category === "Aydınlatma" ? "badge--aydinlatma" : "badge--seramik";
+
+                item.innerHTML = `
+                <div>
+                    <h5>${order.name}</h5>
+                    <p>Birim Fiyat: ${order.price.toLocaleString("tr-TR")} ₺</p>
+                </div>
+                <div class="meta-box">
+                    <span class="badge ${badgeClass}">${order.category}</span>
+                    <button class="btn-del" data-action="delete">Sil</button>
+                </div>                
+                
+                `;// kartın iç HTML içeriğini (isim, fiyat, kategori badge'i, sil butonu) oluşturuyoruz
+
+                orderContainer.appendChild(item);// hazırlanan kartı sayfadaki ana kapsayıcıya ekliyoruz
+
+                updateKPIs(filtered);// KPI'ları güncelliyoruz
+
+
+
+            })
+
+
+
+
+
+        }
+
+        searchInput.addEventListener("input", renderOrders);// arama kutusuna her karakter girildiğinde renderOrders çalışsın
+        categoryFilter.addEventListener("change", renderOrders);// kategori filtresi değiştiğinde renderOrders çalışsın
+
+        renderOrders();// sayfa ilk yüklendiğinde listeyi bir kere çizmek için fonksiyonu çağırıyoruz
+</script>
+    </script>
+
+
+
+</body>
+
+</html>
