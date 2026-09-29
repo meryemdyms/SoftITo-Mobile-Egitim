@@ -326,7 +326,7 @@ void main() {
   final seans1 = SeansKaydi(
     seansKodu: "SNS-2026-1",
     danisan: d1,
-    kategori: HizmetKategorisi.Lipo,
+    kategori: HizmetKategorisi.lipo,
     islemAdi: "Lipo gerisini bilmiyorum",
     birimFiyat: 6500.0,
     seansSayisi: 2,
