@@ -1,4 +1,6 @@
 import 'kategori.dart';
+import 'degerlendirme.dart';
+
 
 class Urun{
     final int id;
@@ -9,6 +11,8 @@ class Urun{
     final Kategori kategori;
     final int stokAdedi;
     final bool favoriMi;
+    final Degerlendirme degerlendirme;
+    
 
     const Urun({
         required this.id,
@@ -18,8 +22,23 @@ class Urun{
         required this.resimUrl,
         required this.kategori,
         required this.stokAdedi,
+        required this.degerlendirme,
         this.favoriMi = false,
     });
+
+    factory Urun.fromJson(Map<String,dynamic> json){
+      return Urun(
+        id: json['id'] as int, 
+        baslik:json['price'] as String, 
+        aciklama: json['description'] as String, 
+        fiyat: (json['price'] as num).toDouble(), 
+        kategori: Kategori.apiMetindenUret(json['category'] as String),
+        resimUrl: json['image'] as String,
+        stokAdedi:json['rating'] as int,  
+        degerlendirme:Degerlendirme.fromJson(json['rating'] as Map<String,dynamic>),
+        favoriMi: false,
+      );
+    }
 
     Urun copyWith({
         int? id,
@@ -29,22 +48,26 @@ class Urun{
         String? resimUrl,
         Kategori? kategori,
         int? stokAdedi,
-        bool? favoriMi,
+        Degerlendirme? degerlendirme,
+        bool? favoriMi,   
     }){
         return Urun(
-        id: id ?? this.id,
-        baslik:baslik ?? this.baslik,
-        aciklama: aciklama ?? this.aciklama,
-        fiyat: fiyat ?? this.fiyat,
-        resimUrl: resimUrl ?? this.resimUrl,
-        kategori: kategori ?? this.kategori,
-        stokAdedi: stokAdedi ?? this.stokAdedi,
-        favoriMi: favoriMi ?? this.favoriMi,
+            id: id?? this.id,
+            baslik:baslik?? this.baslik,
+            aciklama: aciklama?? this.aciklama,
+            fiyat: fiyat?? this.fiyat,
+            resimUrl: resimUrl?? this.resimUrl,
+            kategori: kategori?? this.kategori,
+            stokAdedi: stokAdedi?? this.stokAdedi,
+            degerlendirme:degerlendirme ?? this.degerlendirme,
+            favoriMi: favoriMi?? this.favoriMi,
         );
-    } 
+    }
 
     @override
-    String toString() {
-      return 'Urun(id: $id, baslik: $baslik, fiyat: $fiyat ₺, favoriMi: $favoriMi)';
+    String toString(){
+        return "Urun(id: $id,baslik: $baslik, fiyat: $fiyat, favoriMi: $favoriMi)";
+        
     }
+
 }

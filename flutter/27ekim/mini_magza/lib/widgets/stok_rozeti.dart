@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class StokRozeti extends StatelesWidget{
+class StokRozeti extends StatelessWidget {
     final int stok;
 
     const StokRozeti({super.key, required this.stok});
@@ -12,7 +12,7 @@ class StokRozeti extends StatelesWidget{
         final etiket = tukendiMi ? 'Stok Yok' : '$stok Adet';
         
         return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4);
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
                 color: tukendiMi ? Colors.red.shade100 : Colors.green.shade100,
                 borderRadius: BorderRadius.circular(6),

@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'screens/urun_listesi_ekrani.dart';
 
-void main(){
+void main() {
   runApp(const MiniMagazaUygulamasi());
-
 }
 
-class MiniMagazaUygulamasi extends StatelessWidget{
+class MiniMagazaUygulamasi extends StatelessWidget {
   const MiniMagazaUygulamasi({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, //debug banner kapattık
+      debugShowCheckedModeBanner: false,
       title: "Mini Mağaza",
       theme: ThemeData(
         useMaterial3: true,
@@ -21,8 +20,7 @@ class MiniMagazaUygulamasi extends StatelessWidget{
           brightness: Brightness.light,
         ),
       ),
-
-      home:const UrunListesiEkrani(),
+      home: const UrunListesiEkrani(),
     );
   }
 }
