@@ -7,13 +7,20 @@ import '../../../app/theme/app_dimensions.dart';
 import '../../../app/theme/app_typography.dart';
 import '../../../shared/models/museum_item_model.dart';
 
-/// Eser Detay Alt Paneli (museum-detail & museum-design-system)
-/// 24dp radius, eser görseli, başlık, açıklama ve sesli rehber simülatörü.
+/// Cep Müzem — Eser Detay Alt Paneli (ArtworkSheet)
+///
+/// museum-detail ve museum-design-system yönergeleri doğrultusunda:
+/// - 24dp üst radius ile yumuşak modal açılışı (DraggableScrollableSheet).
+/// - Eser görseli (4:3 en boy oranı, traverten çerçeve).
+/// - Eser başlığı ve hikâye/açıklama metni.
+/// - Varsa sesli küratör rehberi simülatörü (oynat/duraklat/zamanlayıcı).
 class ArtworkSheet extends StatefulWidget {
+  /// İncelenen eser verisi
   final MuseumItemModel item;
 
   const ArtworkSheet({super.key, required this.item});
 
+  /// Alt sayfayı modal bottom sheet olarak açan statik yardımcı fonksiyon
   static Future<void> show(BuildContext context, MuseumItemModel item) {
     return showModalBottomSheet(
       context: context,
@@ -31,8 +38,13 @@ class ArtworkSheet extends StatefulWidget {
 }
 
 class _ArtworkSheetState extends State<ArtworkSheet> {
+  /// Sesli notun oynatılma durumu
   bool _isPlaying = false;
+
+  /// Geçen ses süresi (saniye)
   int _audioSeconds = 0;
+
+  /// Ses oynatma simülasyonu için periyodik zamanlayıcı
   Timer? _audioTimer;
 
   @override
@@ -41,6 +53,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
     super.dispose();
   }
 
+  /// Ses oynatmayı başlatır veya duraklatır
   void _toggleAudio() {
     if (_isPlaying) {
       _pauseAudio();
@@ -49,6 +62,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
     }
   }
 
+  /// Sesli not simülasyonunu başlatır
   void _startAudio() {
     setState(() {
       _isPlaying = true;
@@ -58,7 +72,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
       if (!mounted) return;
       setState(() {
         _audioSeconds++;
-        // 45 saniyelik rehber simülasyonu
+        // 45 saniyelik rehber simülasyonu bittiğinde durdur
         if (_audioSeconds >= 45) {
           _stopAudio();
         }
@@ -66,6 +80,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
     });
   }
 
+  /// Sesli notu duraklatır (zamanlayıcıyı durdurur, süreyi korur)
   void _pauseAudio() {
     _audioTimer?.cancel();
     setState(() {
@@ -73,12 +88,14 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
     });
   }
 
+  /// Sesli notu tamamen durdurur
   void _stopAudio() {
     _audioTimer?.cancel();
     _audioTimer = null;
     _isPlaying = false;
   }
 
+  /// Saniye cinsinden süreyi "00:00" formatına dönüştürür
   String _formatDuration(int seconds) {
     final m = (seconds ~/ 60).toString().padLeft(2, '0');
     final s = (seconds % 60).toString().padLeft(2, '0');
@@ -102,7 +119,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
           ),
           child: Column(
             children: [
-              // Üst Sürükleme Çubuğu ve Kapatma Başlığı
+              // 1. Üst Sürükleme Tutamacı (Drag handle)
               Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 4),
                 child: Center(
@@ -117,7 +134,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                 ),
               ),
 
-              // Başlık ve Kapatma Butonu
+              // 2. Üst Bar: Eser İnceleme Rozeti ve Kapatma Butonu
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.space20,
@@ -155,7 +172,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
 
               const Divider(height: 1, color: AppColors.museumStone),
 
-              // İçerik Listesi
+              // 3. İçerik Kaydırma Listesi
               Expanded(
                 child: ListView(
                   controller: scrollController,
@@ -164,14 +181,14 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                     vertical: AppDimensions.space16,
                   ),
                   children: [
-                    // Eser Başlığı
+                    // A. Eser Başlığı
                     Text(
                       item.title,
                       style: AppTypography.pageTitle.copyWith(fontSize: 24),
                     ),
                     const SizedBox(height: AppDimensions.space16),
 
-                    // Eser Görseli
+                    // B. Eser Görseli (4:3 AspectRatio ile zarif çerçeve)
                     if (item.imageUrls.isNotEmpty)
                       ClipRRect(
                         borderRadius: AppDimensions.cardBorderRadius,
@@ -202,7 +219,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
 
                     const SizedBox(height: AppDimensions.space16),
 
-                    // Sesli Rehber Çaları (Yalnızca sesli not varsa gösterilir)
+                    // C. Sesli Küratör Rehberi Oynatıcı (Sadece ses kaydı tanımlıysa görünür)
                     if (item.audioUrl != null) ...[
                       Container(
                         padding: const EdgeInsets.all(AppDimensions.space12),
@@ -217,6 +234,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                         ),
                         child: Row(
                           children: [
+                            // Oynat / Duraklat Dairesel Buton
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -238,6 +256,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                               ),
                             ),
                             const SizedBox(width: AppDimensions.space12),
+                            // Ses Durumu ve Süre Metinleri
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,6 +278,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                                 ],
                               ),
                             ),
+                            // Oynarken gösterilen ekolayzır simgesi
                             if (_isPlaying)
                               const Icon(
                                 Icons.graphic_eq,
@@ -271,7 +291,7 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
                       const SizedBox(height: AppDimensions.space16),
                     ],
 
-                    // Eser Açıklaması
+                    // D. Eser Hikayesi ve Açıklaması
                     Text(
                       'Eser Hikâyesi & Açıklama',
                       style: AppTypography.cardTitle.copyWith(fontSize: 16),
@@ -289,3 +309,4 @@ class _ArtworkSheetState extends State<ArtworkSheet> {
     );
   }
 }
+

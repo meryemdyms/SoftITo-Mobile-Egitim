@@ -13,6 +13,12 @@ import '../../../companies/domain/repositories/company_repository.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 import '../../../vehicles/domain/repositories/vehicle_repository.dart';
 
+/// Firma yönetim panelinin (Dashboard) durum yönetiminden (State Management) sorumlu Controller sınıfı.
+///
+/// Feature-first MVVM mimarisinde ViewModel görevini üstlenir.
+/// [CompanyRepository], [VehicleRepository], [ReservationRepository] ve [CampaignRepository]
+/// bileşenlerini koordine ederek firma vitrini, araç filosu, rezervasyon operasyonları ve
+/// kampanyaların tek bir panel üzerinden yönetilmesini sağlar.
 class CompanyDashboardController extends ChangeNotifier {
   final CompanyRepository _companyRepository;
   final VehicleRepository _vehicleRepository;
@@ -20,6 +26,7 @@ class CompanyDashboardController extends ChangeNotifier {
   final CampaignRepository _campaignRepository;
   final Clock _clock;
 
+  // --- Dahili Durum Değişkenleri ---
   Company? _company;
   List<Vehicle> _vehicles = [];
   List<Reservation> _reservations = [];
@@ -28,6 +35,7 @@ class CompanyDashboardController extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  /// [CompanyDashboardController] yapıcısı, gerekli repository ve servis bağımlılıklarını alır.
   CompanyDashboardController({
     required CompanyRepository companyRepository,
     required VehicleRepository vehicleRepository,
@@ -40,22 +48,38 @@ class CompanyDashboardController extends ChangeNotifier {
        _campaignRepository = campaignRepository,
        _clock = clock;
 
+  // --- Dışa Açık Getter'lar ---
+
+  /// Yönetilen aktif firma profili.
   Company? get company => _company;
+
+  /// Firmaya ait kayıtlı araçların listesi.
   List<Vehicle> get vehicles => _vehicles;
+
+  /// Firmaya gelen tüm rezervasyon kayıtları.
   List<Reservation> get reservations => _reservations;
+
+  /// Firmanın tanımladığı indirim kampanyaları listesi.
   List<Campaign> get campaigns => _campaigns;
 
+  /// Asenkron bir işlem yürütülürken true değerini alır.
   bool get isLoading => _isLoading;
+
+  /// Hata durumunda kullanıcıya gösterilecek mesajı taşır.
   String? get errorMessage => _errorMessage;
 
-  // Stats
+  // --- Operasyonel İstatistikler (Dashboard Metrikleri) ---
+
+  /// Şu anda aktif kiralamada olan (aracı teslim almış müşteriler) rezervasyon sayısı.
   int get activeRentalsCount =>
       _reservations.where((r) => r.status == ReservationStatus.active).length;
 
+  /// Onaylanmış ancak henüz teslimat tarihi gelmemiş yaklaşan rezervasyon sayısı.
   int get upcomingReservationsCount => _reservations
       .where((r) => r.status == ReservationStatus.confirmed)
       .length;
 
+  /// Bugün teslim edilmesi planlanan (onaylı ve başlangıç tarihi bugün olan) araç sayısı.
   int get todayPickupsCount {
     final now = _clock.now();
     return _reservations.where((r) {
@@ -66,6 +90,7 @@ class CompanyDashboardController extends ChangeNotifier {
     }).length;
   }
 
+  /// Bugün teslim alınması (iade edilmesi) gereken aktif rezervasyon sayısı.
   int get todayReturnsCount {
     final now = _clock.now();
     return _reservations.where((r) {
@@ -76,18 +101,26 @@ class CompanyDashboardController extends ChangeNotifier {
     }).length;
   }
 
+  // --- Veri Yükleme İşlemleri ---
+
+  /// Giriş yapan firma yetkilisinin ([ownerUserId]) şirket profilini ve bağlı verilerini yükler.
+  ///
+  /// Araçlar, rezervasyonlar ve kampanyalar [Future.wait] ile paralel olarak asenkron çekilir.
   Future<void> loadDashboardData(String ownerUserId) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      // 1. Kullanıcı ID'sine bağlı firma profilini getir
       _company = await _companyRepository.getCompanyByOwnerUserId(ownerUserId);
       if (_company == null) {
         throw const NotFoundException('Firma kaydı bulunamadı.');
       }
 
       final companyId = _company!.id;
+
+      // 2. Firmaya ait araç, rezervasyon ve kampanya verilerini paralel çek
       final results = await Future.wait([
         _vehicleRepository.getCompanyVehicles(companyId),
         _reservationRepository.getCompanyReservations(
@@ -112,7 +145,11 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
-  // Vehicle Management
+  // --- Araç Filosu Yönetimi (Vehicle CRUD & Status) ---
+
+  /// Firmaya ait yeni bir araç ekler.
+  ///
+  /// İşlem başarılı olursa araç yerel listeye eklenir ve arayüz güncellenir.
   Future<bool> addVehicle(Vehicle vehicle) async {
     if (_company == null) return false;
     _isLoading = true;
@@ -138,6 +175,7 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
+  /// Mevcut bir aracın bilgilerini günceller.
   Future<bool> updateVehicle(Vehicle vehicle) async {
     if (_company == null) return false;
     _isLoading = true;
@@ -164,6 +202,7 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
+  /// Bir aracın kiralama durumunu (aktif/pasif) tersine çevirir (toggle).
   Future<bool> toggleVehicleStatus(String vehicleId) async {
     if (_company == null) return false;
     _isLoading = true;
@@ -190,7 +229,11 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
-  // Reservation Status Management
+  // --- Rezervasyon Durumu Yönetimi (Lifecycle Transitions) ---
+
+  /// Rezervasyonun durumunu günceller (örn: Onaylı -> Aktif Teslimat veya Aktif -> Tamamlandı).
+  ///
+  /// Yetkilendirme için [actorCompanyId] doğrulaması uygulanır.
   Future<bool> updateReservationStatus(
     String reservationId,
     ReservationStatus newStatus,
@@ -223,7 +266,9 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
-  // Campaign Management
+  // --- Kampanya Yönetimi ---
+
+  /// Firma adına yeni bir promosyon/indirim kampanyası kaydeder.
   Future<bool> addCampaign(Campaign campaign) async {
     if (_company == null) return false;
     _isLoading = true;
@@ -249,7 +294,9 @@ class CompanyDashboardController extends ChangeNotifier {
     }
   }
 
-  // Company Storefront Editor
+  // --- Firma Vitrin & Profil Güncelleme ---
+
+  /// Firmanın genel vitrin bilgilerini (iletişim, adres, çalışma saatleri, açıklama vb.) günceller.
   Future<bool> updateCompanyProfile(
     Company updatedCompany,
     String actorUserId,

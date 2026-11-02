@@ -5,6 +5,14 @@ import '../../../core/utils/date_helpers.dart';
 import '../../puzzle/widgets/artwork_painter.dart';
 import '../models/collection_models.dart';
 
+/// Ritmo Başarı Koleksiyonu Ekranı (Collection View).
+///
+/// `project.md` 5.10. ve 10. Bölüm (Başarı Koleksiyonu) kurallarına göre tasarlanmıştır:
+/// - Sanat Galerisi konsepti: Klasik madalya/rozet sistemi yerine estetik çerçevelerle
+///   tamamlanmış sanat eserleri sergilenir.
+/// - İki ana sekme:
+///   1. Tamamlanan Eserler: Bütün parçaları eksiksiz açılarak keşfedilen sanat tabloları.
+///   2. Yarım Kalan Hikâyeler: Tamamlanamayan veya süresi biten yapbozların kazanılan parçaları.
 class CollectionView extends StatefulWidget {
   const CollectionView({super.key});
 
@@ -59,7 +67,9 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
     );
   }
 
+  /// Tamamlanan sanat eserlerinin 2 sütunlu estetik galeri ızgarası.
   Widget _buildCompletedGallery(List<CollectionItemModel> items) {
+    // Koleksiyon henüz boşsa gösterilecek bilgilendirici boş durum ekranı
     if (items.isEmpty) {
       return Center(
         child: Padding(
@@ -94,6 +104,7 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
       );
     }
 
+    // Sanat Galerisi Izgarası (2 Sütunlu)
     return GridView.builder(
       padding: const EdgeInsets.all(20),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -113,7 +124,7 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Sanat Tablosu Görünümü
+              // Sanat Tablosu Çerçevesi ve Çizimi
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -124,6 +135,7 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
                   ),
                 ),
               ),
+              // Eser Başlığı, Alışkanlık Adı ve Kazanılma Tarihi
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
@@ -157,6 +169,7 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
     );
   }
 
+  /// Eksik kalan süreçlerin ve kazanılan parçaların listelendiği bölüm (Yarım Kalan Hikâyeler).
   Widget _buildUnfinishedGallery(List<CollectionItemModel> items) {
     if (items.isEmpty) {
       return Center(
@@ -197,7 +210,7 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // Küçük Parçalı Görünüm
+                // Yarım Kalan Yapboz İkonu
                 Container(
                   width: 72,
                   height: 72,
@@ -206,11 +219,12 @@ class _CollectionViewState extends State<CollectionView> with SingleTickerProvid
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Icon(Icons.extension_outlined, color: AppColors.primary, size: 28),
                   ),
                 ),
                 const SizedBox(width: 16),
+                // Bilgiler: Seri, Alışkanlık, Açılan Parça ve Kayıt Tarihi
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

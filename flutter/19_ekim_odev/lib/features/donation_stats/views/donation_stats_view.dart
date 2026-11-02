@@ -3,9 +3,12 @@ import '../controllers/donation_stats_controller.dart';
 import '../models/donation_stats_model.dart';
 import '../widgets/donation_stats_widgets.dart';
 
+/// Donörün kan bağış istatistiklerini, bir sonraki bağışa kalan süreyi,
+/// kurtarılan hayat sayısını ve aylık bağış grafiğini gösteren görünüm ekranı.
 class DonationStatsView extends StatefulWidget {
   const DonationStatsView({super.key, this.controller});
 
+  /// Üst katmandan sağlanan opsiyonel kontrolcü (AppShell üzerinden iletilir)
   final DonationStatsController? controller;
 
   @override
@@ -19,6 +22,7 @@ class _DonationStatsViewState extends State<DonationStatsView> {
   @override
   void initState() {
     super.initState();
+    // Dışarıdan controller verilmediyse dahili bir controller başlatılır.
     if (widget.controller != null) {
       _controller = widget.controller!;
     } else {
@@ -29,6 +33,7 @@ class _DonationStatsViewState extends State<DonationStatsView> {
 
   @override
   void dispose() {
+    // Dahili başlatılan kontrolcüyü bellek sızıntısını önlemek için dispose eder.
     if (_ownsController) {
       _controller.dispose();
     }
@@ -43,13 +48,16 @@ class _DonationStatsViewState extends State<DonationStatsView> {
       appBar: AppBar(
         title: const Text('Bağış ve Etki İstatistikleri'),
       ),
+      // İstatistik verilerini dinleyerek sayfa içeriğini reaktif olarak günceller
       body: ValueListenableBuilder<DonationStats>(
         valueListenable: _controller.state,
         builder: (context, stats, _) {
           return ListView(
             padding: const EdgeInsets.symmetric(vertical: 8),
             children: [
+              // Bir sonraki bağış için geri sayım ve uygunluk kartı
               NextDonationCountdownCard(stats: stats),
+              // Kurtarılan can ve toplam bağış metriklerini gösteren yan yana iki kart
               Row(
                 children: [
                   Expanded(
@@ -70,6 +78,7 @@ class _DonationStatsViewState extends State<DonationStatsView> {
                   ),
                 ],
               ),
+              // Son aylara ait bağış dağılım sütun grafiği kartı
               BloodFlowLineChartCard(stats: stats),
             ],
           );
@@ -78,3 +87,4 @@ class _DonationStatsViewState extends State<DonationStatsView> {
     );
   }
 }
+

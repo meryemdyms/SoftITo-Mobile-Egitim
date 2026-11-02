@@ -7,6 +7,17 @@ import '../../profile/views/profile_view.dart';
 import '../../progress/views/progress_view.dart';
 import 'home_view.dart';
 
+/// Ritmo Ana Gezinme Kabuğu (Main Navigation View).
+///
+/// `project.md` 4. Navigasyon kurallarına göre 5 ana sekmeyi barındırır:
+/// 1. Ana Sayfa ([HomeView])
+/// 2. Alışkanlıklar ([HabitsListView])
+/// 3. Gelişim ([ProgressView])
+/// 4. Başarılar ([CollectionView])
+/// 5. Profil ([ProfileView])
+///
+/// Ekran durumlarını korumak için [IndexedStack] kullanır ve sekmeye göre
+/// dinamik yüzen işlem butonu (FloatingActionButton) sunar.
 class MainNavigationView extends StatefulWidget {
   final int initialIndex;
 
@@ -27,6 +38,7 @@ class _MainNavigationViewState extends State<MainNavigationView> {
 
   @override
   Widget build(BuildContext context) {
+    // 5 temel sekme ekranı
     final screens = [
       const HomeView(),
       const HabitsListView(),
@@ -36,10 +48,13 @@ class _MainNavigationViewState extends State<MainNavigationView> {
     ];
 
     return Scaffold(
+      // Sayfalar arası geçişlerde scroll pozisyonunu ve state'i koruyan IndexedStack
       body: IndexedStack(
         index: _currentIndex,
         children: screens,
       ),
+
+      // Alt Gezinme Çubuğu (BottomNavigationBar)
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           color: AppColors.cardBg,
@@ -60,26 +75,31 @@ class _MainNavigationViewState extends State<MainNavigationView> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               items: const [
+                // 1. Sekme: Ana Sayfa
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
                   activeIcon: Icon(Icons.home_rounded),
                   label: 'Ana Sayfa',
                 ),
+                // 2. Sekme: Alışkanlıklar
                 BottomNavigationBarItem(
                   icon: Icon(Icons.fact_check_outlined),
                   activeIcon: Icon(Icons.fact_check_rounded),
                   label: 'Alışkanlıklar',
                 ),
+                // 3. Sekme: Gelişim ve Analiz
                 BottomNavigationBarItem(
                   icon: Icon(Icons.insights_outlined),
                   activeIcon: Icon(Icons.insights_rounded),
                   label: 'Gelişim',
                 ),
+                // 4. Sekme: Başarı Koleksiyonu
                 BottomNavigationBarItem(
                   icon: Icon(Icons.photo_library_outlined),
                   activeIcon: Icon(Icons.photo_library_rounded),
                   label: 'Başarılar',
                 ),
+                // 5. Sekme: Kullanıcı Profili
                 BottomNavigationBarItem(
                   icon: Icon(Icons.person_outline_rounded),
                   activeIcon: Icon(Icons.person_rounded),
@@ -90,6 +110,8 @@ class _MainNavigationViewState extends State<MainNavigationView> {
           ),
         ),
       ),
+
+      // Yalnızca 'Alışkanlıklar' sekmesindeyken görünen hızlı alışkanlık ekleme butonu
       floatingActionButton: _currentIndex == 1
           ? FloatingActionButton.extended(
               onPressed: () {

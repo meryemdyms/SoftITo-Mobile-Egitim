@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'app_colors.dart';
 
-/// Ritmo Merkezi ThemeData Yönetimi
+/// Ritmo Merkezi ThemeData Yönetimi.
+///
+/// Material 3 tasarım diline tam uyumlu, tutarlı tipografi, yuvarlatılmış kartlar,
+/// erişilebilir kontrast ve sakin renk paletini uygulayan tema yapılandırmasıdır.
 class AppTheme {
+  // Doğrudan örneklenmeyi önlemek için private yapıcı
   AppTheme._();
 
+  /// Ritmo açık (light) temasını oluşturur ve döndürür.
   static ThemeData get lightTheme {
+    // 1. Temel renk şeması (ColorScheme) ve Material 3 yapılandırması
     final base = ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -33,7 +39,9 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
     );
 
+    // 2. Özel bileşen temaları ile zenginleştirilmiş ThemeData
     return base.copyWith(
+      // Üst Başlık Çubuğu (AppBar) Teması: Düz zemin, koyu durum çubuğu ikonları
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.primary,
@@ -47,6 +55,8 @@ class AppTheme {
           letterSpacing: -0.3,
         ),
       ),
+
+      // Kart (Card) Teması: Yuvarlatılmış köşeler (20px), ince sınır çizgisi ve gölgesiz minimal tasarım
       cardTheme: CardThemeData(
         color: AppColors.cardBg,
         elevation: 0,
@@ -56,6 +66,8 @@ class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
+
+      // Birincil Buton (ElevatedButton) Teması: Orman yeşili dolgu, yuvarlak köşeler ve rahat dokunma alanı
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -72,6 +84,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // Çerçeveli Buton (OutlinedButton) Teması: İnce yeşil çerçeve ve yuvarlak hatlar
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -86,6 +100,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // Düz Metin Buton (TextButton) Teması
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -96,6 +112,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // Metin Giriş Alanı (TextField / TextFormField) Teması
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.cardBg,
@@ -119,6 +137,8 @@ class AppTheme {
         labelStyle: const TextStyle(color: AppColors.textSecondary, fontSize: 14),
         hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
       ),
+
+      // Alt Gezinme Çubuğu (BottomNavigationBar) Teması
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.cardBg,
         selectedItemColor: AppColors.primary,
@@ -134,6 +154,8 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
+
+      // Çizgi ve Ayırıcı (Divider) Teması
       dividerTheme: const DividerThemeData(
         color: AppColors.border,
         thickness: 1,

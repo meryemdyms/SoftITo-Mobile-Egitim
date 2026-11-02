@@ -19,9 +19,17 @@ import '../../features/map_discovery/presentation/views/map_discovery_view.dart'
 import '../../features/search/presentation/views/search_home_view.dart';
 import '../../features/vehicles/presentation/views/vehicle_details_view.dart';
 
+/// Uygulamanın merkezi yönlendirme ve rota yapılandırma sınıfı.
+///
+/// Rol tabanlı erişim denetimleri (Route Guards), durum korumalı sekmeler (StatefulShellRoute)
+/// ve derin bağlantı (deep-linking) desteği sunar.
 class AppRouter {
   AppRouter._();
 
+  /// AuthController dinleyicisi ile GoRouter örneğini oluşturur.
+  ///
+  /// Kullanıcı giriş yaptığında veya çıkış yaptığında `refreshListenable` tetiklenir
+  /// ve yönlendirme (redirect) mantığı otomatik olarak yeniden değerlendirilir.
   static GoRouter createRouter(AuthController authController) {
     return GoRouter(
       refreshListenable: authController,
@@ -35,7 +43,7 @@ class AppRouter {
         final isCustomerProtectedRoute =
             path.startsWith('/booking/checkout') || path == '/my-bookings';
 
-        // 1. Company route guard
+        // 1. Firma paneli koruması: Oturum yoksa login'e, müşteri ise ana sayfaya yönlendirilir.
         if (isCompanyRoute) {
           if (!isAuth) {
             return '/auth/login?returnTo=$path';
@@ -45,7 +53,7 @@ class AppRouter {
           }
         }
 
-        // 2. Customer protected route guard
+        // 2. Müşteri korumalı rotalar: Oturum yoksa login'e, firma hesabı ise dashboard'a yönlendirilir.
         if (isCustomerProtectedRoute) {
           if (!isAuth) {
             return '/auth/login?returnTo=$path';
@@ -55,15 +63,17 @@ class AppRouter {
           }
         }
 
+        // Korumalı olmayan rotalarda veya koşullar sağlandığında yönlendirme yapılmaz.
         return null;
       },
       routes: [
-        // Stateful Shell for Guest & Customer tabs
+        // Misafir ve Müşteri için alt sekmeleri (Bottom Navigation) yöneten durum korumalı kabuk.
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) {
             return CustomerShellView(navigationShell: navigationShell);
           },
           branches: [
+            // 0. Sekme: Araç Arama ve Ana Keşif Sayfası
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -72,6 +82,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // 1. Sekme: Harita ile Firma ve Araç Keşfi
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -80,6 +91,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // 2. Sekme: Aktif Kampanyalar ve İndirimler
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -88,6 +100,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // 3. Sekme: Rezervasyonlarım (Müşteri oturumu gerektirir)
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -96,6 +109,7 @@ class AppRouter {
                 ),
               ],
             ),
+            // 4. Sekme: Müşteri Profili ve Oturum Yönetimi
             StatefulShellBranch(
               routes: [
                 GoRoute(
@@ -107,28 +121,28 @@ class AppRouter {
           ],
         ),
 
-        // Vehicle details
+        // Araç detay sayfası: Seçilen aracın teknik özelliklerini ve kiralama adımlarını gösterir.
         GoRoute(
           path: '/vehicles/:id',
           builder: (context, state) =>
               VehicleDetailsView(vehicleId: state.pathParameters['id']!),
         ),
 
-        // Company Storefront
+        // Firma vitrini: Firmanın iletişim bilgilerini, puanını ve tüm filosunu listeler.
         GoRoute(
           path: '/companies/:id',
           builder: (context, state) =>
               CompanyStorefrontView(companyId: state.pathParameters['id']!),
         ),
 
-        // Booking Checkout (Protected)
+        // Rezervasyon tamamlama (Checkout): Tarih, ek sürücü, ehliyet ve fiyat döküm ekranı.
         GoRoute(
           path: '/booking/checkout/:id',
           builder: (context, state) =>
               BookingCheckoutView(vehicleId: state.pathParameters['id']!),
         ),
 
-        // Auth routes
+        // Kimlik doğrulama rotaları: Giriş, Müşteri Kayıt ve Firma Kayıt
         GoRoute(
           path: '/auth/login',
           builder: (context, state) =>
@@ -143,7 +157,7 @@ class AppRouter {
           builder: (context, state) => const CompanyRegisterView(),
         ),
 
-        // Company Panel Routes (Protected)
+        // Firma Yönetim Paneli Rotaları (Yetki korumalı)
         GoRoute(
           path: '/company/dashboard',
           builder: (context, state) => const CompanyDashboardView(),

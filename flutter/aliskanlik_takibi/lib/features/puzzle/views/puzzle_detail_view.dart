@@ -4,6 +4,12 @@ import '../../../core/theme/app_colors.dart';
 import '../models/puzzle_models.dart';
 import '../widgets/puzzle_artwork_widget.dart';
 
+/// Ritmo Gizli Yapboz Detay ve Keşif Ekranı (Puzzle Detail View).
+///
+/// `project.md` 7. (Gizli Yapboz Sistemi) ve 7.4. (Süreç Sonu) kurallarına göre tasarlanmıştır:
+/// - Yapbozun büyük kanvas görünümünü sunar.
+/// - Henüz tamamlanmamışsa eser adı ve hikayesi gizlenir, keşif motivasyonu verilir.
+/// - Bütün parçalar açıldığında eserin gerçek adı ve sanatsal açıklaması ortaya çıkar.
 class PuzzleDetailView extends StatelessWidget {
   final PuzzleModel puzzle;
   final ArtworkModel artwork;
@@ -33,7 +39,7 @@ class PuzzleDetailView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Alışkanlık ve Seri Başlığı
+              // Koleksiyon Serisi Rozeti
               Center(
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
@@ -52,6 +58,8 @@ class PuzzleDetailView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+
+              // Eser Başlığı (Gizlilik kuralına uygun)
               Center(
                 child: Text(
                   isDone ? artwork.title : 'Gizemli Sanat Eseri',
@@ -63,6 +71,8 @@ class PuzzleDetailView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+
+              // İlgili Alışkanlık Adı
               Center(
                 child: Text(
                   'Alışkanlık: $habitName',
@@ -71,7 +81,7 @@ class PuzzleDetailView extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Yapboz Kanvası
+              // Büyük Yapboz Kanvası ve Izgarası
               PuzzleArtworkWidget(
                 artwork: artwork,
                 puzzle: puzzle,
@@ -80,7 +90,7 @@ class PuzzleDetailView extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // İlerleme Durumu veya Kutlama Kartı
+              // İlerleme Durumu veya Kutlama / Hikaye Kartı
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),

@@ -1,10 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+/// Cep Müzem — Eser Yuvası (Slot) Tanımı
+///
+/// 2D müze odasında bir eserin yerleştirilebileceği normalize koordinatları tanımlar.
 @immutable
 class SlotDefinition {
+  /// Yuvanın benzersiz kimliği (ör. 'slot_1', 'slot_2')
   final String slotId;
-  final double defaultX; // 0.0 - 1.0 normalized
-  final double defaultY; // 0.0 - 1.0 normalized
+
+  /// Sahne genişliğine göre yatay merkez konumu (0.0 - 1.0 arası normalize)
+  final double defaultX;
+
+  /// Sahne yüksekliğine göre dikey merkez konumu (0.0 - 1.0 arası normalize)
+  final double defaultY;
+
+  /// Yuvanın kullanıcıya gösterilen etiketi (ör. "1. Sergi Nişi")
   final String label;
 
   const SlotDefinition({
@@ -15,12 +25,30 @@ class SlotDefinition {
   });
 }
 
+/// Cep Müzem — Kesin Müze Oda Şablonları (RoomTemplateModel)
+///
+/// AGENTS.md ve project.md Kesin Kuralları:
+/// - V1'de tam olarak üç oda şablonu bulunur:
+///   1. Klasik Galeri — 4 eser
+///   2. Taş Koridor — 6 eser
+///   3. Arşiv Salonu — 8 eser
+/// - Şablonlar 2D'dir ve belirlenmiş eser yuvaları (slot) içerir.
+/// - Agent ve sistem bunların dışında yeni oda şablonu türetmez.
 @immutable
 class RoomTemplateModel {
+  /// Şablonun benzersiz kimliği
   final String id;
+
+  /// Şablonun adı
   final String name;
+
+  /// Arka plan varlık anahtarı
   final String backgroundAsset;
+
+  /// Şablona ait önceden belirlenmiş eser yuvaları listesi
   final List<SlotDefinition> slotDefinitions;
+
+  /// Şablon sürümü
   final int templateVersion;
 
   const RoomTemplateModel({
@@ -31,11 +59,17 @@ class RoomTemplateModel {
     required this.templateVersion,
   });
 
-  /// V1'deki 3 kesin oda şablonu
+  // V1'deki 3 kesin oda şablonu kimlik sabitleri
+  /// 1. Şablon: Klasik Galeri (4 Eser)
   static const String classicGalleryId = 'classic_gallery';
+
+  /// 2. Şablon: Taş Koridor (6 Eser)
   static const String stoneCorridorId = 'stone_corridor';
+
+  /// 3. Şablon: Arşiv Salonu (8 Eser)
   static const String archiveHallId = 'archive_hall';
 
+  /// 1. Klasik Galeri Şablonu: Tek sıra halinde 4 eser yuvası
   static final RoomTemplateModel classicGallery = RoomTemplateModel(
     id: classicGalleryId,
     name: 'Klasik Galeri',
@@ -69,6 +103,7 @@ class RoomTemplateModel {
     ],
   );
 
+  /// 2. Taş Koridor Şablonu: Sol/sağ duvarlar ve orta kaide ile 6 eser yuvası
   static final RoomTemplateModel stoneCorridor = RoomTemplateModel(
     id: stoneCorridorId,
     name: 'Taş Koridor',
@@ -114,6 +149,7 @@ class RoomTemplateModel {
     ],
   );
 
+  /// 3. Arşiv Salonu Şablonu: Üst vitrinler ve alt çekmecelerle 8 eser yuvası
   static final RoomTemplateModel archiveHall = RoomTemplateModel(
     id: archiveHallId,
     name: 'Arşiv Salonu',
@@ -171,12 +207,14 @@ class RoomTemplateModel {
     ],
   );
 
+  /// V1'deki tüm kesin oda şablonlarının listesi (Toplam 3 adet)
   static final List<RoomTemplateModel> allTemplates = [
     classicGallery,
     stoneCorridor,
     archiveHall,
   ];
 
+  /// Şablon kimliğine göre şablon nesnesini getiren yardımcı metot
   static RoomTemplateModel getById(String id) {
     return allTemplates.firstWhere(
       (t) => t.id == id,
@@ -184,3 +222,4 @@ class RoomTemplateModel {
     );
   }
 }
+

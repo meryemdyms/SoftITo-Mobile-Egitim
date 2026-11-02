@@ -3,11 +3,23 @@ import 'package:flutter/material.dart';
 import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 
+/// Tasarım sistemine uygun köşe yuvarlatmalı, kenarlıklı ve hafif gölgeli kart bileşeni.
+///
+/// Opsiyonel tıklanabilirlik (`onTap`) ve özel dolgu (`padding`) desteği sunar.
 class AppCard extends StatelessWidget {
+  /// Kart içinde yer alacak içerik widget'ı.
   final Widget child;
+
+  /// Kartın iç dolgusu (varsayılan: 16px).
   final EdgeInsetsGeometry padding;
+
+  /// Karta tıklandığında çalışacak geri çağrım fonksiyonu (InkWell dalgalanma efekti uygular).
   final VoidCallback? onTap;
+
+  /// Kartın arka plan rengi (varsayılan: AppColors.surface).
   final Color? backgroundColor;
+
+  /// Kartın kenarlık çizgisi.
   final Border? border;
 
   const AppCard({

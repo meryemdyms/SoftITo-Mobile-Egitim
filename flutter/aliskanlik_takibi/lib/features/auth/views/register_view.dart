@@ -3,6 +3,11 @@ import '../../../core/theme/app_colors.dart';
 import '../../home/views/main_navigation_view.dart';
 import '../services/auth_service.dart';
 
+/// Ritmo Yeni Hesap Oluşturma Ekranı (Register View).
+///
+/// `project.md` 5.3. Bölüm kurallarına göre tasarlanmıştır:
+/// Kullanıcının Ad, Soyad, E-posta ve Şifre alanlarını eksiksiz doldurmasını sağlar.
+/// Form doğrulamasının ardından oturumu açar ve kullanıcıyı doğrudan ana ekrana yönlendirir.
 class RegisterView extends StatefulWidget {
   final AuthService authService;
 
@@ -30,6 +35,7 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
+  /// Kayıt işlemini doğrular ve gerçekleştirir.
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -45,6 +51,7 @@ class _RegisterViewState extends State<RegisterView> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
+      // Önceki tüm auth sayfalarını temizleyerek ana gezinme ekranına geçiş yap
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MainNavigationView()),
         (route) => false,
@@ -71,6 +78,7 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Başlık ve Açıklama
                 const Text(
                   'Ritmo Ailesine Katılın',
                   style: TextStyle(
@@ -87,7 +95,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 24),
 
-                // Ad Alanı
+                // Ad Giriş Alanı
                 TextFormField(
                   controller: _firstNameController,
                   decoration: const InputDecoration(
@@ -98,7 +106,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 16),
 
-                // Soyad Alanı
+                // Soyad Giriş Alanı
                 TextFormField(
                   controller: _lastNameController,
                   decoration: const InputDecoration(
@@ -109,7 +117,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 16),
 
-                // E-posta Alanı
+                // E-posta Giriş Alanı
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -121,7 +129,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
                 const SizedBox(height: 16),
 
-                // Şifre Alanı
+                // Şifre Giriş Alanı
                 TextFormField(
                   controller: _passwordController,
                   obscureText: _obscurePassword,

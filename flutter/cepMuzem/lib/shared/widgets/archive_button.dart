@@ -4,13 +4,39 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_dimensions.dart';
 import '../../app/theme/app_typography.dart';
 
-enum ArchiveButtonVariant { primary, secondary, outline }
+/// Arşiv Butonu Görsel Varyantları
+enum ArchiveButtonVariant {
+  /// Birincil buton: Koyu ceviz arka plan, beyaz metin (ana aksiyonlar)
+  primary,
 
+  /// İkincil buton: Parşömen arka plan, koyu ceviz metin, taş kenarlık
+  secondary,
+
+  /// Çerçeveli buton: Şeffaf arka plan, koyu ceviz kenarlık ve metin
+  outline,
+}
+
+/// Cep Müzem — Özel Arşiv Butonu Bileşeni (ArchiveButton)
+///
+/// museum-design-system kuralları:
+/// - 12dp köşe yuvarlaklığı (button radius)
+/// - 44dp minimum dokunma hedefi (erişilebilirlik standardı)
+/// - Yükleniyor durumunda dönen belirteç (CircularProgressIndicator)
+/// - İsteğe bağlı sol simge desteği
 class ArchiveButton extends StatelessWidget {
+  /// Buton üzerinde görüntülenecek metin
   final String label;
+
+  /// Butona tıklandığında tetiklenen geri çağrı fonksiyonu
   final VoidCallback? onPressed;
+
+  /// Buton metninin solunda gösterilecek isteğe bağlı simge
   final IconData? icon;
+
+  /// Yükleniyor durumu aktif mi (aktifken tıklama devre dışı bırakılır)
   final bool isLoading;
+
+  /// Butonun görsel stil varyantı (primary, secondary, outline)
   final ArchiveButtonVariant variant;
 
   const ArchiveButton({
@@ -24,12 +50,14 @@ class ArchiveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Yükleniyorken tıklanma devre dışı bırakılır
     final effectiveOnPressed = isLoading ? null : onPressed;
 
     Color backgroundColor;
     Color foregroundColor;
     BorderSide? borderSide;
 
+    // Seçili varyanta göre renkler ve kenarlık belirlenir
     switch (variant) {
       case ArchiveButtonVariant.primary:
         backgroundColor = AppColors.deepWalnut;
@@ -49,6 +77,7 @@ class ArchiveButton extends StatelessWidget {
     }
 
     return SizedBox(
+      // Erişilebilir 44dp minimum dokunma alanı yüksekliği
       height: AppDimensions.minTouchTarget,
       child: ElevatedButton(
         onPressed: effectiveOnPressed,
@@ -66,6 +95,7 @@ class ArchiveButton extends StatelessWidget {
           ),
         ),
         child: isLoading
+            // Yükleniyor durumu: Dairesel yükleme çarkı
             ? SizedBox(
                 width: 20,
                 height: 20,
@@ -74,6 +104,7 @@ class ArchiveButton extends StatelessWidget {
                   valueColor: AlwaysStoppedAnimation<Color>(foregroundColor),
                 ),
               )
+            // Normal durum: Simge ve etiket metni
             : Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -94,3 +125,4 @@ class ArchiveButton extends StatelessWidget {
     );
   }
 }
+

@@ -2,13 +2,15 @@ import 'package:flutter/foundation.dart';
 import '../models/workout_model.dart';
 
 /// Egzersiz ve kalori verilerini yöneten ValueNotifier tabanlı kontrolcü.
+/// Harici kütüphane gerektirmeden reaktif durum yönetimi sağlar.
 class WorkoutController {
   final ValueNotifier<WorkoutModel> state =
       ValueNotifier<WorkoutModel>(WorkoutModel.initial());
 
   WorkoutModel get current => state.value;
 
-  /// Yeni egzersiz seansı ekler
+  /// Yeni bir egzersiz seansı ekler.
+  /// Kayıt en başa eklenir; toplam yakılan kalori ve aktif dakika güncellenir.
   void addWorkout({
     required String title,
     required int calories,
@@ -34,7 +36,8 @@ class WorkoutController {
     );
   }
 
-  /// Belirtilen egzersizi kaldırır
+  /// Belirtilen kimliğe (id) sahip egzersizi listeden kaldırır.
+  /// Toplam kalori ve süreyi düşürür, `clamp` ile değerlerin sıfırın altına inmesini önler.
   void removeWorkout(String id) {
     final itemIndex = current.workouts.indexWhere((w) => w.id == id);
     if (itemIndex == -1) return;
@@ -49,7 +52,7 @@ class WorkoutController {
     );
   }
 
-  /// Günlük egzersiz verilerini sıfırlar
+  /// Günlük egzersiz, kalori ve süre verilerini sıfırlar.
   void resetDay() {
     state.value = current.copyWith(
       burnedCalories: 0,
@@ -58,6 +61,7 @@ class WorkoutController {
     );
   }
 
+  /// Kontrolcü yok edildiğinde ValueNotifier dinleyicisini kapatır.
   void dispose() {
     state.dispose();
   }

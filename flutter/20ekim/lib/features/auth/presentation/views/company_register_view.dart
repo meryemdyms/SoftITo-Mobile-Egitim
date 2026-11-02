@@ -11,6 +11,10 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../controllers/auth_controller.dart';
 
+/// Araç kiralama firması kayıt ekranı (Company Register View).
+///
+/// Şirket adı, yetkili kişi, kurumsal e-posta, iletişim, adres ve açıklama toplayarak
+/// firma kullanıcısı ve firma vitrini oluşturur.
 class CompanyRegisterView extends StatefulWidget {
   const CompanyRegisterView({super.key});
 
@@ -55,7 +59,7 @@ class _CompanyRegisterViewState extends State<CompanyRegisterView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Firma Bilgileri', style: AppTypography.titleMedium),
+              const Text('Firma Bilgileri', style: AppTypography.titleMedium),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 label: 'Firma / Şirket Ünvanı',
@@ -117,7 +121,7 @@ class _CompanyRegisterViewState extends State<CompanyRegisterView> {
               ),
               const SizedBox(height: AppSpacing.xxl),
 
-              // Submit
+              // Kaydı Tamamla Butonu
               AppButton(
                 label: 'Firma Hesabını Oluştur',
                 isLoading: authCtrl.isLoading,
@@ -131,6 +135,7 @@ class _CompanyRegisterViewState extends State<CompanyRegisterView> {
     );
   }
 
+  /// Form alanlarını doğrular ve firma kaydını gerçekleştirir.
   Future<void> _handleSubmit(
     BuildContext context,
     AuthController authCtrl,

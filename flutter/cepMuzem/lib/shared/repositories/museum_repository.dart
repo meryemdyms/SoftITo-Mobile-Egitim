@@ -2,31 +2,44 @@ import '../models/museum_model.dart';
 import '../models/museum_scene_model.dart';
 import '../models/social_models.dart';
 
+/// Cep Müzem — Müze Repository Arabirimi (MuseumRepository)
+///
+/// MVVM mimarisinde View ve ViewModel'ler doğrudan Firestore veya Storage'a erişmez;
+/// veri erişim işlemlerini bu repository kontratı üzerinden gerçekleştirir.
+///
+/// Görevleri:
+/// - Keşfet akışını kesin ürün kurallarına göre sıralama ve tekilleştirme
+/// - Müze detayı ve 2D sahne odalarını getirme
+/// - Müze beğenme, kaydetme ve yorum ekleme işlemlerini yürütme
+/// - Kullanıcının kendi müzelerini ve kaydettiklerini listeleme
 abstract class MuseumRepository {
-  /// Keşfet akışını kurallara göre getirir:
-  /// Takip edilen varsa önce onların müzeleri (en yeniden eskiye), sonra popüler müzeler.
-  /// Tekrarlar elenir.
+  /// Keşfet akışını kesin ürün kurallarına göre getirir:
+  /// 1. Takip edilen hesaplar varsa: Önce onların bütün erişilebilir müzeleri (en yeniden eskiye).
+  /// 2. Takip edilenlerin müzeleri bittikten sonra popüler müzeler başlar.
+  /// 3. Takip edilen yoksa veya müzesi yoksa popülerler doğrudan başlar.
+  /// 4. Aynı müze akış içerisinde asla tekrarlanmaz.
+  /// 5. Gizli veya erişilemeyen müzeler popüler akışa dahil edilmez.
   Future<List<MuseumModel>> getExploreFeed({String? currentUserId});
 
-  /// ID ile müze getirir
+  /// Benzersiz kimliği (ID) ile müze künyesini getirir
   Future<MuseumModel?> getMuseumById(String museumId, {String? currentUserId});
 
-  /// Müzenin 2D sahne verisini getirir
+  /// Müzenin 2D sahne odalarını ve eser yuvalarını getirir
   Future<MuseumSceneModel?> getMuseumScene(String museumId);
 
-  /// Müzeyi kaydeder veya kaydı kaldırır
+  /// Müzeyi kaydeder veya yer imini kaldırır (başarılıysa yeni durumu döner)
   Future<bool> toggleSaveMuseum({
     required String museumId,
     required String userId,
   });
 
-  /// Müzeyi beğenir veya beğeniyi kaldırır
+  /// Müzeyi beğenir veya beğeniyi kaldırır (başarılıysa yeni durumu döner)
   Future<bool> toggleLikeMuseum({
     required String museumId,
     required String userId,
   });
 
-  /// Müzeye yorum ekler
+  /// Müzeye yeni ziyaretçi notu / yorum ekler
   Future<MuseumCommentModel> addComment({
     required String museumId,
     required String userId,
@@ -35,15 +48,16 @@ abstract class MuseumRepository {
     required String text,
   });
 
-  /// Müzenin yorumlarını getirir
+  /// Müzenin tüm ziyaretçi yorumlarını getirir
   Future<List<MuseumCommentModel>> getComments(String museumId);
 
-  /// Kullanıcının kaydettiği müzeleri getirir
+  /// Belirli bir kullanıcının kaydettiği (yer imine eklediği) sergileri getirir
   Future<List<MuseumModel>> getSavedMuseums(String userId);
 
-  /// Kullanıcının kendi müzelerini getirir
+  /// Belirli bir küratörün kendi oluşturduğu müzeleri getirir
   Future<List<MuseumModel>> getUserMuseums(String userId);
 
-  /// Gerçek Firebase yapılandırma durumu
+  /// Gerçek Firebase projesinin yapılandırılıp yapılandırılmadığını belirtir
   bool get isFirebaseConfigured;
 }
+

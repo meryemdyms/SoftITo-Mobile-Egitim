@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import '../../../core/constants/app_constants.dart';
 
+/// Aylık bağış dağılımını temsil eden model sınıfı (İstatistik grafikleri için kullanılır).
 @immutable
 class DonationMonthStat {
   const DonationMonthStat({
@@ -8,10 +9,14 @@ class DonationMonthStat {
     required this.donationCount,
   });
 
+  /// Ay etiketi (örn: 'Oca', 'Şub')
   final String monthLabel;
+
+  /// İlgili ayda yapılan bağış adedi
   final int donationCount;
 }
 
+/// Kullanıcının genel bağış istatistiklerini tutan değiştirilemez model sınıfı.
 @immutable
 class DonationStats {
   const DonationStats({
@@ -23,15 +28,28 @@ class DonationStats {
     this.monthlyDistribution = const [],
   });
 
+  /// Yapılan toplam bağış sayısı
   final int totalDonations;
+
+  /// Toplam bağışlanan kan ünitesi miktarı
   final int totalUnits;
+
+  /// Son bağıştan bu yana geçen gün sayısı
   final int daysSinceLastDonation;
+
+  /// Bir sonraki bağışın yapılabileceği tarihe kalan gün sayısı (0 ise bağışa uygun)
   final int daysUntilNextDonation;
+
+  /// Donörün an itibarıyla kan vermeye uygun olup olmadığı
   final bool isEligible;
+
+  /// Son aylara ait bağış dağılımı listesi
   final List<DonationMonthStat> monthlyDistribution;
 
+  /// Yapılan bağışlar sayesinde kurtarılan tahmini can sayısı (1 bağış = 3 can)
   int get livesSaved => totalDonations * AppConstants.livesSavedPerDonation;
 
+  /// İstatistik nesnesini yeni değerlerle kopyalar.
   DonationStats copyWith({
     int? totalDonations,
     int? totalUnits,
@@ -52,3 +70,4 @@ class DonationStats {
     );
   }
 }
+

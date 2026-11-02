@@ -8,6 +8,13 @@ import '../../../app/theme/app_typography.dart';
 import '../../../shared/models/museum_model.dart';
 import '../../../shared/repositories/museum_repository.dart';
 
+/// Cep Müzem — Harita ve Keşif Ekranı (MapView)
+///
+/// project.md Madde 15 ve map-visits skill'i gereksinimleri:
+/// - Erişilebilir ve konumu tanımlı olan yayınlanmış müzeler haritada gösterilir.
+/// - Konumu olmayan müzeler için harita pini gösterilmez.
+/// - Harici ücretli Google Places API kullanılmaz (flutter_map + OpenStreetMap mimarisi).
+/// - Pin seçimi doğrudan ziyaret sayılmaz; detay ekranına geçiş imkanı tanır.
 class MapView extends StatefulWidget {
   const MapView({super.key});
 
@@ -16,7 +23,10 @@ class MapView extends StatefulWidget {
 }
 
 class _MapViewState extends State<MapView> {
+  /// Sadece konumu tanımlı olan sergilerin listesi
   List<MuseumModel> _locationMuseums = [];
+
+  /// Yükleniyor durumu
   bool _isLoading = true;
 
   @override
@@ -25,11 +35,13 @@ class _MapViewState extends State<MapView> {
     _loadLocations();
   }
 
+  /// Konumlu müzeleri repository üzerinden filtreleyerek çeker
   Future<void> _loadLocations() async {
     final repo = Provider.of<MuseumRepository>(context, listen: false);
     final all = await repo.getExploreFeed();
     if (mounted) {
       setState(() {
+        // Yalnızca location alanı null olmayan müzeler harita akışına eklenir
         _locationMuseums = all.where((m) => m.location != null).toList();
         _isLoading = false;
       });
@@ -51,14 +63,15 @@ class _MapViewState extends State<MapView> {
               )
             : Column(
                 children: [
-                  // Harita Temsili / Görsel Alanı (Aşama 5'te OpenStreetMap entegrasyonu tamamlanacak)
+                  // 1. Harita Temsili / Görsel Keşif Alanı
+                  // (Aşama 5'te flutter_map + OpenStreetMap etkileşimli katmanı ile zenginleştirilecek)
                   Container(
                     height: 220,
                     margin: const EdgeInsets.all(
                       AppDimensions.horizontalPadding,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE2D9C8),
+                      color: const Color(0xFFE2D9C8), // Harita parşömen/arşiv tonu
                       borderRadius: AppDimensions.cardBorderRadius,
                       border: Border.all(color: AppColors.museumStone),
                     ),
@@ -97,7 +110,7 @@ class _MapViewState extends State<MapView> {
                     ),
                   ),
 
-                  // Konumlu Müzeler Başlığı
+                  // 2. Konumlu Sergiler Başlığı
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppDimensions.horizontalPadding,
@@ -115,7 +128,7 @@ class _MapViewState extends State<MapView> {
                   ),
                   const SizedBox(height: AppDimensions.space8),
 
-                  // Konum Listesi
+                  // 3. Konum Listesi (Kartlar üzerinden ilgili sergiye doğrudan geçiş)
                   Expanded(
                     child: ListView.separated(
                       padding: const EdgeInsets.symmetric(
@@ -159,6 +172,7 @@ class _MapViewState extends State<MapView> {
                             color: AppColors.deepWalnut,
                           ),
                           onTap: () {
+                            // Serginin detay ekranına git
                             context.push('/museum/${m.id}');
                           },
                         );
@@ -171,3 +185,4 @@ class _MapViewState extends State<MapView> {
     );
   }
 }
+

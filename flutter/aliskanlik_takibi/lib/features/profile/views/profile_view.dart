@@ -3,6 +3,13 @@ import '../../../core/services/app_scope.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../auth/views/login_view.dart';
 
+/// Ritmo Kullanıcı Profili ve Ayarlar Ekranı (Profile View).
+///
+/// `project.md` 5.11. Bölüm kurallarına göre tasarlanmıştır:
+/// - Kullanıcı ad-soyad, e-posta ve baş harf avatarı
+/// - Genel başarı özeti (aktif alışkanlık ve kazanılan sanat eseri sayısı)
+/// - Bildirim tercihleri ve Ritmo hakkında bilgilendirme alanı
+/// - Güvenli demo oturumu kapatma ve giriş ekranına dönüş
 class ProfileView extends StatelessWidget {
   const ProfileView({super.key});
 
@@ -24,12 +31,13 @@ class ProfileView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Kullanıcı Kartı
+              // Kullanıcı Kimlik Kartı
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
+                      // Baş Harf Avatar Rozeti
                       Container(
                         width: 60,
                         height: 60,
@@ -51,6 +59,7 @@ class ProfileView extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 16),
+                      // İsim ve E-posta
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,12 +86,14 @@ class ProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Genel Başarı İstatistikleri
+              // Genel Başarı İstatistikleri Başlığı
               const Text(
                 'Başarı Özeti',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.primary),
               ),
               const SizedBox(height: 10),
+
+              // Aktif Alışkanlık ve Kazanılan Eser Rozetleri
               Row(
                 children: [
                   Expanded(
@@ -104,7 +115,7 @@ class ProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 24),
 
-              // Bildirimler ve Ayarlar Bölümü
+              // Bildirimler ve Ayarlar Menü Kartı
               Card(
                 child: Column(
                   children: [
@@ -131,7 +142,7 @@ class ProfileView extends StatelessWidget {
               ),
               const SizedBox(height: 32),
 
-              // Çıkış Yap Butonu
+              // Demo Oturumu Kapatma Butonu
               OutlinedButton.icon(
                 onPressed: () async {
                   await appScope.authService.logout();
@@ -158,6 +169,7 @@ class ProfileView extends StatelessWidget {
     );
   }
 
+  /// Profildeki özet sayaç kartlarını oluşturan yardımcı widget.
   Widget _buildStatCard({
     required String title,
     required String value,

@@ -8,6 +8,10 @@ import '../features/auth/presentation/controllers/auth_controller.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 
+/// Araç Kiralama Uygulamasının kök (root) widget'ı.
+///
+/// Tema, yönlendirme (GoRouter) ve yerelleştirme (Localization)
+/// yapılandırmalarını barındırır.
 class CarRentalApp extends StatefulWidget {
   const CarRentalApp({super.key});
 
@@ -21,21 +25,26 @@ class _CarRentalAppState extends State<CarRentalApp> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Oturum durumundaki değişiklikleri dinleyerek rota korumalarını (route guards)
+    // dinamik yönetebilmek için AuthController GoRouter'a bağlanır.
     final authCtrl = context.read<AuthController>();
     _router ??= AppRouter.createRouter(authCtrl);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Router henüz başlatılmadıysa boş bir widget gösterilir.
     if (_router == null) {
       return const SizedBox.shrink();
     }
 
+    // Material 3 temalı ve GoRouter destekli ana uygulama bileşeni.
     return MaterialApp.router(
       title: AppConstants.appTitle,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       routerConfig: _router,
+      // Türkçe dil desteği ve bölgesel ayarlar
       locale: const Locale('tr', 'TR'),
       supportedLocales: const [Locale('tr', 'TR'), Locale('en', 'US')],
       localizationsDelegates: const [

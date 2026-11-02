@@ -15,7 +15,10 @@ import '../../../vehicles/domain/repositories/vehicle_repository.dart';
 import '../../domain/entities/company.dart';
 import '../../domain/repositories/company_repository.dart';
 
+/// Müşterilerin ve misafirlerin belirli bir kiralama firmasının profilini,
+/// iletişim bilgilerini, aktif kampanyalarını ve filosundaki araçları incelediği vitrin sayfası.
 class CompanyStorefrontView extends StatefulWidget {
+  /// Vitrini görüntülenecek firmanın ID'si.
   final String companyId;
 
   const CompanyStorefrontView({super.key, required this.companyId});
@@ -37,6 +40,7 @@ class _CompanyStorefrontViewState extends State<CompanyStorefrontView> {
     _loadStorefront();
   }
 
+  /// Firmanın bilgilerini, araç filosunu ve özel kampanyalarını eşzamanlı olarak yükler.
   Future<void> _loadStorefront() async {
     setState(() {
       _isLoading = true;
@@ -105,7 +109,7 @@ class _CompanyStorefrontViewState extends State<CompanyStorefrontView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Company Info Header
+            // Firma Üst Bilgi Kartı (Logo, İsim, Çalışma Saati, Açıklama, Adres, Telefon)
             Container(
               padding: AppSpacing.edgeInsetsLg,
               color: AppColors.surface,
@@ -180,10 +184,10 @@ class _CompanyStorefrontViewState extends State<CompanyStorefrontView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Active Campaigns for this company
+            // Firmanın Aktif Kampanyaları (Yatay Liste)
             if (_campaigns.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Text(
                   'Aktif Kampanyalar',
                   style: AppTypography.titleMedium,
@@ -205,7 +209,7 @@ class _CompanyStorefrontViewState extends State<CompanyStorefrontView> {
                     return Container(
                       width: 260,
                       padding: AppSpacing.edgeInsetsMd,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           colors: [AppColors.primary, AppColors.primaryDark],
                           begin: Alignment.topLeft,
@@ -262,13 +266,16 @@ class _CompanyStorefrontViewState extends State<CompanyStorefrontView> {
               const SizedBox(height: AppSpacing.xl),
             ],
 
-            // Vehicles of Company
+            // Firmanın Araç Listesi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Firmanın Araçları', style: AppTypography.titleMedium),
+                  const Text(
+                    'Firmanın Araçları',
+                    style: AppTypography.titleMedium,
+                  ),
                   Text(
                     '${_vehicles.length} Araç',
                     style: AppTypography.bodySmall,

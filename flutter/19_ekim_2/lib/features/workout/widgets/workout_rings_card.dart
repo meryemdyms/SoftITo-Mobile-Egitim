@@ -14,6 +14,7 @@ class WorkoutRingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Aktif tema moduna göre neon veya atletik kontrast renkleri seçilir
     final calorieColor = context.isDarkMode ? AppColors.neonAmber : AppColors.warmAmber;
     final minuteColor = context.isDarkMode ? AppColors.neonLime : AppColors.athleticGreen;
 
@@ -23,6 +24,7 @@ class WorkoutRingsCard extends StatelessWidget {
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: context.cardBorderColor),
+        // Egzersiz vurgu rengiyle kart altına yumuşak ışıma (glow)
         boxShadow: [
           BoxShadow(
             color: minuteColor.withAlpha(context.isDarkMode ? 20 : 15),
@@ -34,6 +36,7 @@ class WorkoutRingsCard extends StatelessWidget {
       ),
       child: Column(
         children: [
+          // Kalori yakımı ilerleme satırı
           _buildMetricRow(
             context: context,
             title: 'Yakılan Kalori',
@@ -43,6 +46,7 @@ class WorkoutRingsCard extends StatelessWidget {
             icon: Icons.local_fire_department_rounded,
           ),
           const SizedBox(height: 20),
+          // Aktif süre (dakika) ilerleme satırı
           _buildMetricRow(
             context: context,
             title: 'Aktif Süre',
@@ -56,6 +60,7 @@ class WorkoutRingsCard extends StatelessWidget {
     );
   }
 
+  /// Başlık, yüzde bilgisi ve yuvarlak hatlı lineer ilerleme çubuğunu bir araya getiren yardımcı metot
   Widget _buildMetricRow({
     required BuildContext context,
     required String title,

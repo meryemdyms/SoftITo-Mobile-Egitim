@@ -3,7 +3,9 @@ import '../../../../core/mock/mock_data_seed.dart';
 import '../../domain/entities/company.dart';
 import '../../domain/repositories/company_repository.dart';
 
+/// Firma kayıtlarını bellek listesinde saklayan repository implementasyonu.
 class InMemoryCompanyRepository implements CompanyRepository {
+  // Bellek içi firma listesi
   final List<Company> _companies = List.from(MockDataSeed.initialCompanies);
 
   @override
@@ -42,7 +44,7 @@ class InMemoryCompanyRepository implements CompanyRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
-    // Ownership validation: actor must own this company
+    // Sahiplik doğrulaması: Kullanıcı yalnızca kendi firmasını güncelleyebilir
     if (company.ownerUserId != actorUserId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi firmanızı güncelleyebilirsiniz.',

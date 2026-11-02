@@ -8,6 +8,12 @@ import '../../../app/theme/app_typography.dart';
 import '../../../shared/widgets/archive_button.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
+/// Cep Müzem — Küratör Giriş Ekranı (LoginView)
+///
+/// project.md Madde 7 gereksinimleri doğrultusunda:
+/// - E-posta ve şifre ile giriş imkânı sunar.
+/// - Form validasyonu (boş kontrolü, e-posta formatı, min 6 karakter) yapar.
+/// - AuthViewModel aracılığıyla oturum açar ve başarılı olunca Keşfet akışına yönlendirir.
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -16,9 +22,16 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  /// Form doğrulama anahtarı
   final _formKey = GlobalKey<FormState>();
+
+  /// Hızlı test için varsayılan demo e-posta ile doldurulan metin denetleyicisi
   final _emailController = TextEditingController(text: 'demo@cepmuzem.com');
+
+  /// Hızlı test için varsayılan demo şifre ile doldurulan metin denetleyicisi
   final _passwordController = TextEditingController(text: '123456');
+
+  /// Şifre gizleme / gösterme durumu
   bool _obscurePassword = true;
 
   @override
@@ -28,7 +41,9 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  /// Giriş butonuna basıldığında tetiklenen oturum açma metodu
   Future<void> _handleLogin() async {
+    // Form validasyonu başarısız ise işleme devam edilmez
     if (!_formKey.currentState!.validate()) return;
 
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
@@ -37,6 +52,7 @@ class _LoginViewState extends State<LoginView> {
       password: _passwordController.text.trim(),
     );
 
+    // Giriş başarılı ve widget hâlâ ekrandaysa Keşfet sayfasına yönlendirilir
     if (success && mounted) {
       context.go('/explore');
     }
@@ -44,6 +60,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   Widget build(BuildContext context) {
+    // ViewModel durumunu (yükleniyor, hata vb.) dinlemek için watch kullanılır
     final authVm = context.watch<AuthViewModel>();
 
     return Scaffold(
@@ -60,7 +77,7 @@ class _LoginViewState extends State<LoginView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo
+                  // 1. Müze Logosu / Simgesi
                   Center(
                     child: Container(
                       width: 64,
@@ -79,6 +96,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
+                  // 2. Karşılama Başlığı ve Açıklama
                   Text(
                     'Küratör Girişi',
                     style: AppTypography.pageTitle,
@@ -92,7 +110,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: AppDimensions.space32),
 
-                  // Hata Mesajı
+                  // 3. Varsa Hata Bildirimi Kutusu (Terracotta tonu ile sakin uyarı)
                   if (authVm.errorMessage != null) ...[
                     Container(
                       padding: const EdgeInsets.all(AppDimensions.space12),
@@ -125,7 +143,7 @@ class _LoginViewState extends State<LoginView> {
                     const SizedBox(height: AppDimensions.space16),
                   ],
 
-                  // E-posta
+                  // 4. E-posta Giriş Alanı
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -148,7 +166,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
-                  // Şifre
+                  // 5. Şifre Giriş Alanı (Görünürlük geçişli)
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -184,7 +202,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: AppDimensions.space24),
 
-                  // Giriş Butonu
+                  // 6. Giriş Yap Aksiyon Butonu
                   ArchiveButton(
                     label: 'Giriş Yap',
                     isLoading: authVm.isLoading,
@@ -192,7 +210,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
-                  // Kayıt Ol Yönlendirmesi
+                  // 7. Yeni Küratör Kaydı Yönlendirmesi
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -217,3 +235,4 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 }
+

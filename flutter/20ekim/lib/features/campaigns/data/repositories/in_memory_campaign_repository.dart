@@ -3,7 +3,9 @@ import '../../../../core/mock/mock_data_seed.dart';
 import '../../domain/entities/campaign.dart';
 import '../../domain/repositories/campaign_repository.dart';
 
+/// Kampanyaları bellek içi listede yöneten repository implementasyonu.
 class InMemoryCampaignRepository implements CampaignRepository {
+  // Bellek içi kampanya listesi
   final List<Campaign> _campaigns = List.from(MockDataSeed.initialCampaigns);
 
   @override
@@ -31,6 +33,7 @@ class InMemoryCampaignRepository implements CampaignRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
+    // Sahiplik doğrulaması
     if (campaign.companyId != actorCompanyId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi firmanıza kampanya ekleyebilirsiniz.',
@@ -48,6 +51,7 @@ class InMemoryCampaignRepository implements CampaignRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
+    // Sahiplik doğrulaması
     if (campaign.companyId != actorCompanyId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi firmanıza ait kampanyayı düzenleyebilirsiniz.',

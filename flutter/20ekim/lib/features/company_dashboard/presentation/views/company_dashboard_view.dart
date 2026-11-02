@@ -10,6 +10,8 @@ import '../../../../core/widgets/app_loading.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../controllers/company_dashboard_controller.dart';
 
+/// Firma yetkililerinin araç filosunu, operasyonel rezervasyon akışlarını,
+/// kampanyalarını ve şirket profilini yönettiği ana kontrol paneli (Dashboard) ekranı.
 class CompanyDashboardView extends StatefulWidget {
   const CompanyDashboardView({super.key});
 
@@ -21,9 +23,11 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
   @override
   void initState() {
     super.initState();
+    // Ekran açılışında firmanın güncel verilerini yükle
     _loadData();
   }
 
+  /// Aktif giriş yapmış firma yetkilisinin ID'sini kullanarak dashboard verilerini çeker.
   void _loadData() {
     final authCtrl = context.read<AuthController>();
     if (authCtrl.currentUser != null) {
@@ -38,6 +42,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
     final authCtrl = context.watch<AuthController>();
     final dashboardCtrl = context.watch<CompanyDashboardController>();
 
+    // Veriler ilk defa yüklenirken yüklenme göstergesini sun
     if (dashboardCtrl.isLoading) {
       return const Scaffold(
         body: AppLoading(message: 'Firma yönetim paneli hazırlanıyor...'),
@@ -62,13 +67,14 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
         ],
       ),
       body: RefreshIndicator(
+        // Aşağı çekerek yenileme (Pull-to-refresh) desteği
         onRefresh: () async => _loadData(),
         child: SingleChildScrollView(
           padding: AppSpacing.edgeInsetsLg,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Banner
+              // 1. Karşılama ve Firma Başlık Kartı
               Container(
                 padding: AppSpacing.edgeInsetsLg,
                 decoration: BoxDecoration(
@@ -122,7 +128,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Operasyonel İstatistikler
+              // 2. Operasyonel Günlük İstatistik Kartları (KPIs)
               Text(
                 'Operasyonel Durum (Bugün)',
                 style: AppTypography.titleMedium,
@@ -177,7 +183,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Hızlı Modül Yönetimi
+              // 3. Yönetim Alt Modülleri ve Sayfa Yönlendirmeleri
               Text('Yönetim Modülleri', style: AppTypography.titleMedium),
               const SizedBox(height: AppSpacing.md),
               _buildNavTile(
@@ -219,6 +225,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
     );
   }
 
+  /// Tekil bir özet metrik kutucuğu oluşturan yardımcı widget.
   Widget _buildStatCard(
     String label,
     String value,
@@ -257,6 +264,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
     );
   }
 
+  /// Yönetim modülleri arasında gezinmeyi sağlayan tıklanabilir liste kartı.
   Widget _buildNavTile({
     required String title,
     required String subtitle,
@@ -285,6 +293,7 @@ class _CompanyDashboardViewState extends State<CompanyDashboardView> {
     );
   }
 
+  /// Oturum kapatma işlemini onay penceresiyle gerçekleştiren metot.
   Future<void> _handleLogout(
     BuildContext context,
     AuthController authCtrl,

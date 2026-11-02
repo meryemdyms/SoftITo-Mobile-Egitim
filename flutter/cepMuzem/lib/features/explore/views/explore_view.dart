@@ -11,14 +11,23 @@ import '../../../shared/widgets/museum_empty_state.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
 import '../viewmodels/explore_viewmodel.dart';
 
+/// Cep Müzem — Keşfet Ekranı (ExploreView)
+///
+/// project.md Madde 8 gereksinimleri:
+/// - Dijital sergi kataloğu şeklinde tasarlanır (Pinterest veya Instagram feed'i kopyalanmaz).
+/// - Sağ üstteki zil simgesinden bildirimler açılır.
+/// - Takip edilenlerin müzeleri ve popüler müzeler kurallara göre listelenir.
+/// - Demo modunda açıkça kullanıcıya bilgi verilir.
 class ExploreView extends StatelessWidget {
   const ExploreView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Repository ve oturum bilgisi Provider üzerinden alınır
     final museumRepo = Provider.of<MuseumRepository>(context, listen: false);
     final authVm = Provider.of<AuthViewModel>(context);
 
+    // ExploreViewModel bu view'a özel ChangeNotifierProvider ile oluşturulur
     return ChangeNotifierProvider(
       create: (_) => ExploreViewModel(
         repository: museumRepo,
@@ -29,6 +38,7 @@ class ExploreView extends StatelessWidget {
   }
 }
 
+/// Keşfet ekranının ana gövde ve arayüz bileşeni
 class _ExploreContent extends StatelessWidget {
   const _ExploreContent();
 
@@ -38,6 +48,7 @@ class _ExploreContent extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        // Üst başlıkta uygulama amblemi ve adı yer alır
         title: Row(
           children: [
             Container(
@@ -58,6 +69,7 @@ class _ExploreContent extends StatelessWidget {
           ],
         ),
         actions: [
+          // Sağ üstteki bildirim zili butonu (Kesin kural: bildirimler buradan açılır)
           IconButton(
             tooltip: 'Bildirimler',
             icon: const Icon(Icons.notifications_none_outlined, size: 24),
@@ -71,7 +83,7 @@ class _ExploreContent extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            // Demo Bildirimi (Açıkça belirtilmiş demo modu)
+            // Demo Bildirim Bandı: Firebase bağlanmadığında açıkça belirtilir (AGENTS.md kuralı)
             if (!vm.isFirebaseConfigured)
               Container(
                 width: double.infinity,
@@ -109,7 +121,7 @@ class _ExploreContent extends StatelessWidget {
                 ),
               ),
 
-            // İçerik Akışı
+            // Sergi Kataloğu İçerik Akışı
             Expanded(child: _buildBody(context, vm)),
           ],
         ),
@@ -117,13 +129,16 @@ class _ExploreContent extends StatelessWidget {
     );
   }
 
+  /// Duruma göre (yükleniyor, hata, boş, liste) içerik gövdesini oluşturur
   Widget _buildBody(BuildContext context, ExploreViewModel vm) {
+    // 1. Yükleniyor Durumu
     if (vm.state == ExploreState.loading) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.antiqueBronze),
       );
     }
 
+    // 2. Hata Durumu
     if (vm.state == ExploreState.error) {
       return MuseumEmptyState(
         title: 'Sergiler Yüklenemedi',
@@ -134,6 +149,7 @@ class _ExploreContent extends StatelessWidget {
       );
     }
 
+    // 3. Boş Durum
     if (vm.museums.isEmpty) {
       return MuseumEmptyState(
         title: 'Henüz Sergi Yok',
@@ -145,6 +161,7 @@ class _ExploreContent extends StatelessWidget {
       );
     }
 
+    // 4. Dolu Sergi Kataloğu Listesi (Yenileme çekmeli)
     return RefreshIndicator(
       onRefresh: vm.loadFeed,
       color: AppColors.antiqueBronze,
@@ -158,6 +175,7 @@ class _ExploreContent extends StatelessWidget {
         separatorBuilder: (context, index) =>
             const SizedBox(height: AppDimensions.space20),
         itemBuilder: (context, index) {
+          // Listenin en başındaki katalog başlık bölümü
           if (index == 0) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,13 +194,16 @@ class _ExploreContent extends StatelessWidget {
             );
           }
 
+          // Müze Kartı Bileşeni
           final museum = vm.museums[index - 1];
           return MuseumCard(
             museum: museum,
             onTap: () {
+              // Tıklanan müzenin detay / 2D simülasyon ekranına git
               context.push('/museum/${museum.id}');
             },
             onToggleSave: () {
+              // Kaydetme durumunu tersine çevir
               vm.toggleSaveMuseum(museum.id);
             },
           );
@@ -191,3 +212,4 @@ class _ExploreContent extends StatelessWidget {
     );
   }
 }
+

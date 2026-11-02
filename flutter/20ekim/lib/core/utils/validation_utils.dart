@@ -1,6 +1,8 @@
+/// Form alanları için ortak giriş doğrulama (validation) kuralları.
 class ValidationUtils {
   ValidationUtils._();
 
+  /// Zorunlu alan kontrolü. Boş veya sadece boşluktan oluşan girdileri reddeder.
   static String? validateRequired(
     String? value, [
     String fieldName = 'Bu alan',
@@ -11,6 +13,7 @@ class ValidationUtils {
     return null;
   }
 
+  /// E-posta format doğrulaması (RFC uyumlu standart desen).
   static String? validateEmail(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'E-posta adresi zorunludur.';
@@ -22,6 +25,7 @@ class ValidationUtils {
     return null;
   }
 
+  /// Telefon numarası doğrulama (en az 10 rakam gerektirir).
   static String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
       return 'Telefon numarası zorunludur.';
@@ -33,6 +37,7 @@ class ValidationUtils {
     return null;
   }
 
+  /// Minimum karakter uzunluğu kontrolü.
   static String? validateMinLength(
     String? value,
     int minLength, [
@@ -44,6 +49,7 @@ class ValidationUtils {
     return null;
   }
 
+  /// Pozitif tam sayı kontrolü (günlük ücret, yıl, yaş vb. için).
   static String? validatePositiveNumber(
     String? value, [
     String fieldName = 'Sayı',

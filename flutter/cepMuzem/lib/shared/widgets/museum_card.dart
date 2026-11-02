@@ -5,9 +5,23 @@ import '../../app/theme/app_dimensions.dart';
 import '../../app/theme/app_typography.dart';
 import '../models/museum_model.dart';
 
+/// Cep Müzem — Sergi Kataloğu Müze Kartı Bileşeni (MuseumCard)
+///
+/// project.md Madde 8 & museum-design-system yönergeleri:
+/// - Kapak görseli (16:9 en boy oranı)
+/// - Varsa konum etiketi (sol üst rozet)
+/// - Yer imi / kaydetme butonu (sağ üst dairesel buton)
+/// - Müze adı, kısa açıklama
+/// - Küratör avatarı, adı, sakin beğeni ve yorum sayaçları
+/// - 16dp kart radius ve 1dp traverten taş kenarlık
 class MuseumCard extends StatelessWidget {
+  /// Kart üzerinde sergilenen müze verisi
   final MuseumModel museum;
+
+  /// Karta tıklandığında (detaya geçiş için) tetiklenen geri çağrı
   final VoidCallback onTap;
+
+  /// Kartın sağ üstündeki kaydetme simgesine tıklandığında tetiklenen geri çağrı
   final VoidCallback onToggleSave;
 
   const MuseumCard({
@@ -39,7 +53,7 @@ class MuseumCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Kapak Görseli
+            // 1. Kapak Görseli Alanı (16:9 Aspect Ratio)
             Stack(
               children: [
                 AspectRatio(
@@ -75,7 +89,8 @@ class MuseumCard extends StatelessWidget {
                     },
                   ),
                 ),
-                // Konum etiketi varsa
+
+                // Konum etiketi (Müzenin konumu tanımlıysa sol üstte gösterilir)
                 if (museum.location != null)
                   Positioned(
                     top: AppDimensions.space12,
@@ -114,7 +129,8 @@ class MuseumCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                // Kaydet Butonu
+
+                // Kaydetme / Yer İmi Butonu (Sağ üst)
                 Positioned(
                   top: AppDimensions.space8,
                   right: AppDimensions.space8,
@@ -151,12 +167,13 @@ class MuseumCard extends StatelessWidget {
               ],
             ),
 
-            // Müze Bilgileri
+            // 2. Müze Bilgileri ve Künye Bölümü
             Padding(
               padding: const EdgeInsets.all(AppDimensions.space16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Sergi Başlığı
                   Text(
                     museum.title,
                     style: AppTypography.cardTitle,
@@ -164,6 +181,8 @@ class MuseumCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: AppDimensions.space8),
+
+                  // Kısa Açıklama Metni
                   Text(
                     museum.description,
                     style: AppTypography.bodySecondary,
@@ -172,9 +191,10 @@ class MuseumCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppDimensions.space12),
 
-                  // Küratör / Müze Sahibi
+                  // Küratör Bilgisi ve Sakin Sosyal Sayaçlar
                   Row(
                     children: [
+                      // Küratör Avatarı
                       CircleAvatar(
                         radius: 14,
                         backgroundColor: AppColors.parchment,
@@ -190,6 +210,8 @@ class MuseumCard extends StatelessWidget {
                             : null,
                       ),
                       const SizedBox(width: AppDimensions.space8),
+
+                      // Küratör Adı
                       Expanded(
                         child: Text(
                           museum.ownerName ?? 'Küratör',
@@ -201,7 +223,8 @@ class MuseumCard extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // Beğeni ve yorum sakin sayaçları
+
+                      // Beğeni Sayacı (Sakin Pinterest seviyesinde sosyal gösterge)
                       Icon(
                         Icons.favorite_border,
                         size: 14,
@@ -210,6 +233,8 @@ class MuseumCard extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text('${museum.likeCount}', style: AppTypography.caption),
                       const SizedBox(width: AppDimensions.space8),
+
+                      // Yorum Sayacı
                       Icon(
                         Icons.chat_bubble_outline,
                         size: 14,
@@ -231,3 +256,4 @@ class MuseumCard extends StatelessWidget {
     );
   }
 }
+

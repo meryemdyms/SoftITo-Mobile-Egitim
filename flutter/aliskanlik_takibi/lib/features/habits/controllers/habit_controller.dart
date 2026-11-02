@@ -7,10 +7,20 @@ import '../../puzzle/repositories/artwork_repository.dart';
 import '../models/habit_models.dart';
 import '../repositories/habit_repository.dart';
 
+/// Alışkanlık Devamlılık ve Streak Bilgi Modeli.
+///
+/// `project.md` 8. Bölüm (Streak Sistemi) kurallarına göre hesaplanan verileri tutar.
 class HabitStreakInfo {
+  /// Mevcut kesintisiz devam eden planlı gün serisi
   final int currentStreak;
+
+  /// Bu alışkanlık sürecinde ulaşılan en yüksek seri rekoru
   final int longestStreak;
+
+  /// Süreç boyunca hedefin başarıyla tamamlandığı gün sayısı
   final int successfulDays;
+
+  /// Planlanmış olmasına rağmen hedefin tamamlanmadığı kaçırılan gün sayısı
   final int missedDays;
 
   const HabitStreakInfo({
@@ -21,6 +31,11 @@ class HabitStreakInfo {
   });
 }
 
+/// Alışkanlık Yönetimi ve Gizli Yapboz Durum Kontrolcüsü (Controller).
+///
+/// `project.md` 3. Mimari kurallarına göre [ChangeNotifier] kullanarak durum yönetimini yürütür.
+/// Tüm iş kuralları (günlük ilerleme kaydı, yapboz parçası açma, seri hesaplamaları ve süreç sonlandırma)
+/// bu sınıf içerisinde UI katmanından bağımsız olarak yönetilir.
 class HabitController extends ChangeNotifier {
   final HabitRepository repository;
   final CollectionRepository collectionRepository;
@@ -35,6 +50,7 @@ class HabitController extends ChangeNotifier {
   HabitRepository get _repository => repository;
   CollectionRepository get _collectionRepository => collectionRepository;
 
+  // Hafızadaki yerel durum listeleri
   List<HabitModel> _habits = [];
   List<HabitScheduleModel> _schedules = [];
   List<HabitProcessModel> _processes = [];
@@ -42,12 +58,17 @@ class HabitController extends ChangeNotifier {
   List<PuzzleModel> _puzzles = [];
   bool _isLoading = false;
 
+  /// Tüm alışkanlıkların değiştirilemez listesi
   List<HabitModel> get habits => List.unmodifiable(_habits);
+
+  /// Sadece aktif durumdaki alışkanlıkların listesi
   List<HabitModel> get activeHabits =>
       _habits.where((h) => h.status == HabitStatus.active).toList();
+
+  /// Yükleme durumu
   bool get isLoading => _isLoading;
 
-  /// Verileri yerel depodan yükler
+  /// Yerel depodaki tüm alışkanlık, takvim, süreç ve yapboz verilerini hafızaya yükler.
   Future<void> loadAll() async {
     _isLoading = true;
     notifyListeners();
@@ -62,26 +83,31 @@ class HabitController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Alışkanlığın takvim planını döner
   HabitScheduleModel? getSchedule(String habitId) {
     final idx = _schedules.indexWhere((s) => s.habitId == habitId);
     return idx != -1 ? _schedules[idx] : null;
   }
 
+  /// Alışkanlığın aktif sürecini döner
   HabitProcessModel? getActiveProcess(String habitId) {
     final idx = _processes.indexWhere(
         (p) => p.habitId == habitId && p.status == ProcessStatus.active);
     return idx != -1 ? _processes[idx] : null;
   }
 
+  /// Belirli bir sürece ait yapbozu döner
   PuzzleModel? getPuzzleForProcess(String processId) {
     final idx = _puzzles.indexWhere((p) => p.processId == processId);
     return idx != -1 ? _puzzles[idx] : null;
   }
 
+  /// Belirli bir yapboza ait parçaları döner
   List<PuzzlePieceModel> getPiecesForPuzzle(String puzzleId) {
     return _repository.getPiecesForPuzzle(puzzleId);
   }
 
+  /// Alışkanlığın bugünkü ilerleme kaydını döner
   DailyProgressModel? getTodayProgress(String habitId) {
     final todayStr = DateHelpers.toIsoDate(DateTime.now());
     final idx = _progressList.indexWhere(
@@ -89,14 +115,14 @@ class HabitController extends ChangeNotifier {
     return idx != -1 ? _progressList[idx] : null;
   }
 
-  /// Belirli bir tarihteki ilerlemeyi getirir
+  /// Belirli bir tarihteki ('YYYY-MM-DD') ilerleme kaydını döner
   DailyProgressModel? getProgressForDate(String habitId, String isoDate) {
     final idx = _progressList.indexWhere(
         (p) => p.habitId == habitId && p.date == isoDate);
     return idx != -1 ? _progressList[idx] : null;
   }
 
-  /// Bugün yapılması planlanan alışkanlıkları listeler
+  /// Bugün yapılması planlanan aktif alışkanlıkları listeler.
   List<HabitModel> getTodayHabits() {
     final now = DateTime.now();
     return activeHabits.where((h) {
@@ -105,7 +131,7 @@ class HabitController extends ChangeNotifier {
     }).toList();
   }
 
-  /// Yeni alışkanlık ekleme
+  /// Yeni alışkanlık ekler ve bağlı sürecini/gizli yapbozunu başlatır.
   Future<HabitModel> addHabit({
     required String userId,
     required String name,
@@ -141,7 +167,7 @@ class HabitController extends ChangeNotifier {
     return habit;
   }
 
-  /// Alışkanlık durumunu güncelleme (arşivle, duraklat, aktifleştir)
+  /// Alışkanlığın durumunu günceller (arşivleme, duraklatma, aktifleştirme).
   Future<void> updateHabitStatus(String habitId, HabitStatus newStatus) async {
     final index = _habits.indexWhere((h) => h.id == habitId);
     if (index == -1) return;
@@ -151,9 +177,14 @@ class HabitController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Günlük ilerleme kaydetme
-  /// İş kuralı: Hedef tamamlandığında gün başarılı olur ve yapbozun sıradaki parçası açılır.
-  /// Aşılması ek parça vermez. Aynı gün tekrar işlem ek parça üretmez.
+  /// Günlük ilerleme kaydetme iş mantığı.
+  ///
+  /// `project.md` 6. Bölüm (Günlük İlerleme Kuralları) ve 7.2. Bölüm (Parça Açılma Kuralları):
+  /// 1. Kısmi ilerleme kaydedilir.
+  /// 2. Hedef tamamlandığında ([actualValue] >= target) gün başarılı sayılır.
+  /// 3. Her başarılı planlı gün İLK DEFA tamamlandığında yapbozun sıradaki parçasını açar.
+  /// 4. Hedefin aşılması ek parça kazandırmaz.
+  /// 5. Aynı gün tekrar işlem ek parça üretmez.
   Future<bool> recordProgress({
     required String habitId,
     required double actualValue,
@@ -167,9 +198,11 @@ class HabitController extends ChangeNotifier {
     final target = schedule.targetValue;
     final isNowCompleted = actualValue >= target;
 
+    // O güne ait mevcut kayıt var mı kontrol et
     final existingIdx = _progressList.indexWhere(
         (p) => p.habitId == habitId && p.date == date);
 
+    // Önceden zaten tamamlanmış mıydı? (Mükerrer parça açılmasını önlemek için)
     final wasAlreadyCompleted = existingIdx != -1 && _progressList[existingIdx].isCompleted;
 
     final progressId = existingIdx != -1
@@ -194,7 +227,7 @@ class HabitController extends ChangeNotifier {
     }
     await _repository.saveProgressList(_progressList);
 
-    // Eğer hedef İLK DEFA başarıyla tamamlandıysa, yapboz parçası açılır!
+    // KURAL: Eğer hedef İLK DEFA başarıyla tamamlandıysa, gizli yapbozun sıradaki parçası açılır!
     if (isNowCompleted && !wasAlreadyCompleted) {
       await _unlockNextPuzzlePiece(process, date);
     }
@@ -203,7 +236,10 @@ class HabitController extends ChangeNotifier {
     return isNowCompleted;
   }
 
-  /// Sıradaki gizli yapboz parçasını açar
+  /// Sıradaki gizli yapboz parçasını açar.
+  ///
+  /// `project.md` 7.2: Parçalar önceden belirlenmiş rastgele sırayla açılır ([revealOrder]).
+  /// Aynı parça tekrar açılmaz. Tüm parçalar tamamlandığında eser Başarı Koleksiyonuna eklenir.
   Future<void> _unlockNextPuzzlePiece(HabitProcessModel process, String dateStr) async {
     final puzzle = getPuzzleForProcess(process.id);
     if (puzzle == null) return;
@@ -213,7 +249,7 @@ class HabitController extends ChangeNotifier {
       return;
     }
 
-    // revealOrder içindeki sıradaki indeks
+    // 1. revealOrder içindeki sıradaki açılacak parça indeksini al
     final nextPieceIndex = puzzle.revealOrder[puzzle.unlockedPieces];
     final allPieces = _repository.getPiecesForPuzzle(puzzle.id);
 
@@ -227,6 +263,7 @@ class HabitController extends ChangeNotifier {
       await _repository.savePieces(allPieces);
     }
 
+    // 2. Yapboz durumunu güncelle
     final newUnlockedCount = puzzle.unlockedPieces + 1;
     final isFinished = newUnlockedCount >= puzzle.totalPieces;
 
@@ -241,7 +278,7 @@ class HabitController extends ChangeNotifier {
       await _repository.savePuzzles(_puzzles);
     }
 
-    // Süreç completedDays güncelle
+    // 3. Süreç modelindeki completedDays değerini artır
     final procIdx = _processes.indexWhere((p) => p.id == process.id);
     if (procIdx != -1) {
       _processes[procIdx] = _processes[procIdx].copyWith(
@@ -251,7 +288,7 @@ class HabitController extends ChangeNotifier {
       await _repository.saveProcesses(_processes);
     }
 
-    // Eğer yapboz tamamlandıysa başarı koleksiyonuna ekle
+    // 4. KURAL: Eğer yapbozun tüm parçaları tamamlandıysa, başarı koleksiyonuna ekle
     if (isFinished) {
       final habit = _habits.firstWhere((h) => h.id == process.habitId);
       final item = CollectionItemModel(
@@ -271,7 +308,9 @@ class HabitController extends ChangeNotifier {
     }
   }
 
-  /// Süreç sonlandırma (Süreç tamamlandı veya süresi bittiğinde çağrılır)
+  /// Süreç sonlandırma (Süreç tamamlandığında veya süresi bittiğinde çağrılır).
+  ///
+  /// Tam başarıda Tamamlanan Eserler'e, eksik başarıda Yarım Kalan Hikâyeler'e ekler.
   Future<void> completeOrEndProcess(String processId) async {
     final procIdx = _processes.indexWhere((p) => p.id == processId);
     if (procIdx == -1) return;
@@ -286,7 +325,7 @@ class HabitController extends ChangeNotifier {
     _processes[procIdx] = process.copyWith(status: newStatus);
     await _repository.saveProcesses(_processes);
 
-    // Koleksiyona ekleme
+    // Başarı Koleksiyonuna veya Yarım Kalan Hikâyeler'e kaydet
     final habit = _habits.firstWhere((h) => h.id == process.habitId);
     final collectionItem = CollectionItemModel(
       id: 'col_${process.id}',
@@ -308,7 +347,13 @@ class HabitController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Streak ve İstatistik Hesaplama Mantığı
+  /// Alışkanlık için streak (seri) ve başarı istatistiklerini hesaplar.
+  ///
+  /// `project.md` 8. Bölüm (Streak Sistemi Kuralları):
+  /// - Başarılı planlı gün streak artırır.
+  /// - Kaçırılan planlı gün streak keser (sıfırlar).
+  /// - Planlanmamış gün streak bozmaz.
+  /// - Bugün henüz bitmediyse dünden gelen seri korunur (bugün kaçırılmış sayılmaz).
   HabitStreakInfo calculateStreak(String habitId) {
     final schedule = getSchedule(habitId);
     final process = getActiveProcess(habitId);
@@ -327,7 +372,7 @@ class HabitController extends ChangeNotifier {
         ? DateHelpers.dateOnly(process.endDate!)
         : today;
 
-    // Süreç başlangıcından bugüne (veya en fazla bitiş tarihine kadar)
+    // İnceleme üst sınırını belirle
     final checkLimit = today.isBefore(endDate) ? today : endDate;
 
     int currentStreak = 0;
@@ -350,12 +395,12 @@ class HabitController extends ChangeNotifier {
             longestStreak = currentStreak;
           }
         } else {
-          // Eğer gün bugün ise ve henüz tamamlanmadıysa, bugünün henüz bitmediğini kabul ediyoruz,
-          // dünden gelen streak'i bozmadan tutabiliriz. Ancak geçmiş bir gün kaçırıldıysa streak kesilir.
+          // Bugünün günü ise ve henüz tamamlanmadıysa seriyi kırma (çünkü gün henüz bitmedi)
+          // Ancak geçmiş bir gün kaçırıldıysa seri sıfırlanır
           final isToday = DateHelpers.isSameDay(iter, today);
           if (!isToday) {
             missedCount++;
-            currentStreak = 0; // Seri kırıldı!
+            currentStreak = 0;
           }
         }
       }
@@ -370,7 +415,7 @@ class HabitController extends ChangeNotifier {
     );
   }
 
-  /// Bugün tamamlanan alışkanlık yüzdesi
+  /// Bugün tamamlanan alışkanlık oranını döner (0.0 ile 1.0 arasında).
   double getTodayCompletionRatio() {
     final todayHabits = getTodayHabits();
     if (todayHabits.isEmpty) return 0.0;

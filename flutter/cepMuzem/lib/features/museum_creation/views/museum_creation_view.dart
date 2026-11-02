@@ -6,6 +6,13 @@ import '../../../app/theme/app_typography.dart';
 import '../../../shared/models/room_template_model.dart';
 import '../../../shared/widgets/archive_button.dart';
 
+/// Cep Müzem — Müze Oluşturma ve Küratör Atölyesi Ekranı (MuseumCreationView)
+///
+/// project.md Madde 10 ve museum-creation skill'i gereksinimleri:
+/// - Kullanıcının anılarını, gezilerini veya koleksiyonlarını 2D dijital müze odalarına dönüştürür.
+/// - V1'deki 3 kesin oda şablonunu (Klasik Galeri 4 eser, Taş Koridor 6 eser, Arşiv Salonu 8 eser) sunar.
+/// - Agent veya sistem bu 3 şablon dışında yeni oda şablonu türetmez.
+/// - Seçilen oda şablonu ile taslak akışının başlatılmasını sağlar.
 class MuseumCreationView extends StatefulWidget {
   const MuseumCreationView({super.key});
 
@@ -14,6 +21,7 @@ class MuseumCreationView extends StatefulWidget {
 }
 
 class _MuseumCreationViewState extends State<MuseumCreationView> {
+  /// Seçili oda şablonunun kimliği (varsayılan: Klasik Galeri)
   String _selectedTemplateId = RoomTemplateModel.classicGalleryId;
 
   @override
@@ -31,6 +39,7 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 1. Küratör Atölyesi Başlık ve Açıklaması
               Text('Küratör Atölyesi', style: AppTypography.sectionTitle),
               const SizedBox(height: 4),
               Text(
@@ -39,10 +48,11 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
               ),
               const SizedBox(height: AppDimensions.space20),
 
+              // 2. V1 Kesin Oda Şablonları Başlığı
               Text('V1 Oda Şablonları', style: AppTypography.cardTitle),
               const SizedBox(height: AppDimensions.space12),
 
-              // 3 Kesin Oda Şablonu Kartları
+              // 3 Kesin Oda Şablonu Kartları (Klasik Galeri, Taş Koridor, Arşiv Salonu)
               for (final template in RoomTemplateModel.allTemplates) ...[
                 _buildTemplateCard(template),
                 const SizedBox(height: AppDimensions.space12),
@@ -50,7 +60,7 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
 
               const SizedBox(height: AppDimensions.space20),
 
-              // Bilgi Kutusu
+              // 3. Bilgilendirme ve Akış Kartı
               Container(
                 padding: const EdgeInsets.all(AppDimensions.space16),
                 decoration: BoxDecoration(
@@ -92,6 +102,7 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
 
               const SizedBox(height: AppDimensions.space24),
 
+              // 4. Taslak Oluşturma Aksiyon Butonu
               ArchiveButton(
                 label: 'Taslak Oluşturmaya Başla',
                 onPressed: () {
@@ -113,6 +124,7 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
     );
   }
 
+  /// Oda şablonu seçim kartı bileşeni
   Widget _buildTemplateCard(RoomTemplateModel template) {
     final isSelected = _selectedTemplateId == template.id;
 
@@ -145,6 +157,7 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
         ),
         child: Row(
           children: [
+            // Şablon Simge Kutusu
             Container(
               width: 52,
               height: 52,
@@ -163,6 +176,8 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
               ),
             ),
             const SizedBox(width: AppDimensions.space16),
+
+            // Şablon Adı ve Yuva Sayısı
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +191,8 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
                 ],
               ),
             ),
+
+            // Seçim Radyo Göstergesi
             Container(
               width: 24,
               height: 24,
@@ -205,3 +222,4 @@ class _MuseumCreationViewState extends State<MuseumCreationView> {
     );
   }
 }
+

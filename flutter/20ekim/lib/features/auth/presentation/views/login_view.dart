@@ -13,7 +13,12 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../controllers/auth_controller.dart';
 
+/// Kullanıcı giriş ekranı (Login View).
+///
+/// Müşteri veya Firma rolü seçimi, demo hızlı doldurma butonları
+/// ve işlem sonrası geri yönlendirme (returnTo) yeteneği sunar.
 class LoginView extends StatefulWidget {
+  /// Giriş tamamlandıktan sonra dönülecek opsiyonel rota yolu.
   final String? returnTo;
 
   const LoginView({super.key, this.returnTo});
@@ -31,7 +36,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    // Default demo email
+    // Test kolaylığı için varsayılan demo müşteri bilgileri doldurulur
     _emailController.text = 'customer@demo.com';
     _passwordController.text = 'demo1234';
   }
@@ -43,6 +48,7 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  /// Demo hesap bilgilerini hızlıca dolduran yardımcı metot.
   void _fillDemoCredentials(UserRole role) {
     setState(() {
       _selectedRole = role;
@@ -70,7 +76,7 @@ class _LoginViewState extends State<LoginView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Disclaimer Notice
+              // Demo Bilgilendirme ve Güvenlik Uyarısı
               Container(
                 padding: AppSpacing.edgeInsetsMd,
                 decoration: BoxDecoration(
@@ -97,8 +103,8 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Role Segment
-              Text('Giriş Türü', style: AppTypography.labelLarge),
+              // Giriş Türü Seçimi (Müşteri / Firma)
+              const Text('Giriş Türü', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.sm),
               Row(
                 children: [
@@ -121,7 +127,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Demo Shortcut Chips
+              // Hızlı Demo Doldurma Çipleri
               Row(
                 children: [
                   ActionChip(
@@ -147,7 +153,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Form inputs
+              // Form Giriş Alanları
               AppTextField(
                 label: 'E-posta Adresi',
                 hint: 'ornek@demo.com',
@@ -174,7 +180,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Submit Button
+              // Giriş Yap Butonu
               AppButton(
                 label: 'Giriş Yap',
                 isLoading: authCtrl.isLoading,
@@ -182,7 +188,7 @@ class _LoginViewState extends State<LoginView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Registration links
+              // Kayıt Olma Bağlantıları
               const Divider(color: AppColors.border),
               const SizedBox(height: AppSpacing.md),
               Center(
@@ -210,6 +216,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  /// Rol seçim butonunu oluşturan yardımcı widget.
   Widget _buildRoleButton({
     required String label,
     required IconData icon,
@@ -251,6 +258,7 @@ class _LoginViewState extends State<LoginView> {
     );
   }
 
+  /// Giriş işlemini tetikler ve sonuca göre hedef ekrana yönlendirir.
   Future<void> _handleLogin(
     BuildContext context,
     AuthController authCtrl,
@@ -266,10 +274,11 @@ class _LoginViewState extends State<LoginView> {
     if (success && mounted) {
       AppSnackbar.showSuccess(context, 'Başarıyla giriş yapıldı.');
 
+      // Rol bazlı yönlendirme
       if (_selectedRole == UserRole.company) {
         context.go('/company/dashboard');
       } else {
-        // Customer login: if sanitized returnTo exists, navigate back there
+        // Müşteri girişi: returnTo parametresi varsa oraya, yoksa ana sayfaya dönülür
         if (widget.returnTo != null && widget.returnTo!.startsWith('/')) {
           context.go(widget.returnTo!);
         } else {

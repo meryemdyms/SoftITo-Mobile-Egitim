@@ -1,8 +1,15 @@
+/// Alışkanlık hedefinin ölçüm türü.
+///
+/// `project.md` 5.7. Bölüm kurallarına göre 3 farklı hedef türü desteklenir:
+/// 1. [boolean]: Evet / Hayır (Örn: Diş fırçalama, yatak toplama)
+/// 2. [quantity]: Sayısal miktar (Örn: 20 sayfa kitap, 2000 ml su)
+/// 3. [duration]: Süre (Örn: 30 dakika yürüyüş, 10 dakika meditasyon)
 enum MeasurementType {
   boolean,
   quantity,
   duration;
 
+  /// Kullanıcı arayüzünde görüntülenecek Türkçe başlık
   String get displayName {
     switch (this) {
       case MeasurementType.boolean:
@@ -15,11 +22,18 @@ enum MeasurementType {
   }
 }
 
+/// Alışkanlığın tekrarlanma sıklığı.
+///
+/// `project.md` 5.7. Bölüm kurallarına göre:
+/// - [everyday]: Haftanın her günü (Pazartesi - Pazar)
+/// - [weekdays]: Sadece hafta içi günleri (Pazartesi - Cuma)
+/// - [customDays]: Kullanıcının özel olarak seçtiği günler (1 = Pazartesi, 7 = Pazar)
 enum FrequencyType {
   everyday,
   weekdays,
   customDays;
 
+  /// Kullanıcı arayüzünde görüntülenecek Türkçe başlık
   String get displayName {
     switch (this) {
       case FrequencyType.everyday:
@@ -32,28 +46,62 @@ enum FrequencyType {
   }
 }
 
+/// Alışkanlığın genel yaşam döngüsü durumu.
 enum HabitStatus {
+  /// Alışkanlık aktif olarak takip ediliyor
   active,
+
+  /// Alışkanlık geçici olarak duraklatıldı
   paused,
+
+  /// Alışkanlık arşivlendi (arşiv listesinde saklanır)
   archived,
 }
 
+/// Alışkanlık sürecinin (yolculuğunun) durumu.
 enum ProcessStatus {
+  /// Süreç devam ediyor ve yapboz parçaları açılıyor
   active,
+
+  /// Süreç başarıyla tamamlandı (tüm parçalar açıldı)
   completed,
+
+  /// Süreç süresi bitti ancak tüm parçalar açılamadı (Yarım Kalan Hikâyeler)
   endedIncomplete,
 }
 
+/// Temel Alışkanlık Bilgi Modeli.
+///
+/// `project.md` 14. Bölüm (Veri Modelleri - Habit) gereksinimlerine göre tanımlanmıştır.
 class HabitModel {
+  /// Alışkanlığın benzersiz kimliği
   final String id;
+
+  /// Alışkanlığın sahibi olan kullanıcının kimliği
   final String userId;
+
+  /// Alışkanlığın adı (Örn: 'Kitap Okumak')
   final String name;
+
+  /// Kategori başlığı (Örn: 'Kişisel Gelişim', 'Spor')
   final String category;
-  final String icon; // Icon name / key
-  final int colorValue; // Color hex integer
+
+  /// İkon anahtarı (Örn: 'book', 'water', 'run')
+  final String icon;
+
+  /// Renk değeri (Hex integer, örn: 0xFF344E41)
+  final int colorValue;
+
+  /// Hedef ölçüm türü ([MeasurementType.boolean], [MeasurementType.quantity], [MeasurementType.duration])
   final MeasurementType measurementType;
-  final String unit; // Örn: 'sayfa', 'dk', 'bardak', vb.
+
+  /// Hedef birimi (Örn: 'sayfa', 'dk', 'bardak', 'adım')
+  final String unit;
+
+  /// Alışkanlığın aktif/arşiv durumu
   final HabitStatus status;
+
+  /// Oluşturulma tarihi
   final DateTime createdAt;
 
   const HabitModel({
@@ -122,15 +170,19 @@ class HabitModel {
   }
 }
 
+/// Alışkanlık Takvim ve Hedef Planlama Modeli.
+///
+/// `project.md` 14. Bölüm (HabitSchedule) gereksinimlerine göre tanımlanmıştır.
+/// Alışkanlığın hangi günlerde uygulanacağını, günlük hedef miktarını ve hatırlatıcı saatini saklar.
 class HabitScheduleModel {
   final String id;
   final String habitId;
   final FrequencyType frequency;
   final List<int> selectedDays; // 1 = Pazartesi, 7 = Pazar
-  final double targetValue; // 1.0 (boolean için), 20 (sayfa), 30 (dk)
+  final double targetValue; // Günlük hedef miktarı (1.0, 20.0, 30.0 vb.)
   final DateTime startDate;
-  final DateTime? endDate; // null ise süresiz
-  final String? reminderTime; // '08:30'
+  final DateTime? endDate; // null ise süresiz alışkanlık
+  final String? reminderTime; // 'HH:mm' formatında hatırlatma saati
 
   const HabitScheduleModel({
     required this.id,
@@ -143,7 +195,10 @@ class HabitScheduleModel {
     this.reminderTime,
   });
 
-  /// Verilen tarihin bu takvimde planlanmış bir gün olup olmadığını belirler
+  /// Verilen tarihin bu takvim planında aktif bir gün olup olmadığını belirler.
+  ///
+  /// Başlangıç ve bitiş tarihlerini denetler, ardından frekans türüne göre
+  /// (her gün, hafta içi veya seçilen günler) günün eşleşmesini kontrol eder.
   bool isScheduledOn(DateTime date) {
     if (date.isBefore(DateTime(startDate.year, startDate.month, startDate.day))) {
       return false;
@@ -192,13 +247,24 @@ class HabitScheduleModel {
       );
 }
 
+/// Alışkanlık Süreci (Dönemi) Modeli.
+///
+/// `project.md` 14. Bölüm (HabitProcess) gereksinimlerine göre tanımlanmıştır.
+/// Her süreç, belirli bir gizli yapboz ile birebir eşleşir.
+/// [plannedDays] sayısı, yapbozun toplam parça sayısını belirler.
 class HabitProcessModel {
   final String id;
   final String habitId;
   final DateTime startDate;
   final DateTime? endDate;
-  final int plannedDays; // Toplam planlanan başarılı gün sayısı (yapboz parça sayısına denk)
-  final int completedDays; // Başarıyla tamamlanan gün sayısı
+
+  /// Toplam planlanan başarılı gün sayısı (Gizli yapbozun toplam parça sayısına denktir)
+  final int plannedDays;
+
+  /// Başarıyla tamamlanan gün sayısı (Açılan yapboz parçası sayısına denktir)
+  final int completedDays;
+
+  /// Sürecin aktif, tamamlandı veya yarım kaldı durumu
   final ProcessStatus status;
 
   const HabitProcessModel({
@@ -255,15 +321,25 @@ class HabitProcessModel {
   }
 }
 
+/// Günlük İlerleme Kayıt Modeli.
+///
+/// `project.md` 6. Bölüm (Alışkanlık Yönetimi - Günlük İlerleme Kuralları) ve
+/// 14. Bölüm (DailyProgress) kurallarına göre tanımlanmıştır.
+///
+/// Temel Kurallar:
+/// - Kısmi ilerleme kaydedilir (ör. 10/20 sayfa).
+/// - Hedef tamamlandığında ([actualValue] >= [targetValue]) gün başarılı sayılır ([isCompleted] = true).
+/// - Gün başarılı olunca yapboz parçası açılır.
+/// - Hedefin aşılması ertesi güne aktarılmaz veya ek parça kazandırmaz.
 class DailyProgressModel {
   final String id;
   final String processId;
   final String habitId;
-  final String date; // YYYY-MM-DD
-  final double targetValue;
-  final double actualValue;
-  final bool isCompleted;
-  final DateTime? completedAt;
+  final String date; // 'YYYY-MM-DD' ISO formatında tarih
+  final double targetValue; // O günkü hedef miktar
+  final double actualValue; // Kullanıcının gerçekleştirdiği fiili miktar
+  final bool isCompleted; // Hedefin tamamlanıp tamamlanmadığı
+  final DateTime? completedAt; // Tamamlanma anı
 
   const DailyProgressModel({
     required this.id,
@@ -276,6 +352,7 @@ class DailyProgressModel {
     this.completedAt,
   });
 
+  /// Günlük hedefe ulaşma oranı (0.0 ile 1.0 arasında sınırlandırılmış)
   double get progressRatio {
     if (targetValue <= 0) return 0.0;
     return (actualValue / targetValue).clamp(0.0, 1.0);

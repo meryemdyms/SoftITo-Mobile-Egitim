@@ -12,6 +12,10 @@ import '../../../../core/widgets/app_loading.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../controllers/customer_profile_controller.dart';
 
+/// Müşteri profili ve hesap detayları görünümü.
+///
+/// Oturumsuz kullanıcılar için giriş/kayıt çağrısı (call to action),
+/// oturumlu kullanıcılar için ise kişisel detaylar, ehliyet süresi ve çıkış işlemi sunar.
 class CustomerProfileView extends StatefulWidget {
   const CustomerProfileView({super.key});
 
@@ -40,6 +44,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
     final authCtrl = context.watch<AuthController>();
     final profileCtrl = context.watch<CustomerProfileController>();
 
+    // 1. Misafir (oturum açmamış) kullanıcı durumu
     if (!authCtrl.isAuthenticated) {
       return Scaffold(
         appBar: AppBar(title: const Text('Profilim')),
@@ -55,7 +60,10 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
                   color: AppColors.muted,
                 ),
                 const SizedBox(height: AppSpacing.md),
-                Text('Misafir Kullanıcı', style: AppTypography.titleLarge),
+                const Text(
+                  'Misafir Kullanıcı',
+                  style: AppTypography.titleLarge,
+                ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Rezervasyon yapmak ve işlemlerinizi takip etmek için giriş yapın veya yeni hesap oluşturun.',
@@ -82,6 +90,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
       );
     }
 
+    // 2. Profil verisi yüklenirken gösterilen durum
     if (profileCtrl.isLoading) {
       return Scaffold(
         appBar: AppBar(title: const Text('Profilim')),
@@ -92,6 +101,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
     final user = authCtrl.currentUser!;
     final profile = profileCtrl.profile;
 
+    // 3. Giriş yapmış müşteri profil detayları
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(
@@ -111,7 +121,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
         padding: AppSpacing.edgeInsetsLg,
         child: Column(
           children: [
-            // User Avatar & Name Card
+            // Kullanıcı Avatarı ve Temel Bilgiler Kartı
             Container(
               width: double.infinity,
               padding: AppSpacing.edgeInsetsXl,
@@ -158,7 +168,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Profile Details
+            // Kişisel ve Ehliyet Bilgileri Listesi
             Container(
               padding: AppSpacing.edgeInsetsLg,
               decoration: BoxDecoration(
@@ -169,7 +179,10 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Kişisel Bilgiler', style: AppTypography.titleMedium),
+                  const Text(
+                    'Kişisel Bilgiler',
+                    style: AppTypography.titleMedium,
+                  ),
                   const SizedBox(height: AppSpacing.md),
                   _buildProfileRow('Telefon', user.phone),
                   const Divider(color: AppColors.border),
@@ -196,7 +209,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
                       '${profile.licenceYearsAt(DateTime.now())} Yıl',
                     ),
                   ] else ...[
-                    Text(
+                    const Text(
                       'Profil detayları bulunamadı.',
                       style: AppTypography.bodySmall,
                     ),
@@ -206,7 +219,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Logout Button
+            // Oturumu Kapat Butonu
             AppButton(
               label: 'Oturumu Kapat',
               variant: AppButtonVariant.outline,
@@ -219,6 +232,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
     );
   }
 
+  /// Profil satırı düzenini oluşturan yardımcı widget.
   Widget _buildProfileRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -235,6 +249,7 @@ class _CustomerProfileViewState extends State<CustomerProfileView> {
     );
   }
 
+  /// Çıkış onay diyaloğunu açar ve çıkışı onaylarsa ana sayfaya yönlendirir.
   Future<void> _handleLogout(
     BuildContext context,
     AuthController authCtrl,

@@ -29,6 +29,7 @@ class WorkoutHistoryList extends StatelessWidget {
     );
   }
 
+  /// Günlük egzersiz kaydı bulunmadığında gösterilen boş durum (Empty State) kutusu
   Widget _buildEmptyState(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -47,6 +48,8 @@ class WorkoutHistoryList extends StatelessWidget {
     );
   }
 
+  /// Kaydedilen tüm antrenmanları dikey listeleyen bileşen;
+  /// dış kaydırma kontrolüyle çatışmaması için iç kaydırma devre dışıdır.
   Widget _buildList(BuildContext context) {
     final limeColor = context.isDarkMode ? AppColors.neonLime : AppColors.athleticGreen;
     final amberColor = context.isDarkMode ? AppColors.neonAmber : AppColors.warmAmber;

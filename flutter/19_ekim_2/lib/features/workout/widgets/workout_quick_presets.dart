@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/extensions/context_extensions.dart';
 
+/// Tip güvenli egzersiz şablonu ekleme geri çağrım (callback) imzası
 typedef WorkoutPresetCallback = void Function({
   required String title,
   required int calories,
@@ -18,6 +19,7 @@ class WorkoutQuickPresets extends StatelessWidget {
     required this.onAddWorkout,
   });
 
+  // Kullanıcıların en sık uyguladığı standart egzersiz ve ortalama kalori şablonları
   static const List<_Preset> _presets = [
     _Preset('HIIT Kardiyo', 200, 20, 'Kardiyo', Icons.flash_on_rounded, AppColors.neonAmber),
     _Preset('Ağırlık Antrenmanı', 160, 25, 'Ağırlık', Icons.fitness_center_rounded, AppColors.neonLime),
@@ -35,6 +37,7 @@ class WorkoutQuickPresets extends StatelessWidget {
           style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 12),
+        // 2 sütunlu, kompakt ve dış sayfa kaydırmasıyla çakışmayan ızgara (Grid)
         GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

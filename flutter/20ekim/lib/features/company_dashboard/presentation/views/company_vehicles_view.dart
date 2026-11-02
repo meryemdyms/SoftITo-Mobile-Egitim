@@ -15,6 +15,8 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 import '../controllers/company_dashboard_controller.dart';
 
+/// Firmanın araç filosunu görüntülediği, yeni araç ekleyebildiği ve mevcut araçların
+/// aktif/pasif kiralama durumlarını yönetebildiği filo yönetim ekranı.
 class CompanyVehiclesView extends StatelessWidget {
   const CompanyVehiclesView({super.key});
 
@@ -26,6 +28,7 @@ class CompanyVehiclesView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(title: const Text('Filo Yönetimi')),
+      // Yeni araç ekleme butonu
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -59,6 +62,7 @@ class CompanyVehiclesView extends StatelessWidget {
     );
   }
 
+  /// Filodaki tek bir aracı temsil eden liste kartı bileşeni.
   Widget _buildVehicleTile(
     BuildContext context,
     Vehicle vehicle,
@@ -96,6 +100,7 @@ class CompanyVehiclesView extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    // Aktif/Pasif durum etiketi
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -135,6 +140,7 @@ class CompanyVehiclesView extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
+          // Aktif/Pasif durumunu tek tıkla değiştiren toggle butonu
           IconButton(
             icon: Icon(
               vehicle.isActive
@@ -151,6 +157,7 @@ class CompanyVehiclesView extends StatelessWidget {
     );
   }
 
+  /// Aracın durumunu aktiften pasife veya pasiften aktife çevirir.
   Future<void> _toggleStatus(
     BuildContext context,
     Vehicle vehicle,
@@ -165,6 +172,7 @@ class CompanyVehiclesView extends StatelessWidget {
     }
   }
 
+  /// Yeni araç ekleme alt sayfasını (Bottom Sheet Modal) açar.
   void _openAddVehicleDialog(
     BuildContext context,
     CompanyDashboardController controller,
@@ -178,6 +186,7 @@ class CompanyVehiclesView extends StatelessWidget {
   }
 }
 
+/// Yeni araç ekleme formunu içeren modal alt pencere (Bottom Sheet).
 class _AddVehicleModal extends StatefulWidget {
   final CompanyDashboardController controller;
 
@@ -190,6 +199,7 @@ class _AddVehicleModal extends StatefulWidget {
 class _AddVehicleModalState extends State<_AddVehicleModal> {
   final _formKey = GlobalKey<FormState>();
 
+  // Form metin alanları kontrolcüleri
   final _brandCtrl = TextEditingController();
   final _modelCtrl = TextEditingController();
   final _yearCtrl = TextEditingController(text: '2024');
@@ -246,6 +256,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               const Divider(color: AppColors.border),
               const SizedBox(height: AppSpacing.md),
 
+              // Marka ve Model Girişi
               Row(
                 children: [
                   Expanded(
@@ -271,6 +282,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Yıl ve Günlük Ücret (Lira) Girişi
               Row(
                 children: [
                   Expanded(
@@ -296,6 +308,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Vites ve Yakıt Seçenekleri
               Row(
                 children: [
                   Expanded(
@@ -314,8 +327,9 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
                             );
                           }).toList(),
                           onChanged: (val) {
-                            if (val != null)
+                            if (val != null) {
                               setState(() => _transmission = val);
+                            }
                           },
                         ),
                       ],
@@ -348,6 +362,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Teslimat Konumu
               AppTextField(
                 label: 'Teslimat Noktası / Konumu',
                 hint: 'Örn: Kadıköy Ofis / Havalimanı',
@@ -357,6 +372,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Kiralama Şartları (Min Yaş ve Min Ehliyet Yılı)
               Row(
                 children: [
                   Expanded(
@@ -380,6 +396,7 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
+              // Kaydet Butonu
               AppButton(label: 'Aracı Kaydet', onPressed: _saveVehicle),
             ],
           ),
@@ -388,11 +405,13 @@ class _AddVehicleModalState extends State<_AddVehicleModal> {
     );
   }
 
+  /// Yeni araç modelini oluşturup veritabanına/repository'ye kaydeden metot.
   Future<void> _saveVehicle() async {
     if (!_formKey.currentState!.validate()) return;
     final company = widget.controller.company;
     if (company == null) return;
 
+    // Lira olarak girilen günlük ücreti kuruşa çevir
     final lira = int.parse(_dailyRateLiraCtrl.text.trim());
     final newVehicle = Vehicle(
       id: 'veh_${DateTime.now().millisecondsSinceEpoch}',

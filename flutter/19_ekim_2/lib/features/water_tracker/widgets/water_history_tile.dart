@@ -45,6 +45,7 @@ class WaterHistorySection extends StatelessWidget {
     );
   }
 
+  /// Kayıt bulunmadığında gösterilen boş durum (Empty State) kartı
   Widget _buildEmptyState(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -63,6 +64,8 @@ class WaterHistorySection extends StatelessWidget {
     );
   }
 
+  /// Ana sayfa zaten kaydırılabilir (SingleChildScrollView) olduğundan, iç listenin
+  /// kaydırmasını devre dışı bırakır ve performansı korumak için son 5 kaydı sınırlar.
   Widget _buildList(BuildContext context) {
     return ListView.separated(
       shrinkWrap: true,

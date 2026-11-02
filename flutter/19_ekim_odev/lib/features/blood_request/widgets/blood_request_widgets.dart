@@ -4,10 +4,11 @@ import '../../../core/extensions/context_extensions.dart';
 import '../../../core/extensions/date_extensions.dart';
 import '../models/blood_request_model.dart';
 
-/// Aciliyet durumunu görselleştiren rozet
+/// Çağrının aciliyet durumunu (Normal, Acil, Çok Acil) renk kodlu olarak gösteren rozet (badge).
 class UrgencyBadge extends StatelessWidget {
   const UrgencyBadge({super.key, required this.urgency});
 
+  /// Görüntülenecek aciliyet seviyesi metni
   final String urgency;
 
   @override
@@ -16,6 +17,7 @@ class UrgencyBadge extends StatelessWidget {
     final isVeryUrgent = urgency == 'Çok Acil';
     final isUrgent = urgency == 'Acil';
 
+    // Aciliyete göre dinamik renk seçimi (Çok Acil: Hata/Kırmızı, Acil: Turuncu, Normal: İkincil Yeşil)
     final badgeColor = isVeryUrgent
         ? colorScheme.error
         : (isUrgent ? colorScheme.tertiary : colorScheme.secondary);
@@ -38,7 +40,7 @@ class UrgencyBadge extends StatelessWidget {
   }
 }
 
-/// Kan gruplarına göre yatay filtre çubuğu
+/// Kan gruplarına göre filtreleme sağlayan yatay kaydırılabilir çip (FilterChip) çubuğu.
 class BloodGroupFilterBar extends StatelessWidget {
   const BloodGroupFilterBar({
     super.key,
@@ -46,7 +48,10 @@ class BloodGroupFilterBar extends StatelessWidget {
     required this.onGroupSelected,
   });
 
+  /// Seçili kan grubu (null ise 'Tümü' seçilidir)
   final String? selectedGroup;
+
+  /// Kan grubu seçildiğinde tetiklenen geri çağırım
   final ValueChanged<String?> onGroupSelected;
 
   @override
@@ -56,12 +61,14 @@ class BloodGroupFilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
+          // Tüm çağrıları gösteren varsayılan filtre çipi
           FilterChip(
             label: const Text('Tümü'),
             selected: selectedGroup == null,
             onSelected: (_) => onGroupSelected(null),
           ),
           const SizedBox(width: 8),
+          // Sabit kan gruplarından dinamik filtre çipleri üretimi
           ...AppConstants.bloodGroups.map((group) {
             return Padding(
               padding: const EdgeInsets.only(right: 8.0),
@@ -78,7 +85,7 @@ class BloodGroupFilterBar extends StatelessWidget {
   }
 }
 
-/// Kan çağrısı kartı üst başlık bölümü
+/// Kan çağrısı kartının üst başlık bölümü (Kan grubu rozeti, hastane adı, şehir ve aciliyet).
 class _BloodRequestCardHeader extends StatelessWidget {
   const _BloodRequestCardHeader({required this.request});
 
@@ -91,6 +98,7 @@ class _BloodRequestCardHeader extends StatelessWidget {
 
     return Row(
       children: [
+        // Belirgin kan grubu kutusu
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
@@ -106,6 +114,7 @@ class _BloodRequestCardHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
+        // Hastane adı, şehir ve oluşturulma tarihi
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,13 +134,14 @@ class _BloodRequestCardHeader extends StatelessWidget {
             ],
           ),
         ),
+        // Aciliyet rozeti
         UrgencyBadge(urgency: request.urgency),
       ],
     );
   }
 }
 
-/// Kan çağrısı ilerleme ve bağışçı buton bölümü
+/// Kan çağrısı kartının alt bölümü: toplanan ünite oranı, ilerleme çubuğu ve destek ol butonu.
 class _BloodRequestCardFooter extends StatelessWidget {
   const _BloodRequestCardFooter({
     required this.request,
@@ -148,6 +158,7 @@ class _BloodRequestCardFooter extends StatelessWidget {
 
     return Row(
       children: [
+        // Toplanan ünite bilgisi ve ilerleme göstergesi
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,6 +179,7 @@ class _BloodRequestCardFooter extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 16),
+        // Bağışçı olma butonu (tamamlandıysa devre dışı kalır)
         FilledButton.tonal(
           onPressed: request.isFulfilled ? null : onSupport,
           child: Text(request.isFulfilled ? 'Tamamlandı' : 'Bağışçıyım'),
@@ -177,7 +189,7 @@ class _BloodRequestCardFooter extends StatelessWidget {
   }
 }
 
-/// Kan çağrısı tekil kart widget'ı
+/// Tekil bir kan talebini temsil eden ana kart widget'ı.
 class BloodRequestCard extends StatelessWidget {
   const BloodRequestCard({
     super.key,
@@ -185,7 +197,10 @@ class BloodRequestCard extends StatelessWidget {
     required this.onSupport,
   });
 
+  /// Görüntülenecek çağrı verisi
   final BloodRequest request;
+
+  /// 'Bağışçıyım' butonuna tıklandığında çalışacak fonksiyon
   final VoidCallback onSupport;
 
   @override
@@ -209,6 +224,7 @@ class BloodRequestCard extends StatelessWidget {
   }
 }
 
+/// Çağrı oluşturma modalının başlık yazısı.
 class _CreateRequestHeader extends StatelessWidget {
   const _CreateRequestHeader();
 
@@ -226,13 +242,14 @@ class _CreateRequestHeader extends StatelessWidget {
   }
 }
 
-/// Yeni kan çağrısı oluşturma form modalı
+/// Yeni bir acil kan ihtiyacı girişi yapılmasını sağlayan alt modal formu (BottomSheet).
 class CreateRequestBottomSheet extends StatefulWidget {
   const CreateRequestBottomSheet({
     super.key,
     required this.onSubmit,
   });
 
+  /// Form onaylandığında yeni çağrı bilgilerini üst katmana ileten callback
   final void Function({
     required String patientName,
     required String bloodGroup,
@@ -261,11 +278,13 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
     super.dispose();
   }
 
+  /// Form alanlarını doğrular ve geçerliyse yeni çağrıyı gönderip modalı kapatır.
   void _submit() {
     final hospital = _hospitalController.text.trim();
     final city = _cityController.text.trim();
     final units = int.tryParse(_unitsController.text) ?? 1;
 
+    // Gerekli alan kontrolü
     if (hospital.isEmpty || city.isEmpty) {
       context.showSnackBar('Lütfen hastane ve şehir bilgilerini giriniz.', isError: true);
       return;
@@ -285,6 +304,7 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
+      // Ekran klavyesi açıldığında formun yukarı kayması için viewInsets.bottom eklenir
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
@@ -298,6 +318,7 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
           children: [
             const _CreateRequestHeader(),
             const SizedBox(height: 16),
+            // Hastane adı giriş alanı
             TextField(
               controller: _hospitalController,
               decoration: const InputDecoration(
@@ -306,6 +327,7 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
               ),
             ),
             const SizedBox(height: 12),
+            // Şehir giriş alanı
             TextField(
               controller: _cityController,
               decoration: const InputDecoration(
@@ -314,8 +336,10 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
               ),
             ),
             const SizedBox(height: 12),
+            // Kan grubu ve aciliyet açılır menüleri (Dropdown)
             _buildDropdowns(),
             const SizedBox(height: 16),
+            // Gönder butonu
             ElevatedButton.icon(
               onPressed: _submit,
               icon: const Icon(Icons.campaign),
@@ -327,6 +351,7 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
     );
   }
 
+  /// Kan grubu ve Aciliyet seçimi için yan yana iki Dropdown oluşturur.
   Widget _buildDropdowns() {
     return Row(
       children: [
@@ -359,3 +384,4 @@ class _CreateRequestBottomSheetState extends State<CreateRequestBottomSheet> {
     );
   }
 }
+

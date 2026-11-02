@@ -1,11 +1,20 @@
 import 'package:flutter/foundation.dart';
 
+/// Müzenin yayınlanma yaşam döngüsü durumları (project.md Madde 10)
 enum MuseumStatus {
+  /// Taslak durumunda; henüz yayınlanmadı
   draft,
+
+  /// Medyalar ve sahne yükleniyor
   publishing,
+
+  /// Başarıyla yayınlandı, ziyarete ve keşfe açık
   published,
+
+  /// Küratör tarafından arşive kaldırıldı
   archived;
 
+  /// String değerden [MuseumStatus] türeten yardımcı metot
   static MuseumStatus fromString(String value) {
     switch (value) {
       case 'draft':
@@ -24,28 +33,73 @@ enum MuseumStatus {
   String get value => name;
 }
 
+/// Cep Müzem — Müze Veri Modeli (MuseumModel)
+///
+/// project.md Madde 16 veri modelleri spesifikasyonu:
+/// - id, ownerId, title, description, coverUrl, location
+/// - status, sceneVersion, likeCount, commentCount, likeCount30d, commentCount30d
+/// - createdAt, publishedAt, updatedAt
+///
+/// Popülerlik Skoru Formülü (project.md Madde 8 & 16):
+/// score = likeCount30d + (2 * commentCount30d)
 @immutable
 class MuseumModel {
+  /// Müzenin benzersiz kimliği
   final String id;
+
+  /// Müzeyi oluşturan küratörün kimliği
   final String ownerId;
+
+  /// Müzenin başlığı / adı
   final String title;
+
+  /// Müzenin kısa açıklaması ve küratör metni
   final String description;
+
+  /// Müzenin sergi kataloğu kapak görseli URL'si
   final String coverUrl;
+
+  /// İsteğe bağlı coğrafi konum açıklaması (ör. "Galata, İstanbul")
   final String? location;
+
+  /// Müzenin yayınlanma durumu (draft, publishing, published, archived)
   final MuseumStatus status;
+
+  /// Gelecekte 3D renderer desteği için sahne şema versiyonu (Varsayılan: 1)
   final int sceneVersion;
+
+  /// Toplam beğeni sayısı
   final int likeCount;
+
+  /// Toplam yorum sayısı
   final int commentCount;
+
+  /// Popülerlik algoritması için son 30 gündeki beğeni sayısı
   final int likeCount30d;
+
+  /// Popülerlik algoritması için son 30 gündeki yorum sayısı
   final int commentCount30d;
+
+  /// Müzenin oluşturulma tarihi
   final DateTime createdAt;
+
+  /// Müzenin yayınlanma tarihi
   final DateTime? publishedAt;
+
+  /// Müzenin son güncellenme tarihi
   final DateTime updatedAt;
 
-  // View kolaylığı için ek profil bilgileri
+  // View katmanında hızlı erişim için zenginleştirilmiş alanlar
+  /// Küratörün adı
   final String? ownerName;
+
+  /// Küratörün profil fotoğrafı URL'si
   final String? ownerPhotoUrl;
+
+  /// Aktif oturum kullanıcısı tarafından kaydedilip kaydedilmediği
   final bool isSavedByCurrentUser;
+
+  /// Aktif oturum kullanıcısı tarafından beğenilip beğenilmediği
   final bool isLikedByCurrentUser;
 
   const MuseumModel({
@@ -71,9 +125,15 @@ class MuseumModel {
   });
 
   /// Kesin Popülerlik Algoritması (project.md Madde 8 & 16):
+  ///
+  /// Son 30 günlük etkileşimler kullanılır:
+  /// - 1 beğeni = 1 puan
+  /// - 1 yorum = 2 puan
+  ///
   /// score = likeCount30d + (2 * commentCount30d)
   int get popularityScore => likeCount30d + (2 * commentCount30d);
 
+  /// Değişmez (immutable) nesneyi kopyalar
   MuseumModel copyWith({
     String? id,
     String? ownerId,
@@ -118,3 +178,4 @@ class MuseumModel {
     );
   }
 }
+

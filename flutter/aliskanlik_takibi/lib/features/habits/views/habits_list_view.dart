@@ -5,6 +5,13 @@ import '../models/habit_models.dart';
 import 'create_habit_view.dart';
 import 'habit_detail_view.dart';
 
+/// Ritmo Alışkanlıklarım Listesi Ekranı (Habits List View).
+///
+/// `project.md` 5.6. Bölüm gereksinimlerine göre tasarlanmıştır:
+/// - Aktif ve Arşivlenmiş alışkanlıklar için iki sekmeli görünüm
+/// - Her kartta hedef miktar, mevcut streak ve açılan yapboz parça sayısı
+/// - Boş durumlarda motive edici açıklamalar ve alışkanlık ekleme yönlendirmesi
+/// - Arşivden geri yükleme ve detay ekranına geçiş
 class HabitsListView extends StatefulWidget {
   const HabitsListView({super.key});
 
@@ -67,6 +74,7 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
     );
   }
 
+  /// Alışkanlıklar listesini veya boş durum ekranını oluşturan yardımcı widget.
   Widget _buildHabitsList(List<HabitModel> list, {required bool isArchived}) {
     if (list.isEmpty) {
       return Center(
@@ -121,6 +129,7 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
     );
   }
 
+  /// Tek bir alışkanlık kartını, ikonunu, hedefini, serisini ve yapboz durumunu oluşturur.
   Widget _buildCard(HabitModel habit, {required bool isArchived}) {
     final appScope = AppScope.of(context);
     final schedule = appScope.habitController.getSchedule(habit.id);
@@ -143,6 +152,7 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
             children: [
               Row(
                 children: [
+                  // Alışkanlık Renkli İkon Rozeti
                   Container(
                     width: 48,
                     height: 48,
@@ -159,6 +169,8 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
                     ),
                   ),
                   const SizedBox(width: 14),
+
+                  // Kategori ve Alışkanlık Adı
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,6 +191,8 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
                       ],
                     ),
                   ),
+
+                  // Arşivden Çıkarma / Geri Yükleme Butonu
                   if (isArchived)
                     IconButton(
                       icon: const Icon(Icons.unarchive_outlined, color: AppColors.primary),
@@ -193,7 +207,7 @@ class _HabitsListViewState extends State<HabitsListView> with SingleTickerProvid
               const Divider(height: 1, thickness: 1, color: AppColors.border),
               const SizedBox(height: 12),
 
-              // Alt Bilgiler: Hedef, Streak, Yapboz
+              // Alt İstatistik Satırı: Hedef, Seri ve Yapboz Parçaları
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

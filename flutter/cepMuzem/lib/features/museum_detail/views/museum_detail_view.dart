@@ -12,7 +12,16 @@ import '../../museum_scene/widgets/two_d_museum_renderer.dart';
 import '../viewmodels/museum_detail_viewmodel.dart';
 import '../widgets/artwork_sheet.dart';
 
+/// Cep Müzem — Müze Detay ve 2D Simülasyon Ekranı (MuseumDetailView)
+///
+/// project.md Madde 9 gereksinimleri:
+/// - 2D Etkileşimli müze odası simülasyonu gösterilir.
+/// - Eser çerçevelerine dokunulduğunda alt detay paneli (ArtworkSheet) açılır.
+/// - Müze künyesi, küratör bilgisi, konum ve açıklama yer alır.
+/// - Beğeni ve kaydetme işlemleri yapılır.
+/// - Ziyaretçi notları listelenir ve yeni yorum gönderilir.
 class MuseumDetailView extends StatelessWidget {
+  /// İncelenen müzenin benzersiz kimliği
   final String museumId;
 
   const MuseumDetailView({super.key, required this.museumId});
@@ -22,6 +31,7 @@ class MuseumDetailView extends StatelessWidget {
     final museumRepo = Provider.of<MuseumRepository>(context, listen: false);
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
 
+    // Müze kimliğine özel MuseumDetailViewModel örneği oluşturulur
     return ChangeNotifierProvider(
       create: (_) => MuseumDetailViewModel(
         repository: museumRepo,
@@ -33,6 +43,7 @@ class MuseumDetailView extends StatelessWidget {
   }
 }
 
+/// Müze detay ekranının gövde widget'ı
 class _MuseumDetailContent extends StatefulWidget {
   const _MuseumDetailContent();
 
@@ -41,6 +52,7 @@ class _MuseumDetailContent extends StatefulWidget {
 }
 
 class _MuseumDetailContentState extends State<_MuseumDetailContent> {
+  /// Yorum yazma giriş alanı denetleyicisi
   final TextEditingController _commentController = TextEditingController();
 
   @override
@@ -49,6 +61,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
     super.dispose();
   }
 
+  /// 2D sahnede bir esere dokunulduğunda alt paneli (ArtworkSheet) açan metot
   void _onItemTapped(
     BuildContext context,
     MuseumDetailViewModel vm,
@@ -56,10 +69,12 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
   ) {
     vm.selectItem(item);
     ArtworkSheet.show(context, item).then((_) {
+      // Panel kapandığında seçimi sıfırla
       vm.clearSelection();
     });
   }
 
+  /// Yorum gönderme aksiyonu
   void _submitComment(MuseumDetailViewModel vm) {
     final text = _commentController.text.trim();
     if (text.isEmpty) return;
@@ -79,6 +94,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
   Widget build(BuildContext context) {
     final vm = context.watch<MuseumDetailViewModel>();
 
+    // 1. Yükleniyor Durumu
     if (vm.state == DetailState.loading) {
       return Scaffold(
         appBar: AppBar(
@@ -93,6 +109,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
       );
     }
 
+    // 2. Hata veya Müze Bulunamadı Durumu
     if (vm.state == DetailState.error || vm.museum == null) {
       return Scaffold(
         appBar: AppBar(
@@ -112,6 +129,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
     }
 
     final museum = vm.museum!;
+    // İlk oda şablonunu al (V1 standardında bir müze en az 1 odaya sahiptir)
     final room = vm.scene?.rooms.isNotEmpty == true
         ? vm.scene!.rooms.first
         : null;
@@ -125,6 +143,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
           overflow: TextOverflow.ellipsis,
         ),
         actions: [
+          // Kaydet / Yer İmi Butonu
           IconButton(
             tooltip: museum.isSavedByCurrentUser ? 'Kaydı Kaldır' : 'Kaydet',
             icon: Icon(
@@ -149,7 +168,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 2D Simülasyon Sahnesi
+              // 1. 2D Simülasyon Sahnesi (Oda ve Eser Yerleşim Alanı)
               if (room != null) ...[
                 Text(
                   'Müze Odası — 2D Sergi Alanı',
@@ -169,7 +188,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
                 const SizedBox(height: AppDimensions.space20),
               ],
 
-              // Müze Künyesi
+              // 2. Müze Künyesi ve Küratör Bilgi Kartı
               Container(
                 padding: const EdgeInsets.all(AppDimensions.space16),
                 decoration: BoxDecoration(
@@ -216,7 +235,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
                             ],
                           ),
                         ),
-                        // Beğeni Butonu
+                        // Beğeni Butonu ve Sayacı
                         IconButton(
                           tooltip: museum.isLikedByCurrentUser
                               ? 'Beğeniyi Kaldır'
@@ -249,7 +268,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
 
               const SizedBox(height: AppDimensions.space24),
 
-              // Yorumlar Bölümü
+              // 3. Ziyaretçi Notları (Yorumlar) Başlığı
               Row(
                 children: [
                   Text(
@@ -260,7 +279,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
               ),
               const SizedBox(height: AppDimensions.space12),
 
-              // Yorum Yazma Formu
+              // 4. Yeni Yorum / Not Yazma Alanı
               Row(
                 children: [
                   Expanded(
@@ -297,7 +316,7 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
 
               const SizedBox(height: AppDimensions.space16),
 
-              // Yorumlar Listesi
+              // 5. Yorumlar Listesi
               if (vm.comments.isEmpty)
                 Container(
                   padding: const EdgeInsets.all(AppDimensions.space16),
@@ -365,3 +384,4 @@ class _MuseumDetailContentState extends State<_MuseumDetailContent> {
     );
   }
 }
+

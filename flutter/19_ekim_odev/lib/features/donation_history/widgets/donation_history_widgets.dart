@@ -4,10 +4,11 @@ import '../../../core/extensions/context_extensions.dart';
 import '../../../core/extensions/date_extensions.dart';
 import '../models/donation_history_model.dart';
 
-/// Bağış türünü gösteren renkli etiket
+/// Bağış türünü (Tam Kan, Trombosit, Plazma) renkli ve belirgin gösteren etiket (badge).
 class DonationTypeBadge extends StatelessWidget {
   const DonationTypeBadge({super.key, required this.donationType});
 
+  /// Bağış türü metni
   final String donationType;
 
   @override
@@ -16,6 +17,7 @@ class DonationTypeBadge extends StatelessWidget {
     final isWholeBlood = donationType == 'Tam Kan';
     final isPlatelet = donationType == 'Trombosit';
 
+    // Tür bazlı renk seçimi (Tam Kan: Birincil Kırmızı, Trombosit: Kehribar/Turuncu, Plazma: Deniz Yeşili)
     final badgeColor = isWholeBlood
         ? colorScheme.primary
         : (isPlatelet ? colorScheme.tertiary : colorScheme.secondary);
@@ -38,6 +40,7 @@ class DonationTypeBadge extends StatelessWidget {
   }
 }
 
+/// Bağış kartının merkez metin içeriği (Hastane adı, tarih, geçen gün ve ek notlar).
 class _DonationCardContent extends StatelessWidget {
   const _DonationCardContent({required this.record});
 
@@ -51,6 +54,7 @@ class _DonationCardContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Hastane adı ve bağış türü rozeti
         Row(
           children: [
             Expanded(
@@ -63,10 +67,12 @@ class _DonationCardContent extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
+        // Türkçe formatlanmış bağış tarihi ve kaç gün önce yapıldığı
         Text(
           '${record.date.toFormattedTurkish()} (${record.date.daysAgo()} gün önce)',
           style: textTheme.bodySmall?.copyWith(color: colorScheme.outline),
         ),
+        // Varsa kullanıcı notu
         if (record.notes.isNotEmpty) ...[
           const SizedBox(height: 6),
           Text(record.notes, style: textTheme.bodySmall),
@@ -76,7 +82,7 @@ class _DonationCardContent extends StatelessWidget {
   }
 }
 
-/// Tekil bağış geçmişi kartı
+/// Tekil bağış geçmişi kaydını gösteren kart bileşeni.
 class DonationRecordCard extends StatelessWidget {
   const DonationRecordCard({
     super.key,
@@ -84,7 +90,10 @@ class DonationRecordCard extends StatelessWidget {
     required this.onDelete,
   });
 
+  /// Görüntülenecek bağış kaydı
   final DonationRecord record;
+
+  /// Kayıt silindiğinde çalışacak fonksiyon
   final VoidCallback onDelete;
 
   @override
@@ -97,13 +106,16 @@ class DonationRecordCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Kan damlası dairesel ikonu
             CircleAvatar(
               radius: 20,
               backgroundColor: colorScheme.primary.withValues(alpha: 0.1),
               child: Icon(Icons.water_drop, color: colorScheme.primary),
             ),
             const SizedBox(width: 14),
+            // Bağış bilgileri
             Expanded(child: _DonationCardContent(record: record)),
+            // Silme butonu
             IconButton(
               icon: Icon(Icons.delete_outline, color: colorScheme.error, size: 20),
               onPressed: onDelete,
@@ -116,7 +128,7 @@ class DonationRecordCard extends StatelessWidget {
   }
 }
 
-/// Boş bağış listesi görünümü
+/// Henüz hiç bağış kaydı bulunmadığında gösterilen boş durum (Empty State) widget'ı.
 class DonationEmptyView extends StatelessWidget {
   const DonationEmptyView({super.key});
 
@@ -150,10 +162,11 @@ class DonationEmptyView extends StatelessWidget {
   }
 }
 
-/// Yeni bağış kaydetme modalı
+/// Yeni bir kan bağışı kaydetmek için açılan alt form modalı (BottomSheet).
 class AddDonationBottomSheet extends StatefulWidget {
   const AddDonationBottomSheet({super.key, required this.onSubmit});
 
+  /// Form tamamlandığında bağış bilgilerini controller'a aktaran callback
   final void Function({
     required DateTime date,
     required String hospitalName,
@@ -182,6 +195,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
     super.dispose();
   }
 
+  /// Tarih seçici diyalog penceresini açar (Gelecek tarihler seçilemez).
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -194,6 +208,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
     }
   }
 
+  /// Formu doğrular ve yeni bağışı kaydeder.
   void _submit() {
     final hospital = _hospitalController.text.trim();
     final city = _cityController.text.trim();
@@ -216,6 +231,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Padding(
+      // Klavye açıldığında formun yukarı kaydırılması için insets padding
       padding: EdgeInsets.only(
         left: 20,
         right: 20,
@@ -235,6 +251,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
                   ),
             ),
             const SizedBox(height: 16),
+            // Bağış merkezi veya hastane adı
             TextField(
               controller: _hospitalController,
               decoration: const InputDecoration(
@@ -243,8 +260,10 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
               ),
             ),
             const SizedBox(height: 12),
+            // Tür seçimi ve tarih belirleme satırı
             _buildTypeAndDateRow(),
             const SizedBox(height: 12),
+            // Not alanı
             TextField(
               controller: _notesController,
               decoration: const InputDecoration(
@@ -253,6 +272,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
               ),
             ),
             const SizedBox(height: 16),
+            // Kaydet butonu
             ElevatedButton.icon(
               onPressed: _submit,
               icon: const Icon(Icons.save_outlined),
@@ -264,6 +284,7 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
     );
   }
 
+  /// Bağış türü Dropdown'u ile Tarih seçici butonunu içeren satır.
   Widget _buildTypeAndDateRow() {
     return Row(
       children: [
@@ -289,3 +310,4 @@ class _AddDonationBottomSheetState extends State<AddDonationBottomSheet> {
     );
   }
 }
+

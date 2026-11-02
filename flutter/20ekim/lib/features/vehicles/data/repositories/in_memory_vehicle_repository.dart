@@ -3,7 +3,9 @@ import '../../../../core/mock/mock_data_seed.dart';
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/vehicle_repository.dart';
 
+/// Araç verilerini yerel bellek listesinde saklayan repository implementasyonu.
 class InMemoryVehicleRepository implements VehicleRepository {
+  // Bellek içi araç koleksiyonu
   final List<Vehicle> _vehicles = List.from(MockDataSeed.initialVehicles);
 
   @override
@@ -38,7 +40,7 @@ class InMemoryVehicleRepository implements VehicleRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
-    // Ownership check
+    // Sahiplik kontrolü: Firma yalnızca kendi companyId'sine araç ekleyebilir
     if (vehicle.companyId != actorCompanyId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi firmanıza araç ekleyebilirsiniz.',
@@ -56,7 +58,7 @@ class InMemoryVehicleRepository implements VehicleRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 150));
 
-    // Ownership check
+    // Sahiplik kontrolü: Başka firmanın aracı güncellenemez
     if (vehicle.companyId != actorCompanyId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi firmanıza ait araçları güncelleyebilirsiniz.',

@@ -1,8 +1,21 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 
-/// Sanat eserlerinin vektörel çizim motoru
+/// Sanat Eserlerinin Vektörel Çizim Motoru (CustomPainter).
+///
+/// `project.md` 7. Gizli Yapboz Sistemi ve 10. Başarı Koleksiyonu için harici görsel
+/// bağımlılığı olmadan, saf Flutter Canvas API'si kullanarak yüksek çözünürlüklü,
+/// estetik ve vektörel manzaralar çizer.
+///
+/// Desteklenen temalar:
+/// - `forest`: Zümrüt orman, güneş huzmeleri ve çam ağaçları
+/// - `starry`: Gece gökyüzü, hilal ve yıldızlar
+/// - `sunrise`: Sıcak gün doğumu ve katmanlı dağlar
+/// - `lake`: Dingin göl yüzeyi ve dağ yansımaları
+/// - `antique`: Sarmaşıklı antik taş kemer
+/// - `lighthouse`: Alacakaranlıkta ışık saçan deniz feneri
 class ArtworkPainter extends CustomPainter {
+  /// Çizilecek sanat eserinin tema anahtarı
   final String themeKey;
 
   ArtworkPainter({required this.themeKey});
@@ -32,8 +45,9 @@ class ArtworkPainter extends CustomPainter {
     }
   }
 
+  /// 'Ormanın Şarkısı' (forest) temasını çizer: Doğal yeşil tonları ve çam ağaçları.
   void _paintForest(Canvas canvas, Size size) {
-    // Arka plan gradyanı
+    // 1. Arka plan gradyanı: Açık zümrütten koyu çam yeşiline geçiş
     final bgPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
@@ -42,13 +56,13 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    // Güneş ışığı huzmesi
+    // 2. Güneş ışığı huzmesi (Bulanık daire)
     final sunPaint = Paint()
       ..color = const Color(0x33FFE89E)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 20);
     canvas.drawCircle(Offset(size.width * 0.75, size.height * 0.25), size.width * 0.3, sunPaint);
 
-    // Uzak dağlar
+    // 3. Uzak dağ silüeti
     final mountainPaint = Paint()..color = const Color(0x55254A37);
     final mPath = Path()
       ..moveTo(0, size.height * 0.6)
@@ -60,14 +74,14 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(mPath, mountainPaint);
 
-    // Ağaçlar ve orman dokusu
+    // 4. Ağaç gövdeleri ve yaprak dokusu
     final treePaint = Paint()..color = const Color(0xFF152A20);
     final trunkPaint = Paint()
       ..color = const Color(0xFF3B271A)
       ..strokeWidth = 6
       ..style = PaintingStyle.stroke;
 
-    // Birkaç çam ağacı çizimi
+    // Belirli yatay noktalara çam ağaçları yerleştir
     final treeXPositions = [0.15, 0.3, 0.48, 0.68, 0.85];
     for (int i = 0; i < treeXPositions.length; i++) {
       final x = size.width * treeXPositions[i];
@@ -75,6 +89,7 @@ class ArtworkPainter extends CustomPainter {
       final trunkTop = baseY - size.height * 0.35;
       canvas.drawLine(Offset(x, baseY), Offset(x, trunkTop), trunkPaint);
 
+      // Üçgen çam yaprakları
       final foliagePath = Path();
       final treeTop = trunkTop - size.height * 0.25;
       foliagePath.moveTo(x, treeTop);
@@ -85,7 +100,9 @@ class ArtworkPainter extends CustomPainter {
     }
   }
 
+  /// 'Yıldızlı Düşler' (starry) temasını çizer: Gece göğü, hilal ve rastgele yıldızlar.
   void _paintStarry(Canvas canvas, Size size) {
+    // Gece gökyüzü gradyanı
     final bgPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
@@ -94,15 +111,15 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    // Ay
+    // Ay ve hilal gölgesi
     final moonPaint = Paint()..color = const Color(0xFFFDE68A);
     canvas.drawCircle(Offset(size.width * 0.75, size.height * 0.2), size.width * 0.12, moonPaint);
     final moonShadow = Paint()..color = const Color(0xFF0F172A);
     canvas.drawCircle(Offset(size.width * 0.72, size.height * 0.19), size.width * 0.11, moonShadow);
 
-    // Yıldızlar
+    // Rastgele parıldayan yıldızlar
     final starPaint = Paint()..color = Colors.white;
-    final rand = Random(42);
+    final rand = Random(42); // Sabit tohum ile her çizimde aynı yıldız dağılımı
     for (int i = 0; i < 40; i++) {
       final x = rand.nextDouble() * size.width;
       final y = rand.nextDouble() * size.height * 0.65;
@@ -121,6 +138,7 @@ class ArtworkPainter extends CustomPainter {
     canvas.drawPath(hillPath, hillPaint);
   }
 
+  /// 'Gündoğumu Tepesi' (sunrise) temasını çizer: Sıcak şafak renkleri ve ufuk dağları.
   void _paintSunrise(Canvas canvas, Size size) {
     final bgPaint = Paint()
       ..shader = const LinearGradient(
@@ -130,11 +148,11 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    // Doğan Güneş
+    // Doğan Güneş diski
     final sunPaint = Paint()..color = const Color(0xFFFFF3B0);
     canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.45), size.width * 0.18, sunPaint);
 
-    // Dağ Katmanları
+    // 1. Dağ Katmanı
     final mountain1 = Paint()..color = const Color(0x886B705C);
     final path1 = Path()
       ..moveTo(0, size.height * 0.58)
@@ -146,6 +164,7 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(path1, mountain1);
 
+    // 2. Dağ Katmanı (Ön plan)
     final mountain2 = Paint()..color = const Color(0xFF3F4E4F);
     final path2 = Path()
       ..moveTo(0, size.height * 0.68)
@@ -157,8 +176,9 @@ class ArtworkPainter extends CustomPainter {
     canvas.drawPath(path2, mountain2);
   }
 
+  /// 'Sessiz Göl Kıyısı' (lake) temasını çizer: Ayna gibi sakin su ve yansımalar.
   void _paintLake(Canvas canvas, Size size) {
-    // Gökyüzü
+    // Gökyüzü yarısı
     final skyPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
@@ -167,7 +187,7 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height * 0.5));
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height * 0.5), skyPaint);
 
-    // Göl suyu
+    // Göl suyu yarısı
     final lakePaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
@@ -176,7 +196,7 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Rect.fromLTWH(0, size.height * 0.5, size.width, size.height * 0.5));
     canvas.drawRect(Rect.fromLTWH(0, size.height * 0.5, size.width, size.height * 0.5), lakePaint);
 
-    // Ufuk dağları
+    // Ufuktaki dağ silüetleri
     final mountainPaint = Paint()..color = const Color(0xFF4A5568);
     final mPath = Path()
       ..moveTo(0, size.height * 0.5)
@@ -187,7 +207,7 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(mPath, mountainPaint);
 
-    // Su yansıması çizgileri
+    // Su dalgalanma ve ışık yansıma çizgileri
     final ripplePaint = Paint()
       ..color = const Color(0x44CAF0F8)
       ..strokeWidth = 2;
@@ -201,11 +221,12 @@ class ArtworkPainter extends CustomPainter {
     }
   }
 
+  /// 'Sarmaşıklı Avlu' (antique) temasını çizer: Antik taş kemer ve sarmaşık yaprakları.
   void _paintAntique(Canvas canvas, Size size) {
     final bgPaint = Paint()..color = const Color(0xFFE9DAC1);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    // Taş Kemer
+    // Taş Kemer yayı
     final archPaint = Paint()
       ..color = const Color(0xFF54BAB9)
       ..style = PaintingStyle.stroke
@@ -218,7 +239,7 @@ class ArtworkPainter extends CustomPainter {
     );
     canvas.drawArc(rect, pi, pi, false, archPaint);
 
-    // Sarmaşık yaprakları
+    // Kemer etrafındaki sarmaşık yaprakları
     final ivyPaint = Paint()..color = const Color(0xFF18978F);
     final rand = Random(12);
     for (int i = 0; i < 24; i++) {
@@ -229,8 +250,9 @@ class ArtworkPainter extends CustomPainter {
     }
   }
 
+  /// 'Işık Kulesi' (lighthouse) temasını çizer: Deniz feneri, ışık huzmesi ve kayalıklar.
   void _paintLighthouse(Canvas canvas, Size size) {
-    // Alacakaranlık gökyüzü
+    // Alacakaranlık gökyüzü gradyanı
     final bgPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.topCenter,
@@ -239,7 +261,7 @@ class ArtworkPainter extends CustomPainter {
       ).createShader(Offset.zero & size);
     canvas.drawRect(Offset.zero & size, bgPaint);
 
-    // Fener ışık huzmesi
+    // Fenerden çıkan ışık huzmesi (üçgen gradyan)
     final lightPaint = Paint()
       ..shader = const LinearGradient(
         begin: Alignment.centerLeft,
@@ -254,7 +276,7 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(lightBeam, lightPaint);
 
-    // Fener kulesi
+    // Fener kulesi gövdesi
     final towerPaint = Paint()..color = const Color(0xFFF0EBD8);
     final towerPath = Path()
       ..moveTo(size.width * 0.4, size.height * 0.75)
@@ -264,7 +286,7 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(towerPath, towerPaint);
 
-    // Kırmızı şerit
+    // Kırmızı dekoratif şerit
     final redStripe = Paint()..color = const Color(0xFFC04B44);
     final stripePath = Path()
       ..moveTo(size.width * 0.415, size.height * 0.45)
@@ -283,7 +305,7 @@ class ArtworkPainter extends CustomPainter {
       ..close();
     canvas.drawPath(roofPath, roofPaint);
 
-    // Deniz kayalığı
+    // Deniz kayalığı kaidesi
     final rockPaint = Paint()..color = const Color(0xFF0D1321);
     final rockPath = Path()
       ..moveTo(0, size.height * 0.82)
@@ -296,6 +318,7 @@ class ArtworkPainter extends CustomPainter {
     canvas.drawPath(rockPath, rockPaint);
   }
 
+  /// Tema anahtarı değiştiğinde yeniden çizim yapılması gerektiğini belirtir.
   @override
   bool shouldRepaint(covariant ArtworkPainter oldDelegate) =>
       oldDelegate.themeKey != themeKey;

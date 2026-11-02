@@ -7,10 +7,20 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../companies/domain/entities/company.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 
+/// Arama sonuçlarında ve firma vitrininde kullanılan zengin araç kartı bileşeni.
+///
+/// Araç görseli, model yılı, günlük kiralama ücreti rozeti, firma ismi ve teknik rozetleri gösterir.
 class VehicleCard extends StatelessWidget {
+  /// Kart üzerinde gösterilecek araç varlığı.
   final Vehicle vehicle;
+
+  /// Araca sahip olan kiralama firması (opsiyonel).
   final Company? company;
+
+  /// Karta tıklandığında araç detayına gitmeyi sağlayan fonksiyon.
   final VoidCallback onTap;
+
+  /// Firma adına tıklandığında firma vitrinine gitmeyi sağlayan opsiyonel fonksiyon.
   final VoidCallback? onCompanyTap;
 
   const VehicleCard({
@@ -45,7 +55,7 @@ class VehicleCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Vehicle Image + Badges
+              // Araç Görseli ve Üzerindeki Rozetler (Model Yılı & Günlük Fiyat)
               Stack(
                 children: [
                   ClipRRect(
@@ -62,6 +72,7 @@ class VehicleCard extends StatelessWidget {
                           )
                         : _buildFallbackImage(),
                   ),
+                  // Sol üst: Model yılı rozeti
                   Positioned(
                     top: AppSpacing.md,
                     left: AppSpacing.md,
@@ -82,6 +93,7 @@ class VehicleCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // Sağ üst: Günlük fiyat rozeti
                   Positioned(
                     top: AppSpacing.md,
                     right: AppSpacing.md,
@@ -106,7 +118,7 @@ class VehicleCard extends StatelessWidget {
                 ],
               ),
 
-              // Details
+              // Araç Başlığı, Firma Bilgisi ve Özellik Rozetleri
               Padding(
                 padding: AppSpacing.edgeInsetsMd,
                 child: Column(
@@ -126,6 +138,7 @@ class VehicleCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: AppSpacing.xs),
+                    // Firma ismi satırı (tıklanabilir)
                     if (company != null)
                       GestureDetector(
                         onTap: onCompanyTap,
@@ -152,7 +165,7 @@ class VehicleCard extends StatelessWidget {
                         ),
                       ),
                     const SizedBox(height: AppSpacing.md),
-                    // Spec badges
+                    // Vites, Yakıt ve Koltuk Kapasitesi Rozetleri
                     Row(
                       children: [
                         _buildSpecBadge(
@@ -181,6 +194,7 @@ class VehicleCard extends StatelessWidget {
     );
   }
 
+  /// Teknik özellik rozeti (Icon + Metin).
   Widget _buildSpecBadge(IconData icon, String text) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -199,6 +213,7 @@ class VehicleCard extends StatelessWidget {
     );
   }
 
+  /// Görsel yoksa veya internet/ağ hatası olduğunda gösterilen yedek araç kutusu.
   Widget _buildFallbackImage() {
     return Container(
       height: 160,

@@ -20,6 +20,8 @@ class WaterTrackerView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Model durumu her güncellendiğinde (su eklendiğinde/silindiğinde)
+    // arayüzü reaktif olarak yeniden derleyen dinleyici.
     return ValueListenableBuilder<WaterTrackerModel>(
       valueListenable: controller.state,
       builder: (context, model, _) {
@@ -28,6 +30,7 @@ class WaterTrackerView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Üst bilgi çubuğu: Logo, tema değiştirici ve gün serisi rozeti
               WaterHeaderCard(
                 model: model,
                 onReset: controller.resetWater,
@@ -35,10 +38,13 @@ class WaterTrackerView extends StatelessWidget {
                 isDarkMode: themeController.isDark(context),
               ),
               const SizedBox(height: 20),
+              // Ana ilerleme kartı: Dairesel gösterge ve kalan/hedef metrikleri
               WaterGaugeCard(model: model),
               const SizedBox(height: 24),
+              // Hızlı su ekleme seçenekleri buton grubu
               WaterQuickAddButtons(onAddWater: controller.addWater),
               const SizedBox(height: 24),
+              // Günlük tüketim geçmişi ve geri alma aksiyonu
               WaterHistorySection(
                 logs: model.logs,
                 onUndo: controller.undoLastLog,

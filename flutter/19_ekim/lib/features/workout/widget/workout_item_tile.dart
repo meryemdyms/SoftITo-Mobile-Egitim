@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:susadim/core/constants/app_colors.dart';
 import 'package:susadim/features/workout/models/workout_entry.dart';
 
+/// Gün içinde kaydedilen tek bir antrenman hareketini listeleyen satır (tile) bileşeni.
+///
+/// Kart içeriğinde:
+/// - Spor simgesi (dambıl ikonu)
+/// - Antrenman başlığı (örn: "Sabah Koşusu")
+/// - Süre ve zorluk seviyesi (örn: "30 dk • Orta")
+/// - Yakılan kalori miktarı (örn: "-250 kcal")
+/// - Silme ikonu yer alır.
 class WorkoutItemTile extends StatelessWidget {
   const WorkoutItemTile({
     required this.entry,
@@ -9,7 +17,10 @@ class WorkoutItemTile extends StatelessWidget {
     super.key,
   });
 
+  /// Görüntülenecek egzersiz kaydı nesnesi
   final WorkoutEntry entry;
+
+  /// Sil butonuna tıklandığında çalışacak geri çağırım fonksiyonu
   final VoidCallback onDelete;
 
   @override
@@ -26,8 +37,11 @@ class WorkoutItemTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Egzersiz simgesi (neon lime renkli dambıl)
           const Icon(Icons.fitness_center_rounded, color: AppColors.neonLime, size: 22),
           const SizedBox(width: 12),
+
+          // Egzersiz başlığı, süre ve yoğunluk bilgisi
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,6 +56,8 @@ class WorkoutItemTile extends StatelessWidget {
               ],
             ),
           ),
+
+          // Yakılan kalori miktarı (örn: -320 kcal)
           Text(
             '-${entry.caloriesBurned} kcal',
             style: const TextStyle(
@@ -50,6 +66,8 @@ class WorkoutItemTile extends StatelessWidget {
               fontSize: 14,
             ),
           ),
+
+          // Kaydı silme butonu
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.textMuted),
             onPressed: onDelete,

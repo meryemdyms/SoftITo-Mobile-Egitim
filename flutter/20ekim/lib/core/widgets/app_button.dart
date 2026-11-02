@@ -4,15 +4,44 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 
-enum AppButtonVariant { primary, secondary, outline, destructive }
+/// Buton görsel stillerini belirleyen varyant türleri.
+enum AppButtonVariant {
+  /// Birincil vurgulu buton (mavi arka plan, beyaz metin).
+  primary,
 
+  /// İkincil buton (açık gri arka plan, koyu metin).
+  secondary,
+
+  /// Çerçeveli buton (şeffaf arka plan, renkli kenarlık).
+  outline,
+
+  /// Kritik veya silme eylemleri için tehlike butonu (kırmızı).
+  destructive,
+}
+
+/// Uygulama genelinde kullanılan, erişilebilir (min. 48px dokunma alanı) standart buton bileşeni.
+///
+/// Yüklenme (loading) durumu, ikon desteği ve farklı görsel varyantları yönetir.
 class AppButton extends StatelessWidget {
+  /// Buton üzerinde gösterilecek metin etiketi.
   final String label;
+
+  /// Tıklama geri çağrım fonksiyonu. Null ise buton devre dışı (disabled) olur.
   final VoidCallback? onPressed;
+
+  /// Butonun görsel stili (varsayılan: primary).
   final AppButtonVariant variant;
+
+  /// İşlem devam ederken buton içinde dönen yükleme göstergesi gösterir.
   final bool isLoading;
+
+  /// Metnin solunda yer alacak opsiyonel ikon.
   final IconData? icon;
+
+  /// Özel genişlik değeri (boş bırakılırsa tam genişlik - double.infinity alır).
   final double? width;
+
+  /// Buton yüksekliği (varsayılan: 48.0 logical pixel).
   final double height;
 
   const AppButton({
@@ -28,12 +57,14 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Butonun aktif olup olmadığını belirler
     final bool isEnabled = onPressed != null && !isLoading;
 
     Color bg;
     Color fg;
     BorderSide? border;
 
+    // Seçilen varyanta ve aktiflik durumuna göre renklerin belirlenmesi
     switch (variant) {
       case AppButtonVariant.primary:
         bg = isEnabled ? AppColors.primary : AppColors.muted.withOpacity(0.4);
@@ -63,6 +94,7 @@ class AppButton extends StatelessWidget {
         break;
     }
 
+    // Buton içeriği: Yükleniyorsa CircularProgressIndicator, değilse ikon ve metin
     Widget content = isLoading
         ? SizedBox(
             width: 22,

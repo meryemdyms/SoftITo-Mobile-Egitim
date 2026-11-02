@@ -45,6 +45,7 @@ class WaterLogItem {
 }
 
 /// Su takip verilerini tutan değişmez (immutable) model sınıfı.
+/// State Management sırasında nesne doğrudan mutate edilmez, [copyWith] ile yeni referans oluşturulur.
 @immutable
 class WaterTrackerModel {
   final int currentWaterMl;
@@ -59,17 +60,22 @@ class WaterTrackerModel {
     required this.logs,
   });
 
+  /// Günlük hedefe göre ilerleme oranını 0.0 ile 1.0 arasında normalize eder.
+  /// Hedef 0 veya daha küçükse sıfıra bölme hatasını engellemek için 0.0 döner.
   double get progress {
     if (dailyGoalWaterMl <= 0) return 0.0;
     final val = currentWaterMl / dailyGoalWaterMl;
     return val > 1.0 ? 1.0 : val;
   }
 
+  /// Günlük hedefe ulaşmak için kalan su miktarını hesaplar.
+  /// Hedef aşıldığında negatif değer yerine 0 döner.
   int get remainingMl {
     final diff = dailyGoalWaterMl - currentWaterMl;
     return diff > 0 ? diff : 0;
   }
 
+  /// Mevcut modelin belirli alanlarını güncelleyerek yeni bir model örneği oluşturur.
   WaterTrackerModel copyWith({
     int? currentWaterMl,
     int? dailyGoalWaterMl,
@@ -84,6 +90,7 @@ class WaterTrackerModel {
     );
   }
 
+  /// Uygulama ilk açıldığında veya test senaryolarında gösterilecek varsayılan başlangıç verisi.
   factory WaterTrackerModel.initial() {
     final now = DateTime.now();
     return WaterTrackerModel(

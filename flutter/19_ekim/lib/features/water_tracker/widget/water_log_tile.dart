@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:susadim/core/constants/app_colors.dart';
 import 'package:susadim/features/water_tracker/models/water_log.dart';
 
+/// Gün içinde eklenen tek bir su tüketim kaydını gösteren satır (tile) bileşeni.
+///
+/// Bileşen içeriği:
+/// - Sıvı simgesi (damla ikonu)
+/// - İçecek türü ve saati (örn. "Su", "14:30")
+/// - Eklenen miktar (örn. "+250 ml")
+/// - Kaydı silme aksiyonu (çarpı ikonu)
 class WaterLogTile extends StatelessWidget {
   const WaterLogTile({
     required this.log,
@@ -9,12 +16,16 @@ class WaterLogTile extends StatelessWidget {
     super.key,
   });
 
+  /// Görüntülenecek su tüketim kaydı verisi
   final WaterLog log;
+
+  /// Silme butonuna tıklandığında tetiklenecek silme aksiyonu
   final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    // Zaman damgasını 'SS:DD' (örn. '09:05') formatına çevirir
     final timeStr = _formatTime(log.timestamp);
 
     return Container(
@@ -27,8 +38,11 @@ class WaterLogTile extends StatelessWidget {
       ),
       child: Row(
         children: [
+          // Sol damla simgesi
           const Icon(Icons.water_drop_outlined, color: AppColors.neonCyan, size: 20),
           const SizedBox(width: 12),
+
+          // İçecek türü ve tüketim saati
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,6 +53,8 @@ class WaterLogTile extends StatelessWidget {
               ],
             ),
           ),
+
+          // Eklenen miktar (örn: +500 ml)
           Text(
             '+${log.amountMl} ml',
             style: const TextStyle(
@@ -47,6 +63,8 @@ class WaterLogTile extends StatelessWidget {
               fontSize: 14,
             ),
           ),
+
+          // Kaydı silme butonu
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 18, color: AppColors.textMuted),
             onPressed: onDelete,
@@ -57,6 +75,10 @@ class WaterLogTile extends StatelessWidget {
     );
   }
 
+  /// [DateTime] nesnesini iki basamaklı 'SS:DD' formatında dizeye dönüştürür.
+  ///
+  /// `padLeft(2, '0')` metodu, tek basamaklı saat veya dakikaların önüne '0' ekler
+  /// (Örneğin saat 9 ve dakika 5 ise '09:05' üretilir).
   String _formatTime(DateTime dt) {
     final hour = dt.hour.toString().padLeft(2, '0');
     final minute = dt.minute.toString().padLeft(2, '0');

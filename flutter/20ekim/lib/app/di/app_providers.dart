@@ -22,6 +22,10 @@ import '../../features/search/presentation/controllers/vehicle_search_controller
 import '../../features/vehicles/data/repositories/in_memory_vehicle_repository.dart';
 import '../../features/vehicles/domain/repositories/vehicle_repository.dart';
 
+/// Uygulamanın Bağımlılık Enjeksiyonu (Dependency Injection) katmanı.
+///
+/// Tüm repository, servis ve ChangeNotifier tabanlı ViewModel/Controller nesnelerini
+/// oluşturarak widget ağacına Provider üzerinden sunar.
 class AppProviders extends StatefulWidget {
   final Widget child;
 
@@ -32,6 +36,7 @@ class AppProviders extends StatefulWidget {
 }
 
 class _AppProvidersState extends State<AppProviders> {
+  // Mock veri saklama ve servis nesneleri tekil (singleton benzeri) olarak yaşam döngüsünde tutulur.
   late final Clock _clock;
   late final InMemoryCustomerProfileRepository _profileRepository;
   late final InMemoryCompanyRepository _companyRepository;
@@ -43,6 +48,7 @@ class _AppProvidersState extends State<AppProviders> {
   @override
   void initState() {
     super.initState();
+    // Zaman servisi ve bellek içi veri kaynakları başlatılır.
     _clock = const SystemClock();
     _profileRepository = InMemoryCustomerProfileRepository();
     _companyRepository = InMemoryCompanyRepository();
@@ -59,7 +65,7 @@ class _AppProvidersState extends State<AppProviders> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        // Services and Repositories
+        // Servis ve Repository Sözleşmeleri (Domain Interface & Data Implementation)
         Provider<Clock>.value(value: _clock),
         Provider<CustomerProfileRepository>.value(value: _profileRepository),
         Provider<CompanyRepository>.value(value: _companyRepository),
@@ -68,7 +74,7 @@ class _AppProvidersState extends State<AppProviders> {
         Provider<ReservationRepository>.value(value: _reservationRepository),
         Provider<CampaignRepository>.value(value: _campaignRepository),
 
-        // ChangeNotifier Controllers
+        // ChangeNotifier Kontrolcüleri (ViewModel Katmanı)
         ChangeNotifierProvider<AuthController>(
           create: (_) => AuthController(authRepository: _authRepository),
         ),

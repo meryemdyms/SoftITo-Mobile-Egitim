@@ -1,18 +1,26 @@
-
 import 'package:flutter/material.dart';
 import '../models/transation_model.dart';
 
+/// Para transferi işlemlerini, form yönetimini ve dinamik liste güncellemelerini
+/// gösteren ekran widget'ı.
+///
+/// Bu ekranda; Form ve TextFormField kullanımı, form doğrulama (validation),
+/// showModalBottomSheet ile alt pencere açma, TextEditingController yönetimi,
+/// ve setState ile bakiye ve işlem geçmişini canlı güncelleme mekanizmaları gösterilir.
 class TransferFormScreen extends StatefulWidget {
   const TransferFormScreen({super.key});
 
   @override
-  State<TransferFormScreen> createState() =>
-      _TransferFormScreenState();
+  State<TransferFormScreen> createState() => _TransferFormScreenState();
 }
 
 class _TransferFormScreenState extends State<TransferFormScreen> {
+  /// Kullanıcının mevcut hesap bakiyesi.
+  /// Yapılan her transfer sonrasında bu tutardan düşülür.
   double _balance = 148950.00;
 
+  /// İşlem geçmişini tutan dinamik liste.
+  /// Yeni bir transfer yapıldığında listenin başına  yeni kayıt eklenir.
   final List<TransactionItem> _history = [
     const TransactionItem(
       id: 'tx_init_1',
@@ -52,17 +60,23 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     ),
   ];
 
-  // Para Transferi BottomSheet
+
+  // PARA TRANSFERİ BOTTOMSHEET (ALT FORM PENCERESİ)
+  /// Ekranın altından yukarı doğru açılan (Modal Bottom Sheet) transfer formunu açar.
   void _openTransferModel() {
+    // Formun geçerlilik durumunu denetlemek için kullanılan anahtar (GlobalKey)
     final formKey = GlobalKey<FormState>();
 
+    // Kullanıcının girdiği metinleri okumak için controller nesneleri
     final receiverController = TextEditingController();
     final amountController = TextEditingController();
     final descriptionController = TextEditingController();
 
     showModalBottomSheet(
       context: context,
+      // isScrollControlled: true -> Klavye açıldığında formun yukarı kayabilmesini sağlar
       isScrollControlled: true,
+      // useSafeArea: true -> Cihazın çentik ve alt navigasyon barı gibi alanlarını korur
       useSafeArea: true,
       builder: (sheetContext) {
         return Padding(
@@ -70,15 +84,17 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
             20,
             24,
             20,
+            // Klavye yüksekliğini hesaba katarak alt boşluk bırakır (klavyenin altında kalmayı önler)
             MediaQuery.viewInsetsOf(sheetContext).bottom + 24,
           ),
           child: SingleChildScrollView(
             child: Form(
-              key: formKey,
+              key: formKey, // Form doğrulaması için GlobalKey bağlandı
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min, // Sadece içerik kadar yer kapla
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Form Başlığı
                   const Text(
                     'Yeni Para Transferi',
                     style: TextStyle(
@@ -98,7 +114,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Alıcı Adı
+                  // 1. Alıcı Adı Giriş Alanı
                   TextFormField(
                     controller: receiverController,
                     decoration: const InputDecoration(
@@ -106,21 +122,22 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
                       prefixIcon: Icon(Icons.person_outline),
                       border: OutlineInputBorder(),
                     ),
+                    // Doğrulama kuralı: Boş olamaz
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return 'Alıcı adı boş bırakılamaz';
                       }
-                      return null;
+                      return null; // Hata yok anlamına gelir
                     },
                   ),
 
                   const SizedBox(height: 16),
 
-                  // Transfer Tutarı
+                  // 2. Transfer Tutarı Giriş Alanı
                   TextFormField(
                     controller: amountController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(
+                    // Sayısal klavyeyi açar ve ondalık sayı girişine izin verir
+                    keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                     ),
                     decoration: const InputDecoration(
@@ -129,11 +146,12 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
                       suffixText: '₺',
                       border: OutlineInputBorder(),
                     ),
+                    // Doğrulama kuralları: Boş olamaz, sayı olmalı, sıfırdan büyük olmalı ve bakiyeyi aşmamalı
                     validator: (value) {
                       final amount = double.tryParse(
                         (value ?? '')
                             .trim()
-                            .replaceAll(',', '.'),
+                            .replaceAll(',', '.'), // Virgülü noktaya çevirerek ayrıştırmayı garantiye al
                       );
 
                       if (amount == null ||
@@ -142,20 +160,21 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
                         return 'Geçerli bir tutar giriniz';
                       }
 
+                      // Bakiye kontrolü
                       if (amount > _balance) {
                         return 'Yetersiz bakiye';
                       }
 
-                      return null;
+                      return null; // Başarılı doğrulama
                     },
                   ),
 
                   const SizedBox(height: 16),
 
-                  // Açıklama
+                  // 3. Açıklama Giriş Alanı (İsteğe bağlı)
                   TextFormField(
                     controller: descriptionController,
-                    maxLines: 2,
+                    maxLines: 2, // 2 satırlık geniş alan
                     decoration: const InputDecoration(
                       labelText: 'Açıklama',
                       prefixIcon: Icon(Icons.description_outlined),
@@ -165,36 +184,37 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Transfer Butonu
+                  // 4. Transferi Onaylama Butonu
                   SizedBox(
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton.icon(
                       onPressed: () {
+                        // Form alanlarındaki validator fonksiyonlarını çalıştırır
+                        // Eğer kurallara uymayan bir alan varsa işlemi durdurur
                         if (!formKey.currentState!.validate()) {
                           return;
                         }
 
-                        final receiver =
-                            receiverController.text.trim();
-
+                        // Form verilerini değişkenlere al
+                        final receiver = receiverController.text.trim();
                         final amount = double.parse(
                           amountController.text
                               .trim()
                               .replaceAll(',', '.'),
                         );
+                        final description = descriptionController.text.trim();
 
-                        final description =
-                            descriptionController.text.trim();
-
+                        // Ekran durumunu güncelle
                         setState(() {
-                          // Bakiyeyi azalt
+                          // 1. Bakiyeyi transfer tutarı kadar azalt
                           _balance -= amount;
 
-                          // Yeni işlemi geçmişe ekle
+                          // 2. Yeni işlemi listenin en başına (index 0) ekle
                           _history.insert(
                             0,
                             TransactionItem(
+                              // Zaman damgası kullanarak benzersiz bir id oluşturulur
                               id: 'tx_${DateTime.now().microsecondsSinceEpoch}',
                               title: receiver,
                               category: description.isEmpty
@@ -202,14 +222,16 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
                                   : description,
                               date: 'Az önce',
                               amount: amount,
-                              isExpense: true,
+                              isExpense: true, // Para çıkışı olduğu için gider olarak işaretlenir
                               icon: Icons.send,
                             ),
                           );
                         });
 
+                        // Form penceresini (BottomSheet) kapat
                         Navigator.pop(sheetContext);
 
+                        // Kullanıcıya yeşil renkli başarı SnackBar'ı göster
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -236,7 +258,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
         );
       },
     ).whenComplete(() {
-      // BottomSheet kapandıktan sonra controller'ları temizle
+      // BottomSheet kapatıldığında controller nesnelerini bellekten temizler (memory leak önlemi)
       receiverController.dispose();
       amountController.dispose();
       descriptionController.dispose();
@@ -250,24 +272,24 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Bakiye Kartı
+          // 1. Güncel bakiye kartı
           _buildBalanceCard(),
 
           const SizedBox(height: 24),
 
-          // Transfer Butonu
+          // 2. Transfer modalını açan buton
           _buildTransferButton(),
 
           const SizedBox(height: 32),
 
-          // İşlem Geçmişi
+          // 3. Geçmiş transfer işlemleri listesi
           _buildTransactionHistory(),
         ],
       ),
     );
   }
-
-  // Bakiye Kartı
+  // BAKİYE KARTI BİLEŞENİ
+  /// Kullanıcının kalan toplam bakiyesini gösteren mor kart widget'ı.
   Widget _buildBalanceCard() {
     return Container(
       width: double.infinity,
@@ -289,6 +311,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
           const SizedBox(height: 12),
 
+          // Anlık güncellenen bakiye (virgülden sonra iki basamak formatlı)
           Text(
             '₺${_balance.toStringAsFixed(2)}',
             style: const TextStyle(
@@ -302,7 +325,8 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     );
   }
 
-  // Transfer Butonu
+  // TRANSFER BUTONU BİLEŞENİ
+  /// Modal form penceresini tetikleyen ana aksiyon butonu.
   Widget _buildTransferButton() {
     return SizedBox(
       width: double.infinity,
@@ -322,7 +346,8 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
     );
   }
 
-  // İşlem Geçmişi
+  // İŞLEM GEÇMİŞİ LİSTE BİLEŞENİ
+  /// Yapılan transferlerin ve harcamaların listelendiği bölüm.
   Widget _buildTransactionHistory() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,9 +362,10 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
 
         const SizedBox(height: 16),
 
+        // İşlem listesini dinamik olarak oluşturan ListView.builder
         ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true, // Liste boyutunu içeriğe göre ayarla
+          physics: const NeverScrollableScrollPhysics(), // Kaydırma çatışmasını önle
           itemCount: _history.length,
           itemBuilder: (context, index) {
             final transaction = _history[index];
@@ -347,6 +373,7 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
             return Card(
               margin: const EdgeInsets.only(bottom: 10),
               child: ListTile(
+                // Sol taraftaki yuvarlak ikon alanı: Gider ise açık kırmızı, gelir ise açık yeşil arka plan
                 leading: CircleAvatar(
                   backgroundColor: transaction.isExpense
                       ? Colors.red.shade50
@@ -358,15 +385,18 @@ class _TransferFormScreenState extends State<TransferFormScreen> {
                         : Colors.green,
                   ),
                 ),
+                // Alıcı veya işlem adı
                 title: Text(
                   transaction.title,
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                // Kategori ve tarih bilgisi
                 subtitle: Text(
                   '${transaction.category} • ${transaction.date}',
                 ),
+                // Tutar gösterimi ve renk biçimlendirmesi
                 trailing: Text(
                   '${transaction.isExpense ? "-" : "+"}'
                   '₺${transaction.amount.toStringAsFixed(2)}',

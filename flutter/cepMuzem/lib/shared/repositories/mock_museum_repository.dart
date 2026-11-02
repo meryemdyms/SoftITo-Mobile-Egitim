@@ -5,28 +5,47 @@ import '../models/room_template_model.dart';
 import '../models/social_models.dart';
 import 'museum_repository.dart';
 
-/// Firebase yapılandırılana kadar kullanılan DEMO Museum Repository.
-/// project.md ve AGENTS.md kurallarındaki popülerlik ve keşfet sıralama mantığını
-/// birebir ve deterministik olarak uygular.
+/// Cep Müzem — Demo Müze Repository İmplementasyonu (MockMuseumRepository)
+///
+/// AGENTS.md ve project.md kuralları gereği:
+/// - Firebase projesi bağlanana kadar ayrı Demo repository şeffafça kullanılır.
+/// - Popülerlik ve keşfet sıralama mantığını (project.md Madde 8 & 16) birebir uygular:
+///   * Takip edilenlerin müzeleri en yeniye göre sıralanarak başta listelenir.
+///   * Takip edilenlerin müzeleri bittikten sonra popüler müzeler başlar.
+///   * score = likeCount30d + (2 * commentCount30d) formülü kullanılır.
+///   * Eşitlik durumunda en yeni yayınlanan müze öne geçer.
+///   * Tekrarlayan müzeler elenir.
+/// - 2D müze simülasyonu için hazır oda ve eser verileri sunar.
 class MockMuseumRepository implements MuseumRepository {
+  /// Demo modunda Firebase yapılandırılmamıştır
   @override
   bool get isFirebaseConfigured => false;
 
+  /// Bellekte tutulan kaydedilen müze kimlikleri kümesi
   final Set<String> _savedMuseumIds = {'museum_001'};
+
+  /// Bellekte tutulan beğenilen müze kimlikleri kümesi
   final Set<String> _likedMuseumIds = {};
+
+  /// Bellekte tutulan ziyaretçi yorumları listesi
   final List<MuseumCommentModel> _comments = [];
 
-  // Demo takip ilişkileri (currentUserId -> followedUserIds)
+  /// Demo takip ilişkileri haritası (kullanıcıKimliği -> takipEdilenKullanıcıKimlikleri)
   final Map<String, Set<String>> _followingMap = {
     'demo_user_001': {'user_curator_pera', 'user_ceramic_master'},
   };
 
+  /// Bellekteki müze modelleri listesi
   late List<MuseumModel> _museums;
+
+  /// Bellekteki 2D müze sahne modelleri haritası (museumId -> MuseumSceneModel)
   late Map<String, MuseumSceneModel> _scenes;
 
+  /// MockMuseumRepository yapıcısı; demo sergilerini ve sahnelerini başlatır
   MockMuseumRepository() {
     _initDemoData();
   }
+
 
   void _initDemoData() {
     final now = DateTime.now();
@@ -293,6 +312,7 @@ class MockMuseumRepository implements MuseumRepository {
     };
   }
 
+  /// V1 Klasik Galeri şablonuna göre 2D sahne modeli inşa eden yardımcı metot
   MuseumSceneModel _buildGalleryScene({
     required String museumId,
     required String roomName,
@@ -314,16 +334,29 @@ class MockMuseumRepository implements MuseumRepository {
     );
   }
 
+  /// Keşfet Akışı Algoritması (project.md Madde 8 & AGENTS.md):
+  ///
+  /// 1. Yalnızca yayınlanmış (published) müzeler listelenir.
+  /// 2. Takip edilen hesap varsa:
+  ///    - Takip edilenlerin bütün erişilebilir müzeleri en yeniden eskiye (publishedAt) sıralanır.
+  ///    - Takip edilenlerin tüm müzeleri gösterildikten sonra popülerler başlar.
+  /// 3. Takip edilen yoksa veya takip edilenlerin müzesi yoksa:
+  ///    - Popüler müzeler doğrudan başlar.
+  /// 4. Popülerlik Sıralaması:
+  ///    - score = likeCount30d + (2 * commentCount30d) formülüyle hesaplanır.
+  ///    - Eşit puan durumunda en yeni yayınlanan önce gelir.
+  /// 5. Tekrarlar: Aynı müze akış içerisinde asla tekrarlanmaz.
   @override
   Future<List<MuseumModel>> getExploreFeed({String? currentUserId}) async {
+    // Ağ gecikmesini simüle etmek için 250ms beklenir
     await Future.delayed(const Duration(milliseconds: 250));
 
-    // Yalnızca published müzeler
+    // Yalnızca yayınlanmış (published) müzeler filtrelenir
     final publishedMuseums = _museums
         .where((m) => m.status == MuseumStatus.published)
         .toList();
 
-    // Takip edilenler var mı kontrolü
+    // Kullanıcının takip ettiği hesaplar tespit edilir
     final followedUserIds = currentUserId != null
         ? (_followingMap[currentUserId] ?? <String>{})
         : <String>{};
@@ -331,8 +364,8 @@ class MockMuseumRepository implements MuseumRepository {
     final List<MuseumModel> feed = [];
     final Set<String> addedIds = {};
 
+    // Adım 1: Takip edilenlerin müzeleri (varsa)
     if (followedUserIds.isNotEmpty) {
-      // 1. Takip edilenlerin müzeleri: en yeniden eskiye
       final followedMuseums =
           publishedMuseums
               .where((m) => followedUserIds.contains(m.ownerId))
@@ -351,9 +384,7 @@ class MockMuseumRepository implements MuseumRepository {
       }
     }
 
-    // 2. Ardından popüler müzeler başlar
-    // Kesin algoritma: score = likeCount30d + (2 * commentCount30d)
-    // Eşitlikte en yeni yayınlanan önce gelir.
+    // Adım 2: Popüler müzeler (Kesin algoritma: likeCount30d + 2*commentCount30d)
     final popularMuseums = publishedMuseums.toList()
       ..sort((a, b) {
         final scoreA = a.popularityScore;
@@ -366,7 +397,7 @@ class MockMuseumRepository implements MuseumRepository {
         return bDate.compareTo(aDate);
       });
 
-    // 3. Tekrarlar elenerek popülerler eklenir
+    // Adım 3: Tekrarlar elenerek akışa eklenir
     for (final m in popularMuseums) {
       if (!addedIds.contains(m.id)) {
         feed.add(_enrichMuseum(m));
@@ -377,6 +408,7 @@ class MockMuseumRepository implements MuseumRepository {
     return feed;
   }
 
+  /// Müze modelini kullanıcının beğeni ve kayıt durumuyla zenginleştiren yardımcı fonksiyon
   MuseumModel _enrichMuseum(MuseumModel m) {
     return m.copyWith(
       isSavedByCurrentUser: _savedMuseumIds.contains(m.id),
@@ -384,6 +416,7 @@ class MockMuseumRepository implements MuseumRepository {
     );
   }
 
+  /// Müze kimliğiyle (ID) tekil müze detayını getirir
   @override
   Future<MuseumModel?> getMuseumById(
     String museumId, {
@@ -398,13 +431,14 @@ class MockMuseumRepository implements MuseumRepository {
     }
   }
 
+  /// Müzenin 2D oda ve eser sahnesini getirir
   @override
   Future<MuseumSceneModel?> getMuseumScene(String museumId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     if (_scenes.containsKey(museumId)) {
       return _scenes[museumId];
     }
-    // Varsayılan Klasik Galeri sahnesi oluştur
+    // Sahnesi olmayan müze için varsayılan Klasik Galeri oluştur
     final now = DateTime.now();
     return _buildGalleryScene(
       museumId: museumId,
@@ -430,6 +464,7 @@ class MockMuseumRepository implements MuseumRepository {
     );
   }
 
+  /// Müzeyi kaydeder veya yer imini kaldırır (project.md Madde 13)
   @override
   Future<bool> toggleSaveMuseum({
     required String museumId,
@@ -446,6 +481,7 @@ class MockMuseumRepository implements MuseumRepository {
     }
   }
 
+  /// Müzeyi beğenir veya beğeniyi kaldırır ve sayaçları günceller
   @override
   Future<bool> toggleLikeMuseum({
     required String museumId,
@@ -475,6 +511,7 @@ class MockMuseumRepository implements MuseumRepository {
     }
   }
 
+  /// Müzeye yeni ziyaretçi notu / yorum ekler
   @override
   Future<MuseumCommentModel> addComment({
     required String museumId,
@@ -513,12 +550,14 @@ class MockMuseumRepository implements MuseumRepository {
     return newComment;
   }
 
+  /// Müzenin ziyaretçi yorumlarını getirir
   @override
   Future<List<MuseumCommentModel>> getComments(String museumId) async {
     await Future.delayed(const Duration(milliseconds: 150));
     return _comments.where((c) => c.museumId == museumId).toList();
   }
 
+  /// Kullanıcının yer imine eklediği sergileri getirir
   @override
   Future<List<MuseumModel>> getSavedMuseums(String userId) async {
     await Future.delayed(const Duration(milliseconds: 200));
@@ -528,6 +567,7 @@ class MockMuseumRepository implements MuseumRepository {
         .toList();
   }
 
+  /// Kullanıcının kendi oluşturduğu müzeleri getirir
   @override
   Future<List<MuseumModel>> getUserMuseums(String userId) async {
     await Future.delayed(const Duration(milliseconds: 200));
@@ -537,3 +577,4 @@ class MockMuseumRepository implements MuseumRepository {
         .toList();
   }
 }
+

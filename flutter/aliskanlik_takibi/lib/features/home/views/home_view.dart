@@ -6,6 +6,14 @@ import '../../habits/models/habit_models.dart';
 import '../../habits/views/create_habit_view.dart';
 import '../../habits/views/habit_detail_view.dart';
 
+/// Ritmo Ana Sayfa Ekranı (Home View).
+///
+/// `project.md` 5.5. Bölüm gereksinimlerine göre tasarlanmıştır:
+/// - Kişisel karşılama ve günün tam tarihi
+/// - Günlük motivasyon mesajı
+/// - Günün genel ilerleme yüzdesi ve en yüksek streak bilgisi
+/// - Bugünün planlı alışkanlıkları (Bekleyenler ve Tamamlananlar olarak ayrılmış)
+/// - Tek dokunuşla hızlı ilerleme kaydetme / tamamlama kontrolü
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
@@ -14,6 +22,7 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
+  // Günlük motive edici sözler havuzu
   final List<String> _motivationQuotes = [
     'Her gün bir parça, büyük bir resmi tamamlar.',
     'Küçük adımlar, zamanla dağları aşar.',
@@ -28,14 +37,19 @@ class _HomeViewState extends State<HomeView> {
     final user = appScope.authService.currentUser;
     final habitController = appScope.habitController;
 
+    // Alışkanlık durumu değiştikçe ekranın yeniden çizilmesini sağlar
     return AnimatedBuilder(
       animation: habitController,
       builder: (context, _) {
+        // Bugün yapılması gereken alışkanlıklar ve tamamlama oranı
         final todayHabits = habitController.getTodayHabits();
         final completionRatio = habitController.getTodayCompletionRatio();
+
+        // Güne göre değişen motivasyon sözü seçimi
         final quoteIndex = DateTime.now().day % _motivationQuotes.length;
         final motivation = _motivationQuotes[quoteIndex];
 
+        // Aktif alışkanlıklar arasındaki en uzun streak'i hesapla
         int maxStreak = 0;
         for (final h in habitController.activeHabits) {
           final sInfo = habitController.calculateStreak(h.id);
@@ -44,6 +58,7 @@ class _HomeViewState extends State<HomeView> {
           }
         }
 
+        // Alışkanlıkları tamamlananlar ve bekleyenler olarak ikiye ayır
         final pendingHabits = <HabitModel>[];
         final completedHabits = <HabitModel>[];
 
@@ -68,7 +83,7 @@ class _HomeViewState extends State<HomeView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Karşılama ve Tarih
+                    // Karşılama ve Tarih Bölümü
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -95,6 +110,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ],
                         ),
+                        // Profil İkon Rozeti
                         Container(
                           width: 44,
                           height: 44,
@@ -164,6 +180,7 @@ class _HomeViewState extends State<HomeView> {
                               ],
                             ),
                             const SizedBox(height: 12),
+                            // İlerleme Çubuğu
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: LinearProgressIndicator(
@@ -199,7 +216,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Bugünün Alışkanlıkları Başlığı
+                    // Bugünün Alışkanlıkları Başlığı ve Ekleme Butonu
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -224,7 +241,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Alışkanlık Yoksa Boş Durum
+                    // Bugün için planlanmış alışkanlık yoksa boş durum kartı
                     if (todayHabits.isEmpty) ...[
                       Card(
                         child: Padding(
@@ -265,7 +282,7 @@ class _HomeViewState extends State<HomeView> {
                         ),
                       ),
                     ] else ...[
-                      // Bekleyen Alışkanlıklar
+                      // Tamamlanmayı bekleyen alışkanlıklar
                       if (pendingHabits.isNotEmpty) ...[
                         const Text(
                           'Tamamlanacaklar',
@@ -276,7 +293,7 @@ class _HomeViewState extends State<HomeView> {
                         const SizedBox(height: 16),
                       ],
 
-                      // Tamamlanan Alışkanlıklar
+                      // Bugün tamamlanmış alışkanlıklar
                       if (completedHabits.isNotEmpty) ...[
                         const Text(
                           'Bugün Tamamlananlar ✨',
@@ -296,6 +313,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
+  /// Tek bir alışkanlığın kart görünümünü ve hızlı tamamlama butonunu oluşturur.
   Widget _buildHabitCard(HabitModel habit, {required bool isDone}) {
     final appScope = AppScope.of(context);
     final schedule = appScope.habitController.getSchedule(habit.id);
@@ -307,6 +325,7 @@ class _HomeViewState extends State<HomeView> {
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
         onTap: () {
+          // Alışkanlık detay sayfasına git
           Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => HabitDetailView(habit: habit)),
           );
@@ -317,7 +336,7 @@ class _HomeViewState extends State<HomeView> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                // İkon
+                // Alışkanlık İkonu
                 Container(
                   width: 44,
                   height: 44,
@@ -335,7 +354,7 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(width: 14),
 
-                // Bilgiler
+                // Alışkanlık Bilgileri
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +377,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
 
-                // Tamamlama Kontrolü Butonu
+                // Hızlı Tamamlama Kontrol Butonu
                 IconButton(
                   icon: Icon(
                     isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
@@ -366,6 +385,7 @@ class _HomeViewState extends State<HomeView> {
                     size: 28,
                   ),
                   onPressed: () async {
+                    // Eğer tamamlandıysa sıfırla, tamamlanmadıysa hedef değer kadar ilerleme kaydet
                     final newVal = isDone ? 0.0 : target;
                     await appScope.habitController.recordProgress(
                       habitId: habit.id,

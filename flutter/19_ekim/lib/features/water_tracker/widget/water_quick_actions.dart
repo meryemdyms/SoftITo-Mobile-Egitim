@@ -4,15 +4,24 @@ import 'package:susadim/features/water_tracker/controller/water_tracker_controll
 import 'package:susadim/features/water_tracker/models/water_log.dart';
 import 'package:susadim/features/water_tracker/widget/water_goal_dialog.dart';
 
+/// Kullanıcının sık kullanılan porsiyonlarda (200, 330, 500, 750 ml)
+/// tek dokunuşla su eklemesini sağlayan hızlı aksiyon bileşeni.
 class WaterQuickActions extends StatelessWidget {
   const WaterQuickActions({required this.controller, super.key});
 
   final WaterTrackerController controller;
 
+  /// Hızlı ekleme seçenekleri listesi (ml cinsinden standart bardak/şişe hacimleri)
   static const List<int> _amounts = <int>[200, 330, 500, 750];
 
+  /// Belirtilen miktarda su ekleme işlemini gerçekleştirir.
+  /// Eğer bu ekleme ile günlük hedefe ulaşılmışsa tebrik diyalogunu açar.
   void _onAddWater(BuildContext context, int ml) {
     final reachedGoal = controller.addWater(ml, type: DrinkType.water);
+
+    // context.mounted kontrolü: Widget ağacında hala aktif olup olmadığını denetler.
+    // Asenkron işlemlerde veya olası sayfa geçişlerinde Context hatası (leak/crash)
+    // yaşanmasını önleyen modern bir Flutter best-practice kuralıdır.
     if (reachedGoal && context.mounted) {
       WaterGoalDialog.show(
         context,
@@ -28,8 +37,11 @@ class WaterQuickActions extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Bölüm başlığı
         const _SectionHeader(title: 'Hızlı Su Ekle'),
         const SizedBox(height: 10),
+
+        // Butonların yan yana eşit genişlikte dizildiği satır
         Row(
           children: _amounts
               .map(
@@ -50,6 +62,7 @@ class WaterQuickActions extends StatelessWidget {
   }
 }
 
+/// Bölüm başlığı metnini standartlaştıran yardımcı bileşen
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.title});
 
@@ -67,6 +80,7 @@ class _SectionHeader extends StatelessWidget {
   }
 }
 
+/// Her bir hızlı su ekleme butonunun (kartının) tasarımı ve dokunma efekti
 class _QuickAddButton extends StatelessWidget {
   const _QuickAddButton({required this.amountMl, required this.onTap});
 
@@ -77,7 +91,7 @@ class _QuickAddButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(16), // Dokunma (ripple) efektinin sınırları
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
@@ -88,8 +102,11 @@ class _QuickAddButton extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Artı ikonu
             const Icon(Icons.add, color: AppColors.neonCyan, size: 18),
             const SizedBox(height: 4),
+
+            // Mililitre sayısal değeri
             Text(
               '$amountMl',
               style: const TextStyle(
@@ -98,6 +115,8 @@ class _QuickAddButton extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
+
+            // 'ml' birim etiketi
             const Text(
               'ml',
               style: TextStyle(color: AppColors.textMuted, fontSize: 11),

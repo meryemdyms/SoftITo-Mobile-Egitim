@@ -5,6 +5,14 @@ import '../../home/views/main_navigation_view.dart';
 import '../../onboarding/views/onboarding_view.dart';
 import 'login_view.dart';
 
+/// Ritmo Açılış ve Yönlendirme Ekranı (Splash Screen).
+///
+/// Uygulama ilk açıldığında gösterilen logo animasyonu ve marka sloganını içerir.
+/// Arka planda servisleri başlatır ve kullanıcının durumuna göre:
+/// - Giriş yapılmışsa -> [MainNavigationView]
+/// - Tanıtım görülmemişse -> [OnboardingView]
+/// - Tanıtım görülmüş ama oturum yoksa -> [LoginView]
+/// sayfalarına güvenli yönlendirme gerçekleştirir.
 class SplashView extends StatefulWidget {
   final AuthService authService;
 
@@ -22,30 +30,41 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+
+    // 1. Logo ve metin için yumuşak giriş animasyon kontrolcüsü
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
     );
 
+    // Saydamlık (Fade) animasyonu
     _fadeAnim = CurvedAnimation(
       parent: _animController,
       curve: Curves.easeIn,
     );
 
+    // Hafif büyüme (Scale) animasyonu (0.85 -> 1.0)
     _scaleAnim = Tween<double>(begin: 0.85, end: 1.0).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
 
     _animController.forward();
+
+    // 2. Oturum ve onboarding durumunu kontrol edip uygun ekrana yönlendir
     _checkNavigation();
   }
 
+  /// Oturum ve tanıtım durumunu inceleyip kullanıcıyı doğru ekrana aktarır.
   Future<void> _checkNavigation() async {
+    // Servisin hazır olduğundan emin ol
     await widget.authService.init();
+
+    // Animasyonun estetik olarak izlenebilmesi için kısa bir bekleme süresi
     await Future.delayed(const Duration(milliseconds: 1800));
 
     if (!mounted) return;
 
+    // Oturum durumuna göre yönlendirme mantığı
     if (widget.authService.isLoggedIn) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainNavigationView()),
@@ -83,7 +102,7 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Ritmo Logo İkonu
+                // Ritmo Logo İkon Kutusu
                 Container(
                   width: 96,
                   height: 96,
@@ -107,6 +126,8 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                   ),
                 ),
                 const SizedBox(height: 24),
+
+                // Ritmo Başlığı
                 const Text(
                   'RITMO',
                   style: TextStyle(
@@ -117,6 +138,8 @@ class _SplashViewState extends State<SplashView> with SingleTickerProviderStateM
                   ),
                 ),
                 const SizedBox(height: 8),
+
+                // Ritmo Sloganı (project.md Bölüm 1)
                 const Text(
                   'Küçük adımlar, büyük değişimler.',
                   style: TextStyle(

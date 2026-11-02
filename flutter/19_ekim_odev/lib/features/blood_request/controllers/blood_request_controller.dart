@@ -1,7 +1,11 @@
 import 'package:flutter/foundation.dart';
 import '../models/blood_request_model.dart';
 
+/// Kan taleplerinin durum yönetimini (State Management) sağlayan kontrolcü sınıfı.
+/// Başlangıç verilerini (mock data) yükler, yeni talep oluşturma, filtreleme ve
+/// kan talebine bağış desteği verme işlemlerini yönetir.
 class BloodRequestController {
+  /// Kontrolcü örneği oluşturulduğunda varsayılan örnek kan talepleriyle durumu ilklendirir.
   BloodRequestController()
       : state = ValueNotifier<BloodRequestState>(
           BloodRequestState(
@@ -59,8 +63,10 @@ class BloodRequestController {
           ),
         );
 
+  /// Kan talepleri sayfasının reaktif durum nesnesi.
   final ValueNotifier<BloodRequestState> state;
 
+  /// Yeni bir kan talebi oluşturup listenin en başına ekler.
   void addRequest({
     required String patientName,
     required String bloodGroup,
@@ -86,6 +92,7 @@ class BloodRequestController {
     state.value = state.value.copyWith(requests: updatedList);
   }
 
+  /// Kan grubuna göre filtreleme yapar. Aynı gruba tekrar basılırsa filtreyi kaldırır.
   void filterByBloodGroup(String? bloodGroup) {
     if (state.value.filterBloodGroup == bloodGroup) {
       state.value = state.value.copyWith(filterBloodGroup: () => null);
@@ -94,6 +101,7 @@ class BloodRequestController {
     }
   }
 
+  /// Belirtilen çağrıya bir ünite kan desteği ekler ve ihtiyaç tamamlandıysa çağrıyı kapatır.
   void supportRequest(String requestId) {
     final updatedList = state.value.requests.map((req) {
       if (req.id == requestId) {
@@ -110,7 +118,9 @@ class BloodRequestController {
     state.value = state.value.copyWith(requests: updatedList);
   }
 
+  /// Kontrolcü sonlandığında state dinleyicisini dispose eder.
   void dispose() {
     state.dispose();
   }
 }
+

@@ -4,16 +4,20 @@ import '../../../customer_profile/domain/entities/customer_profile.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 import '../entities/reservation.dart';
 
+/// Rezervasyon oluşturma iş kurallarını denetleyen etki alanı (Domain) doğrulama servisi.
+///
+/// Şartname Kuralları:
+/// 1. Araç ilanda aktif olmalıdır.
+/// 2. Bitiş tarihi başlangıç tarihinden sonra olmalıdır.
+/// 3. Başlangıç tarihi geçmişte olamaz.
+/// 4. Müşteri yaşı aracın `minDriverAge` koşulunu sağlamalıdır.
+/// 5. Müşteri ehliyet süresi aracın `minLicenceYears` koşulunu sağlamalıdır.
+/// 6. Tarih aralığı aracın bloke dönemleriyle çakışmamalıdır.
+/// 7. Tarih aralığı aracın onaylanmış veya aktif rezervasyonlarıyla çakışmamalıdır.
 class BookingValidatorService {
   BookingValidatorService._();
 
-  /// Validates all bookability rules:
-  /// - startAt < endAt
-  /// - startAt not in past relative to currentTime
-  /// - vehicle is active
-  /// - customer age & driving licence age meet vehicle requirements
-  /// - no overlap with vehicle blockedPeriods
-  /// - no overlap with active/confirmed reservations
+  /// Tüm rezervasyon kurallarını doğrular; uygunsuzluk durumunda [BookingException] fırlatır.
   static void validateBookability({
     required Vehicle vehicle,
     required CustomerProfile customerProfile,
@@ -34,14 +38,14 @@ class BookingValidatorService {
       );
     }
 
-    // Start cannot be in the past (allowing 5 minute clock skew grace)
+    // Başlangıç zamanı geçmişte olamaz (5 dakikalık tolerans payı tanınır)
     if (startAt.isBefore(currentTime.subtract(const Duration(minutes: 5)))) {
       throw const BookingException(
         'Kiralama başlangıç tarihi geçmişte olamaz.',
       );
     }
 
-    // Driver age requirement
+    // Minimum sürücü yaşı kontrolü
     final customerAge = customerProfile.ageAt(currentTime);
     if (customerAge < vehicle.minDriverAge) {
       throw BookingException(
@@ -49,7 +53,7 @@ class BookingValidatorService {
       );
     }
 
-    // Driver licence requirement
+    // Minimum ehliyet süresi (yıl) kontrolü
     final licenceYears = customerProfile.licenceYearsAt(currentTime);
     if (licenceYears < vehicle.minLicenceYears) {
       throw BookingException(
@@ -57,14 +61,14 @@ class BookingValidatorService {
       );
     }
 
-    // Blocked periods check
+    // Firmanın bloke ettiği dönem kontrolü
     if (vehicle.isBlockedIn(startAt, endAt)) {
       throw const BookingException(
         'Araç seçilen tarih aralığında firma tarafından bloklanmıştır.',
       );
     }
 
-    // Existing active / confirmed reservations check
+    // Mevcut onaylı veya aktif rezervasyonlarla çakışma kontrolü
     for (final reservation in existingVehicleReservations) {
       if (reservation.blocksCalendar) {
         if (DateFormatter.areIntervalsOverlapping(
@@ -81,7 +85,7 @@ class BookingValidatorService {
     }
   }
 
-  /// Checks if vehicle is available for the given dates without throwing, returning a boolean.
+  /// Belirtilen tarihlerde aracın müsait olup olmadığını hata fırlatmadan boolean (`true`/`false`) olarak döner.
   static bool isVehicleAvailable({
     required Vehicle vehicle,
     required DateTime startAt,

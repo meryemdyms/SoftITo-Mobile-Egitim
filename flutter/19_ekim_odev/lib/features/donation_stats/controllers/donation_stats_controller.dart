@@ -3,7 +3,11 @@ import '../../../core/constants/app_constants.dart';
 import '../../donation_history/models/donation_history_model.dart';
 import '../models/donation_stats_model.dart';
 
+/// Kullanıcının bağış kayıtlarını analiz ederek özet istatistikleri ve
+/// son 6 aylık bağış grafiği verilerini hesaplayan kontrolcü sınıfı.
 class DonationStatsController {
+  /// Kontrolcü örneği oluşturulurken başlangıç verilerini tanımlar.
+  /// Eğer dışarıdan bağış geçmişi ([initialRecords]) verilmişse istatistikleri otomatik hesaplar.
   DonationStatsController({List<DonationRecord>? initialRecords})
       : state = ValueNotifier<DonationStats>(
           const DonationStats(
@@ -27,8 +31,11 @@ class DonationStatsController {
     }
   }
 
+  /// İstatistik verilerini dinlemek için kullanılan reaktif durum nesnesi.
   final ValueNotifier<DonationStats> state;
 
+  /// Verilen bağış kayıtları listesini analiz ederek toplam bağış, son bağıştan geçen süre,
+  /// uygunluk durumu ve aylık dağılımı günceller.
   void calculateStats(List<DonationRecord> records) {
     if (records.isEmpty) {
       state.value = const DonationStats(
@@ -42,16 +49,18 @@ class DonationStatsController {
       return;
     }
 
+    // Toplam bağış sayısı ve toplam bağışlanan ünite miktarı
     final totalDonations = records.length;
     final totalUnits = records.fold(0, (sum, r) => sum + r.units);
 
-    // En son bağışı bul
+    // Tarihe göre sıralayıp en son bağışı bulma
     final sortedRecords = [...records]..sort((a, b) => b.date.compareTo(a.date));
     final latestRecord = sortedRecords.first;
     final daysSince = DateTime.now().difference(latestRecord.date).inDays;
+    // 90 günlük yasal bağış aralığından kalan gün sayısı
     final remainingDays = AppConstants.minDonationIntervalDays - daysSince;
 
-    // Son 6 ayın istatistiğini oluştur
+    // İçinde bulunulan aydan geriye doğru son 6 ayın bağış sayılarını hesaplama
     final now = DateTime.now();
     final months = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
     final List<DonationMonthStat> monthly = [];
@@ -65,6 +74,7 @@ class DonationStatsController {
       monthly.add(DonationMonthStat(monthLabel: monthLabel, donationCount: countInMonth));
     }
 
+    // Yeni hesaplanan değerlerle state nesnesini güncelleme
     state.value = DonationStats(
       totalDonations: totalDonations,
       totalUnits: totalUnits,
@@ -75,7 +85,9 @@ class DonationStatsController {
     );
   }
 
+  /// Kontrolcü sonlandığında state dinleyicisini serbest bırakır.
   void dispose() {
     state.dispose();
   }
 }
+

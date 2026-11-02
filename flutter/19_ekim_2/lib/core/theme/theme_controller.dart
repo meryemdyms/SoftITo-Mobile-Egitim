@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
 /// Karanlık, Aydınlık ve Sistem tema modunu yöneten ValueNotifier tabanlı kontrolcü.
+/// Ekstra paket yükü olmadan Flutter'ın yerel [ValueNotifier] yapısıyla reaktif durum yönetimi sağlar.
 class ThemeController {
+  /// Dinlenebilir tema modu durumu
   final ValueNotifier<ThemeMode> themeMode;
 
   ThemeController([ThemeMode initial = ThemeMode.system])
       : themeMode = ValueNotifier<ThemeMode>(initial);
 
+  /// Mevcut modun doğrudan koyu tema olup olmadığını döndürür
   bool get isDarkMode => themeMode.value == ThemeMode.dark;
 
+  /// Sistem teması seçiliyse cihazın anlık parlaklık modunu (Dark/Light) çözer,
+  /// aksi takdirde seçili olan modu baz alır.
   bool isDark(BuildContext context) {
     if (themeMode.value == ThemeMode.system) {
       return MediaQuery.platformBrightnessOf(context) == Brightness.dark;
@@ -16,7 +21,7 @@ class ThemeController {
     return themeMode.value == ThemeMode.dark;
   }
 
-  /// Temayı karanlık ve aydınlık mod arasında değiştirir
+  /// Temayı aydınlık ve karanlık mod arasında tek dokunuşla değiştirir (Toggle).
   void toggleTheme([BuildContext? context]) {
     final currentIsDark = context != null
         ? isDark(context)
@@ -25,11 +30,12 @@ class ThemeController {
     themeMode.value = currentIsDark ? ThemeMode.light : ThemeMode.dark;
   }
 
-  /// Belirli bir tema modunu ayarlar
+  /// Belirli bir tema modunu (Dark, Light veya System) doğrudan atar
   void setThemeMode(ThemeMode mode) {
     themeMode.value = mode;
   }
 
+  /// Controller ömrü tamamlandığında ValueNotifier dinleyicisini serbest bırakır.
   void dispose() {
     themeMode.dispose();
   }

@@ -18,6 +18,10 @@ import '../../../vehicles/domain/repositories/vehicle_repository.dart';
 import '../../domain/entities/reservation.dart';
 import '../controllers/booking_controller.dart';
 
+/// Giriş yapmış müşterinin geçmiş ve mevcut rezervasyonlarını listelediği ekran.
+///
+/// Rezervasyon durumu takibi (Onaylandı, Aktif Teslim, Tamamlandı, İptal)
+/// ve onaylı rezervasyonları iptal etme aksiyonu sunar.
 class MyBookingsView extends StatefulWidget {
   const MyBookingsView({super.key});
 
@@ -35,6 +39,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
     _loadData();
   }
 
+  /// Müşteri rezervasyonlarını ve kartlarda araç adını göstermek için araç listesini yükler.
   Future<void> _loadData() async {
     final authCtrl = context.read<AuthController>();
     final bookingCtrl = context.read<BookingController>();
@@ -57,6 +62,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
     final authCtrl = context.watch<AuthController>();
     final bookingCtrl = context.watch<BookingController>();
 
+    // Oturum denetimi: Misafir veya firma hesabı ise uyarı gösterilir
     if (!authCtrl.isAuthenticated || !authCtrl.isCustomer) {
       return Scaffold(
         appBar: AppBar(title: const Text('Rezervasyonlarım')),
@@ -108,6 +114,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
     );
   }
 
+  /// Tekil rezervasyon kartı bileşeni.
   Widget _buildReservationCard(
     BuildContext context,
     Reservation reservation,
@@ -131,7 +138,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: Vehicle Name + Status Badge
+          // Araç Başlığı ve Durum Rozeti
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -148,7 +155,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
           const Divider(color: AppColors.border),
           const SizedBox(height: AppSpacing.xs),
 
-          // Date & Time
+          // Tarih ve Gün Bilgisi
           Row(
             children: [
               const Icon(
@@ -164,6 +171,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
             ],
           ),
           const SizedBox(height: 4),
+          // Alış ve İade Konumları
           Row(
             children: [
               const Icon(
@@ -184,14 +192,17 @@ class _MyBookingsViewState extends State<MyBookingsView> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Price & Actions
+          // Ücret ve İptal Butonu
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Ödenecek Tutar:', style: AppTypography.labelSmall),
+                  const Text(
+                    'Ödenecek Tutar:',
+                    style: AppTypography.labelSmall,
+                  ),
                   Text(
                     CurrencyFormatter.formatKurus(reservation.totalPrice),
                     style: AppTypography.titleMedium.copyWith(
@@ -200,6 +211,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
                   ),
                 ],
               ),
+              // Yalnızca Onaylandı durumundaki rezervasyon müşteri tarafından iptal edilebilir
               if (reservation.status == ReservationStatus.confirmed)
                 AppButton(
                   label: 'İptal Et',
@@ -216,6 +228,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
     );
   }
 
+  /// Durum rozeti (Badge) renk ve metin haritalaması.
   Widget _buildStatusBadge(ReservationStatus status) {
     Color bg;
     Color fg;
@@ -251,6 +264,7 @@ class _MyBookingsViewState extends State<MyBookingsView> {
     );
   }
 
+  /// Rezervasyon iptal onay diyaloğunu açar ve işlemi yürütür.
   Future<void> _cancelBooking(
     BuildContext context,
     Reservation reservation,

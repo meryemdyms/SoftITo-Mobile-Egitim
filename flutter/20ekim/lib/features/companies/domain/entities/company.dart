@@ -1,14 +1,36 @@
+/// Platformda araç listeleyen bağımsız araç kiralama firması varlığı (Entity).
 class Company {
+  /// Firmanın benzersiz kimliği.
   final String id;
+
+  /// Bu firmanın sahibi olan kullanıcının ID'si (yetkilendirme kontrolünde kullanılır).
   final String ownerUserId;
+
+  /// Firma ticari ünvanı veya marka adı.
   final String name;
+
+  /// Firma logo görsel URL'si veya asset yolu.
   final String logo;
+
+  /// Firma hakkında tanıtım açıklaması.
   final String description;
+
+  /// Firmanın ofis açık adresi.
   final String address;
+
+  /// Harita konumu için enlem (latitude) değeri.
   final double latitude;
+
+  /// Harita konumu için boylam (longitude) değeri.
   final double longitude;
+
+  /// Çalışma saatleri (örn. "08:30 - 20:00").
   final String openingHours;
+
+  /// İletişim telefon numarası.
   final String phone;
+
+  /// Firmanın sistemde aktif olup olmadığı.
   final bool active;
 
   const Company({
@@ -25,6 +47,7 @@ class Company {
     this.active = true,
   });
 
+  /// Belirli alanları güncelleyerek yeni bir [Company] nesnesi üretir.
   Company copyWith({
     String? id,
     String? ownerUserId,

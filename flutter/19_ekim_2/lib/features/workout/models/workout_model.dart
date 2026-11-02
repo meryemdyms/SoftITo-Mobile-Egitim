@@ -63,6 +63,7 @@ class WorkoutItem {
 }
 
 /// Egzersiz ve kalori verilerini tutan değişmez model sınıfı.
+/// UI durumunun tahmin edilebilirliği için `@immutable` olarak işaretlenmiştir.
 @immutable
 class WorkoutModel {
   final int burnedCalories;
@@ -79,18 +80,22 @@ class WorkoutModel {
     required this.workouts,
   });
 
+  /// Günlük yakılan kalorinin hedefe oranını [0.0 - 1.0] aralığında döner.
+  /// Hedef 0 veya geçersizse sıfıra bölme hatasını önler.
   double get calorieProgress {
     if (dailyCalorieGoal <= 0) return 0.0;
     final val = burnedCalories / dailyCalorieGoal;
     return val > 1.0 ? 1.0 : val;
   }
 
+  /// Günlük aktif sürenin (dakika) hedefe oranını [0.0 - 1.0] aralığında döner.
   double get minuteProgress {
     if (dailyMinutesGoal <= 0) return 0.0;
     final val = activeMinutes / dailyMinutesGoal;
     return val > 1.0 ? 1.0 : val;
   }
 
+  /// Belirli alanları güncelleyerek yeni bir [WorkoutModel] nesnesi üretir.
   WorkoutModel copyWith({
     int? burnedCalories,
     int? dailyCalorieGoal,
@@ -107,6 +112,7 @@ class WorkoutModel {
     );
   }
 
+  /// Kullanıcı ilk kez girdiğinde veya test ortamında kullanılacak varsayılan başlangıç verisi.
   factory WorkoutModel.initial() {
     return WorkoutModel(
       burnedCalories: 420,

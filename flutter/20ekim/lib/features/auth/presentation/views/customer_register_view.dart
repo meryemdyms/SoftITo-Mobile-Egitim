@@ -12,6 +12,9 @@ import '../../../../core/widgets/app_snackbar.dart';
 import '../../../../core/widgets/app_text_field.dart';
 import '../controllers/auth_controller.dart';
 
+/// Bireysel müşteri kayıt ekranı (Customer Register View).
+///
+/// Ad-soyad, e-posta, telefon, şifre ile birlikte demo ehliyet bilgilerini toplar.
 class CustomerRegisterView extends StatefulWidget {
   const CustomerRegisterView({super.key});
 
@@ -55,7 +58,7 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Kişisel Bilgiler', style: AppTypography.titleMedium),
+              const Text('Kişisel Bilgiler', style: AppTypography.titleMedium),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 label: 'Ad Soyad',
@@ -91,8 +94,8 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Birth date picker
-              Text('Doğum Tarihi', style: AppTypography.labelLarge),
+              // Doğum Tarihi Seçimi (DatePicker)
+              const Text('Doğum Tarihi', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.xs),
               InkWell(
                 onTap: _pickBirthDate,
@@ -122,8 +125,8 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Driving Licence Info
-              Text(
+              // Ehliyet Bilgileri Bölümü (Demo ve KVKK uyarısı ile)
+              const Text(
                 'Ehliyet Bilgileri (Demo)',
                 style: AppTypography.titleMedium,
               ),
@@ -141,8 +144,8 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // Licence Class dropdown
-              Text('Ehliyet Sınıfı', style: AppTypography.labelLarge),
+              // Ehliyet Sınıfı Açılır Menüsü (Dropdown)
+              const Text('Ehliyet Sınıfı', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.xs),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -177,8 +180,11 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
-              // Issue Date Picker
-              Text('Ehliyet Veriliş Tarihi', style: AppTypography.labelLarge),
+              // Ehliyet Veriliş Tarihi Seçimi (DatePicker)
+              const Text(
+                'Ehliyet Veriliş Tarihi',
+                style: AppTypography.labelLarge,
+              ),
               const SizedBox(height: AppSpacing.xs),
               InkWell(
                 onTap: _pickIssueDate,
@@ -208,7 +214,7 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
               ),
               const SizedBox(height: AppSpacing.xxl),
 
-              // Submit
+              // Kaydı Tamamla Butonu
               AppButton(
                 label: 'Kaydı Tamamla',
                 isLoading: authCtrl.isLoading,
@@ -222,6 +228,7 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
     );
   }
 
+  /// Müşteri doğum tarihini seçtiren takvim penceresi.
   Future<void> _pickBirthDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -232,6 +239,7 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
     if (picked != null) setState(() => _birthDate = picked);
   }
 
+  /// Ehliyet alış tarihini seçtiren takvim penceresi.
   Future<void> _pickIssueDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -242,6 +250,7 @@ class _CustomerRegisterViewState extends State<CustomerRegisterView> {
     if (picked != null) setState(() => _issueDate = picked);
   }
 
+  /// Formu onaylar ve müşteri kaydını başlatır.
   Future<void> _handleSubmit(
     BuildContext context,
     AuthController authCtrl,

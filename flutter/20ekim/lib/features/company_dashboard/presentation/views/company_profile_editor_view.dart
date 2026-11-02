@@ -11,6 +11,8 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../controllers/company_dashboard_controller.dart';
 
+/// Firmanın müşteri vitrininde gösterilen genel bilgilerini (Firma Adı, Telefon,
+/// Çalışma Saatleri, Açık Adres ve Tanıtım Metni) düzenlemesini sağlayan form ekranı.
 class CompanyProfileEditorView extends StatefulWidget {
   const CompanyProfileEditorView({super.key});
 
@@ -22,6 +24,7 @@ class CompanyProfileEditorView extends StatefulWidget {
 class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
   final _formKey = GlobalKey<FormState>();
 
+  // Form metin alanları için TextEditingController'lar
   late TextEditingController _nameCtrl;
   late TextEditingController _phoneCtrl;
   late TextEditingController _addressCtrl;
@@ -31,6 +34,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
   @override
   void initState() {
     super.initState();
+    // Mevcut firma profili bilgilerini ilgili metin alanlarına doldur
     final company = context.read<CompanyDashboardController>().company;
     _nameCtrl = TextEditingController(text: company?.name ?? '');
     _phoneCtrl = TextEditingController(text: company?.phone ?? '');
@@ -41,6 +45,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
 
   @override
   void dispose() {
+    // Bellek sızıntılarını önlemek için controller'ları serbest bırak
     _nameCtrl.dispose();
     _phoneCtrl.dispose();
     _addressCtrl.dispose();
@@ -64,6 +69,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Açıklama Başlığı
               Text(
                 'Müşterilerin Gördüğü Vitrin Bilgileri',
                 style: AppTypography.titleMedium,
@@ -75,6 +81,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
+              // Firma Adı
               AppTextField(
                 label: 'Firma Adı',
                 controller: _nameCtrl,
@@ -83,6 +90,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // İletişim Telefonu
               AppTextField(
                 label: 'İletişim Telefonu',
                 controller: _phoneCtrl,
@@ -91,6 +99,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Çalışma Saatleri
               AppTextField(
                 label: 'Çalışma Saatleri',
                 hint: 'Örn: 08:30 - 20:00',
@@ -100,6 +109,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Açık Adres
               AppTextField(
                 label: 'Açık Adres',
                 controller: _addressCtrl,
@@ -109,6 +119,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Firma Tanıtım Açıklaması
               AppTextField(
                 label: 'Firma Tanıtım Açıklaması',
                 controller: _descCtrl,
@@ -118,6 +129,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
+              // Kaydet Butonu
               AppButton(
                 label: 'Değişiklikleri Kaydet',
                 isLoading: dashboardCtrl.isLoading,
@@ -130,16 +142,19 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
     );
   }
 
+  /// Form alanlarını doğrular ve firma vitrin profilini günceller.
   Future<void> _handleSave(
     BuildContext context,
     CompanyDashboardController dashboardCtrl,
     AuthController authCtrl,
   ) async {
+    // Form validasyonu kontrolü
     if (!_formKey.currentState!.validate()) return;
     final currentCompany = dashboardCtrl.company;
     final user = authCtrl.currentUser;
     if (currentCompany == null || user == null) return;
 
+    // Güncellenmiş nesneyi hazırla
     final updated = currentCompany.copyWith(
       name: _nameCtrl.text.trim(),
       phone: _phoneCtrl.text.trim(),
@@ -148,6 +163,7 @@ class _CompanyProfileEditorViewState extends State<CompanyProfileEditorView> {
       description: _descCtrl.text.trim(),
     );
 
+    // Repository katmanı üzerinden güncelle
     final success = await dashboardCtrl.updateCompanyProfile(updated, user.id);
     if (success && mounted) {
       AppSnackbar.showSuccess(context, 'Firma vitrin bilgileri güncellendi.');

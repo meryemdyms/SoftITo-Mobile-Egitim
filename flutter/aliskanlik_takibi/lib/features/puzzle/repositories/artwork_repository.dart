@@ -1,8 +1,14 @@
 import 'dart:math';
 import '../models/puzzle_models.dart';
 
-/// Ritmo Gizli Sanat Eserleri Kataloğu
+/// Ritmo Gizli Sanat Eserleri Kataloğu ve Havuzu (Artwork Repository).
+///
+/// `project.md` 7.1. (Yapboz Oluşturma) ve 10. (Koleksiyon Serileri) bölümlerine göre:
+/// - Huzur Serisi, Düşler Serisi, Doğa Serisi, Sanat Serisi, Şehir Serisi kategorilerinde
+///   küratörlü sanat eserleri barındırır.
+/// - Her yeni alışkanlık süreci başladığında bu havuzdan rastgele bir gizli eser atanır.
 class ArtworkRepository {
+  /// Sistemde kayıtlı küratörlü sanat eserleri koleksiyonu
   static const List<ArtworkModel> _curatedArtworks = [
     ArtworkModel(
       id: 'art_forest',
@@ -48,8 +54,10 @@ class ArtworkRepository {
     ),
   ];
 
+  /// Tüm küratörlü eserlerin listesini döner.
   List<ArtworkModel> getAll() => List.unmodifiable(_curatedArtworks);
 
+  /// Kimliğe ([id]) göre eseri bulur. Bulunamazsa varsayılan olarak ilk eseri döner.
   ArtworkModel getById(String id) {
     return _curatedArtworks.firstWhere(
       (a) => a.id == id,
@@ -57,7 +65,8 @@ class ArtworkRepository {
     );
   }
 
-  /// Yeni süreç oluştururken rastgele bir gizli eser seçer
+  /// Yeni bir alışkanlık süreci oluşturulurken rastgele bir gizli eser seçer.
+  /// İsteğe bağlı olarak belirli bir eseri ([excludeId]) hariç tutabilir.
   ArtworkModel getRandomArtwork({String? excludeId}) {
     final pool = excludeId != null
         ? _curatedArtworks.where((a) => a.id != excludeId).toList()

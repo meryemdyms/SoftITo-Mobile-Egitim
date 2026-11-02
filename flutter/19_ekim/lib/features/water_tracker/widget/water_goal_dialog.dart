@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:susadim/core/constants/app_colors.dart';
 
+/// Günlük su hedefine başarıyla ulaşıldığında kullanıcıyı motive etmek amacıyla
+/// ekranda beliren neon temalı tebrik diyalogu (Congratulatory Dialog).
 class WaterGoalDialog extends StatelessWidget {
   const WaterGoalDialog({
     required this.totalMl,
@@ -8,9 +10,15 @@ class WaterGoalDialog extends StatelessWidget {
     super.key,
   });
 
+  /// Gün boyunca içilen toplam miktar
   final int totalMl;
+
+  /// Belirlenmiş olan günlük hedef miktar
   final int goalMl;
 
+  /// Diyalogu pratik bir şekilde açmak için statik yardımcı metot.
+  ///
+  /// Doğrudan `WaterGoalDialog.show(context, totalMl: 2600, goalMl: 2500)` şeklinde çağrılabilir.
   static Future<void> show(
     BuildContext context, {
     required int totalMl,
@@ -18,7 +26,7 @@ class WaterGoalDialog extends StatelessWidget {
   }) {
     return showDialog<void>(
       context: context,
-      barrierDismissible: true,
+      barrierDismissible: true, // Diyalogun dışına dokunulduğunda kapanabilmesini sağlar
       builder: (ctx) => WaterGoalDialog(totalMl: totalMl, goalMl: goalMl),
     );
   }
@@ -26,7 +34,7 @@ class WaterGoalDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.transparent, // Arka plan Container dekorasyonuyla yönetildiği için şeffaf yapılır
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       child: Container(
@@ -35,6 +43,7 @@ class WaterGoalDialog extends StatelessWidget {
           color: AppColors.obsidianSurface,
           borderRadius: BorderRadius.circular(28),
           border: Border.all(color: AppColors.neonCyan, width: 1.5),
+          // Neon ışıma (glow) efekti veren dış gölge (BoxShadow)
           boxShadow: [
             BoxShadow(
               color: AppColors.neonCyan.withValues(alpha: 0.18),
@@ -44,14 +53,21 @@ class WaterGoalDialog extends StatelessWidget {
           ],
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.min, // İçeriğin kapladığı kadar yükseklik alır
           children: [
+            // Kupa simgesi ve dairesel çerçeve
             const _TrophyIcon(),
             const SizedBox(height: 18),
+
+            // Tebrikler başlığı
             const _DialogTitle(),
             const SizedBox(height: 10),
+
+            // Hedef miktar ve ulaşılan miktar detay mesajı
             _DialogMessage(totalMl: totalMl, goalMl: goalMl),
             const SizedBox(height: 24),
+
+            // Diyalogu kapatan onay butonu
             _ConfirmButton(onPressed: () => Navigator.of(context).pop()),
           ],
         ),
@@ -60,6 +76,7 @@ class WaterGoalDialog extends StatelessWidget {
   }
 }
 
+/// Kupa (Trophy) simgesini dairesel neon parlama efekti içinde sunan bileşen
 class _TrophyIcon extends StatelessWidget {
   const _TrophyIcon();
 
@@ -82,6 +99,7 @@ class _TrophyIcon extends StatelessWidget {
   }
 }
 
+/// Diyalog ana başlığı ve alt başlık metinleri
 class _DialogTitle extends StatelessWidget {
   const _DialogTitle();
 
@@ -113,6 +131,7 @@ class _DialogTitle extends StatelessWidget {
   }
 }
 
+/// Tüketilen ve hedeflenen miktarı içeren açıklama metni
 class _DialogMessage extends StatelessWidget {
   const _DialogMessage({required this.totalMl, required this.goalMl});
 
@@ -133,6 +152,7 @@ class _DialogMessage extends StatelessWidget {
   }
 }
 
+/// Diyalogu kapatan tam genişlikli onay butonu
 class _ConfirmButton extends StatelessWidget {
   const _ConfirmButton({required this.onPressed});
 

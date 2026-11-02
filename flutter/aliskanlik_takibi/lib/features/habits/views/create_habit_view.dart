@@ -3,6 +3,16 @@ import '../../../core/services/app_scope.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/habit_models.dart';
 
+/// Ritmo Yeni Alışkanlık Oluşturma Ekranı (Create Habit View).
+///
+/// `project.md` 5.7. (Alışkanlık Oluşturma) ve 12. (Hazır Alışkanlık Önerileri)
+/// kurallarına göre tasarlanmıştır:
+/// - Hazır alışkanlık şablonları (Kitap okuma, su içme, yürüyüş, meditasyon, çalışma)
+/// - Kategori, ikon ve renk paleti seçimi
+/// - Hedef türü (Evet/Hayır, Miktar, Süre) ve ölçü birimi belirleme
+/// - Tekrar sıklığı (Her gün, Hafta içi, Seçilen günler)
+/// - Süreç uzunluğu (21, 30, 60, 90 gün veya 30 günlük dönemli Süresiz)
+/// - Günlük hatırlatıcı saati seçimi
 class CreateHabitView extends StatefulWidget {
   const CreateHabitView({super.key});
 
@@ -27,6 +37,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
   bool _enableReminder = false;
   bool _isLoading = false;
 
+  // Seçilebilir alışkanlık kategorileri
   final List<String> _categories = [
     'Kişisel Gelişim',
     'Spor & Fitness',
@@ -36,6 +47,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
     'Günlük Rutinler',
   ];
 
+  // Seçilebilir ikonlar
   final List<({String key, IconData icon})> _icons = [
     (key: 'book', icon: Icons.menu_book_rounded),
     (key: 'water', icon: Icons.water_drop_rounded),
@@ -47,6 +59,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
     (key: 'music', icon: Icons.music_note_rounded),
   ];
 
+  // Seçilebilir renk paleti
   final List<int> _colors = [
     0xFF344E41,
     0xFFA3B899,
@@ -109,6 +122,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
     ),
   ];
 
+  /// Seçilen hazır şablonu form alanlarına otomatik doldurur.
   void _applyTemplate(({
     String name,
     String category,
@@ -127,6 +141,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
     });
   }
 
+  /// Formu onaylar, alışkanlık modelini ve bağlı gizli yapboz sürecini kaydeder.
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -145,6 +160,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
         ? '${_reminderTime.hour.toString().padLeft(2, '0')}:${_reminderTime.minute.toString().padLeft(2, '0')}'
         : null;
 
+    // Alışkanlığı, planı ve gizli yapbozu oluştur
     await appScope.habitController.addHabit(
       userId: userId,
       name: _nameController.text.trim(),
@@ -212,7 +228,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
                 ),
                 const SizedBox(height: 24),
 
-                // Alışkanlık Adı
+                // Alışkanlık Adı Giriş Alanı
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
@@ -223,7 +239,7 @@ class _CreateHabitViewState extends State<CreateHabitView> {
                 ),
                 const SizedBox(height: 16),
 
-                // Kategori
+                // Kategori Seçimi
                 DropdownButtonFormField<String>(
                   initialValue: _selectedCategory,
                   decoration: const InputDecoration(labelText: 'Kategori'),

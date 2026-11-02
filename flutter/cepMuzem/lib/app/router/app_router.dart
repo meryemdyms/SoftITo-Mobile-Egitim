@@ -14,32 +14,46 @@ import '../../features/splash/views/splash_view.dart';
 import '../../shared/widgets/museum_empty_state.dart';
 import 'main_scaffold.dart';
 
+/// Cep Müzem — Uygulama Navigasyon Yapılandırması (go_router)
+///
+/// Uygulamanın tüm sayfa geçişlerini, alt navigasyon (IndexedStack) durumlarını,
+/// oturum koruyucularını (route guards) ve hata sayfalarını yönetir.
 class AppRouter {
+  /// Oturum durumuna göre rotaları dinamik olarak yeniden tetiklemek için dinlenen ViewModel
   final AuthViewModel authViewModel;
 
   AppRouter({required this.authViewModel});
 
+  /// [GoRouter] örneği; sayfa rotalarını, dallanmaları ve yönlendirme mantığını tanımlar.
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
+    // AuthViewModel dinlenerek oturum durumu değiştiğinde redirect mantığı anında tetiklenir
     refreshListenable: authViewModel,
     routes: [
-      // Splash
-      GoRoute(path: '/splash', builder: (context, state) => const SplashView()),
+      // 1. Splash Ekranı: Uygulama logosu ve oturum kontrolü
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashView(),
+      ),
 
-      // Auth Routes
-      GoRoute(path: '/login', builder: (context, state) => const LoginView()),
+      // 2. Kimlik Doğrulama Rotaları (Giriş ve Kayıt)
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginView(),
+      ),
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterView(),
       ),
 
-      // Bottom Navigation Stateful Branches (Kesin 4 sekme)
+      // 3. Alt Navigasyonlu Ana İskelet (Kesin 4 sekme kuralı)
+      // StatefulShellRoute ile her sekmenin kendi gezinme geçmişi korunur.
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainScaffold(navigationShell: navigationShell);
         },
         branches: [
-          // 1. Keşfet
+          // 1. Sekme: Keşfet (Dijital sergi kataloğu, takip edilenler ve popüler akış)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -48,7 +62,7 @@ class AppRouter {
               ),
             ],
           ),
-          // 2. Harita
+          // 2. Sekme: Harita (Müze pinleri ve ziyaret keşfi)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -57,7 +71,7 @@ class AppRouter {
               ),
             ],
           ),
-          // 3. Müzeni Oluştur
+          // 3. Sekme: Müzeni Oluştur (Küratör atölyesi, oda şablonları, eser yerleşimi)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -66,7 +80,7 @@ class AppRouter {
               ),
             ],
           ),
-          // 4. Profil
+          // 4. Sekme: Profil (Küratör bilgileri, Müzelerim, Kaydettiklerim, Ayarlar)
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -78,7 +92,7 @@ class AppRouter {
         ],
       ),
 
-      // Müze Detay Ekranı
+      // 4. Müze Detay Ekranı: 2D simülasyon, eser inceleme, sesli rehber ve yorumlar
       GoRoute(
         path: '/museum/:id',
         builder: (context, state) {
@@ -87,38 +101,42 @@ class AppRouter {
         },
       ),
 
-      // Bildirimler Ekranı
+      // 5. Bildirimler Ekranı: Sağ üstteki zil simgesinden açılan etkileşim listesi
       GoRoute(
         path: '/notifications',
         builder: (context, state) => const NotificationsView(),
       ),
     ],
 
-    // Route Guards & Redirect
+    // Rota Koruyucuları (Route Guards & Redirect Mantığı)
+    // Oturum durumuna ve bulunulan rotaya göre güvenli yönlendirme sağlar.
     redirect: (context, state) {
       final isLoggingIn =
           state.matchedLocation == '/login' ||
           state.matchedLocation == '/register';
       final isSplash = state.matchedLocation == '/splash';
 
+      // Splash ekranındayken yönlendirme yapılmaz, splash kendi zamanlamasını yönetir
       if (isSplash) return null;
 
       final isAuthenticated = authViewModel.isAuthenticated;
 
-      // Oturum yoksa ve korumalı alandaysa
+      // Kullanıcı oturum açmamışsa ve auth dışındaki korumalı rotalara erişmeye çalışıyorsa
       if (!isAuthenticated && !isLoggingIn) {
         return '/login';
       }
 
-      // Oturum varsa ve login/register sayfalarındaysa Keşfet'e git
+      // Kullanıcı zaten oturum açmışsa login veya register sayfalarında kalması engellenir
       if (isAuthenticated && isLoggingIn) {
         return '/explore';
       }
 
+      // Herhangi bir yönlendirme gerekmiyorsa rota normal seyrinde devam eder
       return null;
     },
 
-    // 404 / Hatalı Sayfa Durumu
+    // 404 / Hatalı Sayfa Durumu Yönetimi
+    // Geçersiz bir URL veya rota istendiğinde kullanıcı dostu boş durum ekranı sunulur
     errorBuilder: (context, state) => Scaffold(
       appBar: AppBar(title: const Text('Sayfa Bulunamadı')),
       body: MuseumEmptyState(
@@ -131,3 +149,4 @@ class AppRouter {
     ),
   );
 }
+

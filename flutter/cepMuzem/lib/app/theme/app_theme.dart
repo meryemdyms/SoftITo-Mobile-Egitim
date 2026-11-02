@@ -5,11 +5,19 @@ import 'app_colors.dart';
 import 'app_dimensions.dart';
 import 'app_typography.dart';
 
-/// Cep Müzem — Yaşayan Müze Merkezi Teması
+/// Cep Müzem — Yaşayan Müze Merkezi Tema Yapılandırması (Material 3)
+///
+/// museum-design-system yönergesine uygun olarak:
+/// - Fildişi (Ivory) ve Müze Beyazı tabanlı aydınlık arayüz
+/// - Koyu Ceviz ve Antik Bronz etkileşim öğeleri
+/// - 16dp kart, 12dp buton, 24dp modal radius kuralları
+/// - 44dp minimum erişilebilir dokunma hedefleri
 class AppTheme {
   AppTheme._();
 
+  /// Uygulamanın merkezi açık tema tanımı
   static ThemeData get lightTheme {
+    // Material 3 renk şeması: Belirlenen palet kodlarıyla birebir eşleştirilmiştir
     final colorScheme = ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.deepWalnut,
@@ -36,6 +44,8 @@ class AppTheme {
       canvasColor: AppColors.ivory,
       cardColor: AppColors.museumWhite,
       dividerColor: AppColors.museumStone,
+
+      // 1. Üst Çubuk (AppBar) Yapılandırması: Gölgesiz, Fildişi zemin ve koyu simgeler
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.ivory,
         surfaceTintColor: Colors.transparent,
@@ -45,6 +55,8 @@ class AppTheme {
         iconTheme: const IconThemeData(color: AppColors.deepWalnut, size: 24),
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
+
+      // 2. Kart (Card) Yapılandırması: 16dp radius, müze taşı ince çerçeve ve 0 elevation
       cardTheme: CardThemeData(
         color: AppColors.museumWhite,
         elevation: 0,
@@ -54,6 +66,8 @@ class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
+
+      // 3. Birincil Buton (ElevatedButton) Yapılandırması: Koyu ceviz, 12dp radius, 44dp min touch
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.deepWalnut,
@@ -73,6 +87,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // 4. Çerçeveli Buton (OutlinedButton) Yapılandırması
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.deepWalnut,
@@ -93,6 +109,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // 5. Metin Butonu (TextButton) Yapılandırması: Antik bronz rengi ve 44dp hedef
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.antiqueBronze,
@@ -105,6 +123,8 @@ class AppTheme {
           ),
         ),
       ),
+
+      // 6. Giriş Alanları (InputDecoration) Yapılandırması: Beyaz zemin, taş çerçeve, net odak
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.museumWhite,
@@ -133,6 +153,8 @@ class AppTheme {
           color: AppColors.secondaryText.withValues(alpha: 0.7),
         ),
       ),
+
+      // 7. Alt Navigasyon Çubuğu (BottomNavigationBar) Yapılandırması: Sabit, beyaz yüzey
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: AppColors.museumWhite,
         selectedItemColor: AppColors.deepWalnut,
@@ -148,6 +170,8 @@ class AppTheme {
           fontWeight: FontWeight.w400,
         ),
       ),
+
+      // 8. Alt Panel (BottomSheet) Yapılandırması: 24dp üst radius, beyaz zemin
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.museumWhite,
         surfaceTintColor: Colors.transparent,
@@ -158,3 +182,4 @@ class AppTheme {
     );
   }
 }
+

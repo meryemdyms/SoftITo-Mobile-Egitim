@@ -1,19 +1,56 @@
+/// Başarı Koleksiyonu Öğe Kategorisi.
+///
+/// `project.md` 10. Bölüm (Başarı Koleksiyonu) kurallarına göre:
+/// Klasik bronz/gümüş/altın rozet sistemi yerine yapboz eserleri kullanılır.
+/// İki ana bölüm bulunur:
+/// - [completedArtwork]: Tamamlanan Eserler (Tüm parçaları eksiksiz açılan görseller)
+/// - [unfinishedStory]: Yarım Kalan Hikâyeler (Süresi biten veya duraklatılan eksik yapbozlar)
 enum CollectionCategory {
-  completedArtwork, // Tamamlanan Eserler
-  unfinishedStory, // Yarım Kalan Hikâyeler
+  /// Eksiksiz kazanılmış sanat eserleri
+  completedArtwork,
+
+  /// Eksik kalan ancak kazanılan parçaları korunan süreçler
+  unfinishedStory,
 }
 
+/// Başarı Koleksiyonu Parça ve Eser Kayıt Modeli.
+///
+/// `project.md` 14. Bölüm (Veri Modelleri - CollectionItem) kurallarına göre:
+/// Kullanıcının kazandığı tamamlanmış eserleri veya yarım kalan süreçlerini
+/// görsel kimliği ([artworkId]), alışkanlık adı ([habitName]), açılan parça sayısı
+/// ve tamamlanma oranıyla birlikte saklar.
 class CollectionItemModel {
+  /// Koleksiyon öğesinin benzersiz kimliği
   final String id;
+
+  /// Eserin sahibi kullanıcının kimliği
   final String userId;
+
+  /// Bağlı yapbozun kimliği
   final String puzzleId;
+
+  /// Bağlı alışkanlık sürecinin kimliği
   final String processId;
+
+  /// Sanat eseri kataloğundaki eserin kimliği (Örn: 'art_forest')
   final String artworkId;
+
+  /// Bu eserin kazanıldığı alışkanlığın adı
   final String habitName;
+
+  /// Koleksiyon kategorisi ([CollectionCategory.completedArtwork] veya [CollectionCategory.unfinishedStory])
   final CollectionCategory category;
+
+  /// Yapbozun tamamlanma yüzdesi (0.0 ile 1.0 arasında, tamamlananlarda 1.0)
   final double completionRate;
+
+  /// Kullanıcının bu eserde açmayı başardığı parça sayısı
   final int unlockedPieces;
+
+  /// Yapbozun toplam parça sayısı
   final int totalPieces;
+
+  /// Koleksiyona eklendiği tarih
   final DateTime collectedAt;
 
   const CollectionItemModel({

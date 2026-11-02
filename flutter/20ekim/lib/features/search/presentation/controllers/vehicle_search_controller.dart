@@ -11,12 +11,13 @@ import '../../../companies/domain/repositories/company_repository.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 import '../../../vehicles/domain/repositories/vehicle_repository.dart';
 
+/// Araç arama, takvim müsaitliği denetleme, filtreleme ve sıralama işlemlerini yöneten ViewModel/Controller.
 class VehicleSearchController extends ChangeNotifier {
   final VehicleRepository _vehicleRepository;
   final ReservationRepository _reservationRepository;
   final CompanyRepository _companyRepository;
 
-  // Search parameters
+  // Arama Parametreleri
   String _pickupLocation = 'İstanbul / Kadıköy';
   String _returnLocation = 'İstanbul / Kadıköy';
   DateTime _startDateTime = DateTime.now().add(
@@ -24,14 +25,14 @@ class VehicleSearchController extends ChangeNotifier {
   );
   DateTime _endDateTime = DateTime.now().add(const Duration(days: 4, hours: 2));
 
-  // Filters
+  // Filtreler
   TransmissionType? _selectedTransmission;
   FuelType? _selectedFuel;
   String? _selectedCompanyId;
-  int? _maxDailyRate; // kuruş
+  int? _maxDailyRate; // kuruş cinsinden tamsayı
   String _sortBy = 'recommended'; // 'price_asc', 'price_desc', 'recommended'
 
-  // State
+  // Durum
   bool _isLoading = false;
   String? _errorMessage;
   List<Vehicle> _allVehicles = [];
@@ -46,24 +47,50 @@ class VehicleSearchController extends ChangeNotifier {
        _reservationRepository = reservationRepository,
        _companyRepository = companyRepository;
 
+  /// Alış noktası konumu.
   String get pickupLocation => _pickupLocation;
+
+  /// İade noktası konumu.
   String get returnLocation => _returnLocation;
+
+  /// Kiralama başlangıç tarih ve saati.
   DateTime get startDateTime => _startDateTime;
+
+  /// Kiralama bitiş tarih ve saati.
   DateTime get endDateTime => _endDateTime;
+
+  /// Hesaplanmış toplam gün sayısı: `ceil(toplam_saat / 24)`.
   int get dayCount =>
       DateFormatter.calculateDayCount(_startDateTime, _endDateTime);
 
+  /// Seçilen vites filtresi.
   TransmissionType? get selectedTransmission => _selectedTransmission;
+
+  /// Seçilen yakıt filtresi.
   FuelType? get selectedFuel => _selectedFuel;
+
+  /// Seçilen firma ID filtresi.
   String? get selectedCompanyId => _selectedCompanyId;
+
+  /// Seçilen maksimum günlük ücret filtresi (kuruş).
   int? get maxDailyRate => _maxDailyRate;
+
+  /// Seçilen sıralama kriteri.
   String get sortBy => _sortBy;
 
+  /// Arama işlemi yükleniyor mu?
   bool get isLoading => _isLoading;
+
+  /// Hata mesajı (varsa).
   String? get errorMessage => _errorMessage;
+
+  /// Filtrelenmiş ve sıralanmış araç listesi.
   List<Vehicle> get vehicles => _filteredVehicles;
+
+  /// Araç kartlarında firma adını hızlı göstermek için firma haritası.
   Map<String, Company> get companiesMap => _companiesMap;
 
+  /// Arama tarihlerini ve konumlarını günceller ve müsait araçları yeniden arar.
   void setSearchDates({
     required DateTime start,
     required DateTime end,
@@ -77,6 +104,7 @@ class VehicleSearchController extends ChangeNotifier {
     searchVehicles();
   }
 
+  /// Filtre kriterlerini günceller ve listeyi filtreler.
   void setFilter({
     TransmissionType? transmission,
     FuelType? fuel,
@@ -87,30 +115,35 @@ class VehicleSearchController extends ChangeNotifier {
     bool clearCompany = false,
     bool clearMaxRate = false,
   }) {
-    if (clearTransmission)
+    if (clearTransmission) {
       _selectedTransmission = null;
-    else if (transmission != null)
+    } else if (transmission != null) {
       _selectedTransmission = transmission;
+    }
 
-    if (clearFuel)
+    if (clearFuel) {
       _selectedFuel = null;
-    else if (fuel != null)
+    } else if (fuel != null) {
       _selectedFuel = fuel;
+    }
 
-    if (clearCompany)
+    if (clearCompany) {
       _selectedCompanyId = null;
-    else if (companyId != null)
+    } else if (companyId != null) {
       _selectedCompanyId = companyId;
+    }
 
-    if (clearMaxRate)
+    if (clearMaxRate) {
       _maxDailyRate = null;
-    else if (maxRate != null)
+    } else if (maxRate != null) {
       _maxDailyRate = maxRate;
+    }
 
     _applyFiltersAndSort();
     notifyListeners();
   }
 
+  /// Tüm filtreleri sıfırlar ve varsayılana döner.
   void resetFilters() {
     _selectedTransmission = null;
     _selectedFuel = null;
@@ -121,12 +154,14 @@ class VehicleSearchController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sıralama türünü ayarlar ('price_asc', 'price_desc', 'recommended').
   void setSortBy(String sort) {
     _sortBy = sort;
     _applyFiltersAndSort();
     notifyListeners();
   }
 
+  /// Seçili tarih aralığında çakışmayan ve aktif olan araçları arar.
   Future<void> searchVehicles() async {
     _isLoading = true;
     _errorMessage = null;
@@ -140,7 +175,7 @@ class VehicleSearchController extends ChangeNotifier {
         activeOnly: true,
       );
 
-      // Check calendar availability for each vehicle
+      // Her aracın seçili tarih aralığında müsait olup olmadığı kontrol edilir
       final List<Vehicle> availableVehicles = [];
       for (final vehicle in activeVehicles) {
         final reservations = await _reservationRepository
@@ -169,6 +204,7 @@ class VehicleSearchController extends ChangeNotifier {
     }
   }
 
+  /// Filtreleri ve sıralama kurallarını araç listesine uygular.
   void _applyFiltersAndSort() {
     var result = List<Vehicle>.from(_allVehicles);
 

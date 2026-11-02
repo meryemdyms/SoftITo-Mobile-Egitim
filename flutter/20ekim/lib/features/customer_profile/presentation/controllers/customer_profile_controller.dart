@@ -4,6 +4,7 @@ import '../../../../core/errors/app_exceptions.dart';
 import '../../domain/entities/customer_profile.dart';
 import '../../domain/repositories/customer_profile_repository.dart';
 
+/// Müşteri profilinin yüklenmesini, güncellenmesini ve durumunu yöneten ChangeNotifier ViewModel.
 class CustomerProfileController extends ChangeNotifier {
   final CustomerProfileRepository _profileRepository;
 
@@ -15,10 +16,16 @@ class CustomerProfileController extends ChangeNotifier {
     required CustomerProfileRepository profileRepository,
   }) : _profileRepository = profileRepository;
 
+  /// Yüklenmiş aktif müşteri profili.
   CustomerProfile? get profile => _profile;
+
+  /// Profil işlemi devam ediyor mu?
   bool get isLoading => _isLoading;
+
+  /// Son oluşan hata mesajı (varsa).
   String? get errorMessage => _errorMessage;
 
+  /// Kullanıcı ID'sine göre profili yükler.
   Future<void> loadProfile(String userId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -37,6 +44,7 @@ class CustomerProfileController extends ChangeNotifier {
     }
   }
 
+  /// Müşteri profilini günceller.
   Future<bool> updateProfile(
     CustomerProfile updatedProfile,
     String actorUserId,

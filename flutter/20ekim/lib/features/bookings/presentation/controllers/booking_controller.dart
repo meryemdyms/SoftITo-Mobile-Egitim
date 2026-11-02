@@ -14,6 +14,7 @@ import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 import '../../domain/services/booking_validator_service.dart';
 
+/// Müşteri rezervasyon oluşturma, listeleme ve iptal etme süreçlerini yöneten ViewModel/Controller.
 class BookingController extends ChangeNotifier {
   final ReservationRepository _reservationRepository;
   final VehicleRepository _vehicleRepository;
@@ -37,11 +38,19 @@ class BookingController extends ChangeNotifier {
        _campaignRepository = campaignRepository,
        _clock = clock;
 
+  /// Müşterinin rezervasyonları listesi.
   List<Reservation> get myReservations => _myReservations;
+
+  /// Araç repository referansı.
   VehicleRepository get vehicleRepository => _vehicleRepository;
+
+  /// İşlem devam ediyor mu?
   bool get isLoading => _isLoading;
+
+  /// Son oluşan hata mesajı (varsa).
   String? get errorMessage => _errorMessage;
 
+  /// Müşterinin mevcut rezervasyonlarını repository üzerinden yükler.
   Future<void> loadCustomerReservations(String customerId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -63,7 +72,7 @@ class BookingController extends ChangeNotifier {
     }
   }
 
-  /// Calculates pricing snapshot preview
+  /// Seçili araç ve tarihler için indirimli fiyat önizlemesi hesaplar.
   Future<PriceCalculationResult> calculatePricePreview({
     required Vehicle vehicle,
     required DateTime startAt,
@@ -84,7 +93,7 @@ class BookingController extends ChangeNotifier {
     );
   }
 
-  /// Validates and creates a new reservation
+  /// Müşteri kiralama kurallarını ve müsaitliği doğrulayıp yeni rezervasyonu onaylar.
   Future<Reservation?> createReservation({
     required String customerId,
     required Vehicle vehicle,
@@ -108,7 +117,7 @@ class BookingController extends ChangeNotifier {
       final existingReservations = await _reservationRepository
           .getVehicleReservations(vehicle.id);
 
-      // Validate bookability
+      // 1. Kiralama kurallarını ve takvim çakışmasını doğrula
       BookingValidatorService.validateBookability(
         vehicle: vehicle,
         customerProfile: profile,
@@ -118,13 +127,14 @@ class BookingController extends ChangeNotifier {
         currentTime: _clock.now(),
       );
 
-      // Calculate price snapshot
+      // 2. Fiyat ve indirim snapshot'ını hesapla
       final priceResult = await calculatePricePreview(
         vehicle: vehicle,
         startAt: startAt,
         endAt: endAt,
       );
 
+      // 3. Rezervasyon nesnesini oluştur
       final newReservation = Reservation(
         id: 'res_${DateTime.now().millisecondsSinceEpoch}',
         vehicleId: vehicle.id,
@@ -162,7 +172,7 @@ class BookingController extends ChangeNotifier {
     }
   }
 
-  /// Cancels confirmed reservation for customer
+  /// Müşterinin 'Onaylandı' durumundaki rezervasyonunu iptal eder.
   Future<bool> cancelReservation({
     required String reservationId,
     required String customerId,

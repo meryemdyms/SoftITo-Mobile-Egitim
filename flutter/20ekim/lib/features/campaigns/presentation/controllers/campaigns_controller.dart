@@ -4,6 +4,7 @@ import '../../../../core/errors/app_exceptions.dart';
 import '../../domain/entities/campaign.dart';
 import '../../domain/repositories/campaign_repository.dart';
 
+/// Tüm aktif kampanyaların listelenmesini ve durumunu yöneten ChangeNotifier ViewModel.
 class CampaignsController extends ChangeNotifier {
   final CampaignRepository _campaignRepository;
 
@@ -14,10 +15,16 @@ class CampaignsController extends ChangeNotifier {
   CampaignsController({required CampaignRepository campaignRepository})
     : _campaignRepository = campaignRepository;
 
+  /// Geçerli aktif kampanyalar listesi.
   List<Campaign> get activeCampaigns => _activeCampaigns;
+
+  /// Yüklenme durumu.
   bool get isLoading => _isLoading;
+
+  /// Hata mesajı (varsa).
   String? get errorMessage => _errorMessage;
 
+  /// Tüm geçerli aktif kampanyaları yükler.
   Future<void> loadCampaigns() async {
     _isLoading = true;
     _errorMessage = null;

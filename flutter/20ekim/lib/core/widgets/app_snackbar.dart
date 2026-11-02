@@ -4,9 +4,11 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 
+/// Uygulama içi yüzen (floating) bilgilendirme bildirimleri (SnackBar) gösterim yardımcısı.
 class AppSnackbar {
   AppSnackbar._();
 
+  /// Başarılı işlem bildirimi gösterir (Yeşil arka plan).
   static void showSuccess(BuildContext context, String message) {
     _show(
       context,
@@ -16,6 +18,7 @@ class AppSnackbar {
     );
   }
 
+  /// Hata veya uyarı bildirimi gösterir (Kırmızı arka plan).
   static void showError(BuildContext context, String message) {
     _show(
       context,
@@ -25,6 +28,7 @@ class AppSnackbar {
     );
   }
 
+  /// Genel bilgilendirme bildirimi gösterir (Koyu lacivert/mürekkep arka plan).
   static void showInfo(BuildContext context, String message) {
     _show(
       context,
@@ -34,6 +38,7 @@ class AppSnackbar {
     );
   }
 
+  /// Ortak SnackBar gösterim mantığı.
   static void _show(
     BuildContext context, {
     required String message,

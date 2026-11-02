@@ -16,6 +16,7 @@ class WorkoutView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Egzersiz veya kalori verisi güncellendiğinde ekranı reaktif olarak yeniden oluşturan dinleyici.
     return ValueListenableBuilder<WorkoutModel>(
       valueListenable: controller.state,
       builder: (context, model, _) {
@@ -24,10 +25,13 @@ class WorkoutView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Kalori ve aktif süre ilerlemesini gösteren ana aktivite kartı
               WorkoutRingsCard(model: model),
               const SizedBox(height: 24),
+              // Tek tıkla sık kullanılan egzersizleri ekleyen hazır şablon butonları
               WorkoutQuickPresets(onAddWorkout: controller.addWorkout),
               const SizedBox(height: 24),
+              // Gün içinde kaydedilen egzersizlerin listesi ve silme aksiyonu
               WorkoutHistoryList(
                 workouts: model.workouts,
                 onRemoveWorkout: controller.removeWorkout,

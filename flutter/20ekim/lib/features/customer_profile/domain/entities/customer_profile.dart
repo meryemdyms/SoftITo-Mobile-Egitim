@@ -1,8 +1,20 @@
+/// Müşterinin yaş ve ehliyet uygunluk denetimleri için kullanılan profil varlığı.
+///
+/// Demo veri sınırları dahilindedir; gerçek kimlik verisi saklanmaz.
 class CustomerProfile {
+  /// Bağlı olduğu kullanıcı ID'si.
   final String userId;
+
+  /// Doğum tarihi (sürücü yaşı kuralı denetiminde kullanılır).
   final DateTime birthDate;
+
+  /// Ehliyet / sürücü belgesi numarası.
   final String drivingLicenceNumber;
+
+  /// Ehliyet sınıfı (B, A2, C vb.).
   final String licenceClass;
+
+  /// Ehliyet veriliş tarihi (ehliyet süresi kuralı denetiminde kullanılır).
   final DateTime issueDate;
 
   const CustomerProfile({
@@ -13,7 +25,7 @@ class CustomerProfile {
     required this.issueDate,
   });
 
-  /// Calculates age based on given current date
+  /// Verilen referans tarihe göre sürücünün tam yaşını hesaplar.
   int ageAt(DateTime date) {
     int age = date.year - birthDate.year;
     if (date.month < birthDate.month ||
@@ -23,7 +35,7 @@ class CustomerProfile {
     return age;
   }
 
-  /// Calculates driving licence age in years based on given current date
+  /// Verilen referans tarihe göre ehliyetin kaç yıllık olduğunu hesaplar.
   int licenceYearsAt(DateTime date) {
     int years = date.year - issueDate.year;
     if (date.month < issueDate.month ||
@@ -33,6 +45,7 @@ class CustomerProfile {
     return years;
   }
 
+  /// Belirli alanları güncelleyerek yeni bir [CustomerProfile] nesnesi oluşturur.
   CustomerProfile copyWith({
     String? userId,
     DateTime? birthDate,

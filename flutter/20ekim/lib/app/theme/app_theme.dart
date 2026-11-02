@@ -4,10 +4,16 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 import 'app_typography.dart';
 
+/// Uygulamanın Material Design 3 tema yapılandırma sınıfı.
+///
+/// Renk şeması, tipografi, butonlar, giriş alanları ve gezinme çubuğu gibi
+/// tüm UI bileşenlerinin global stil kurallarını belirler.
 class AppTheme {
   AppTheme._();
 
+  /// Uygulamanın aydınlık (Light) tema nesnesi.
   static ThemeData get lightTheme {
+    // Material 3 ColorScheme haritalaması
     final colorScheme = ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.primary,
@@ -32,7 +38,8 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.canvas,
-      fontFamily: null, // Default system font with rich weights
+      fontFamily: null, // Sistem yazı tipi ve zengin kalınlık ağırlıkları
+      // Üst çubuk (AppBar) varsayılan stili
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.ink,
@@ -41,6 +48,7 @@ class AppTheme {
         scrolledUnderElevation: 1,
         titleTextStyle: AppTypography.titleLarge,
       ),
+      // Kartlar için standart dolgu, kenarlık ve köşe yuvarlatma
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -50,6 +58,7 @@ class AppTheme {
         ),
         margin: EdgeInsets.zero,
       ),
+      // Metin giriş alanları (TextField) için tutarlı tema
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
@@ -80,6 +89,7 @@ class AppTheme {
         hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.muted),
         labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.ink),
       ),
+      // Vurgulu (Filled) buton stili (minimum 48px dokunma alanı kuralı)
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -90,6 +100,7 @@ class AppTheme {
           textStyle: AppTypography.labelLarge.copyWith(color: Colors.white),
         ),
       ),
+      // Çerçeveli (Outlined) buton stili
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -101,6 +112,7 @@ class AppTheme {
           ),
         ),
       ),
+      // Alt gezinme çubuğu (Bottom Navigation Bar) stili
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
         elevation: 3,
@@ -115,6 +127,7 @@ class AppTheme {
           return AppTypography.labelSmall;
         }),
       ),
+      // Bilgilendirme bildirimleri (SnackBar) stili
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.ink,
         contentTextStyle: AppTypography.bodyMedium.copyWith(

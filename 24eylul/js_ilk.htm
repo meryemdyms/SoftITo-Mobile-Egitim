@@ -223,37 +223,6 @@
         console.log(indirimHesapla(100, 20));
 
 
-        //Şarj süresi tahmin dk cinsinden motoru mevcutyüzde,hedefyzde,bataryaKw,istasyonKw gece gündüz tarfiesi ekle
-
-        const tahminiSureHesapla = (mevcutYuzde, hedefYuzde, bataryaKw, istasyonKw) => {
-
-            if (hedefYuzde <= mevcutYuzde) {
-                return "Hedef yüzde mevcut yüzdeden büyük olmalı";
-            }
-
-            const farkYuzde = hedefYuzde - mevcutYuzde;
-            const farkOndalik = farkYuzde / 100;
-            const gerekenEnerji = farkOndalik * 100;
-
-            let sarjGucu;
-
-            if (istasyonKw <= bataryaKw) {
-                sarjGucu = istasyonKw;
-            } else {
-                sarjGucu = bataryaKw;
-            }
-
-            const sureSaat = gerekenEnerji / sarjGucu;
-            const sureDakika = sureSaat * 60;
-
-            return sureDakika;
-        }
-
-        console.log(tahminiSureHesapla(15, 85, 100, 150));
-
-        //bataryakw bataryanın alış hızı
-        //istasyonkw istasyonun veriş hızı
-        //%1 1000kw alabilir
         
 
 

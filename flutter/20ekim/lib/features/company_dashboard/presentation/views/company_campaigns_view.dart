@@ -13,6 +13,8 @@ import '../../../../core/widgets/app_text_field.dart';
 import '../../../campaigns/domain/entities/campaign.dart';
 import '../controllers/company_dashboard_controller.dart';
 
+/// Firmaya ait indirim ve promosyon kampanyalarının listelendiği,
+/// yeni kampanya oluşturulup yayınlandığı yönetim ekranı.
 class CompanyCampaignsView extends StatelessWidget {
   const CompanyCampaignsView({super.key});
 
@@ -24,6 +26,7 @@ class CompanyCampaignsView extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.canvas,
       appBar: AppBar(title: const Text('Kampanya Yönetimi')),
+      // Yeni kampanya oluşturma butonu
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
@@ -57,6 +60,7 @@ class CompanyCampaignsView extends StatelessWidget {
     );
   }
 
+  /// Kampanya bilgilerini özetleyen kart görünümü.
   Widget _buildCampaignTile(BuildContext context, Campaign campaign) {
     return Container(
       padding: AppSpacing.edgeInsetsMd,
@@ -74,6 +78,7 @@ class CompanyCampaignsView extends StatelessWidget {
               Expanded(
                 child: Text(campaign.title, style: AppTypography.titleMedium),
               ),
+              // İndirim oranı rozeti
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
@@ -105,6 +110,7 @@ class CompanyCampaignsView extends StatelessWidget {
     );
   }
 
+  /// Yeni kampanya oluşturma modal penceresini (Bottom Sheet) açar.
   void _openAddCampaignDialog(
     BuildContext context,
     CompanyDashboardController controller,
@@ -118,6 +124,7 @@ class CompanyCampaignsView extends StatelessWidget {
   }
 }
 
+/// Yeni kampanya oluşturma formunu barındıran alt pencere bileşeni.
 class _AddCampaignModal extends StatefulWidget {
   final CompanyDashboardController controller;
 
@@ -130,9 +137,12 @@ class _AddCampaignModal extends StatefulWidget {
 class _AddCampaignModalState extends State<_AddCampaignModal> {
   final _formKey = GlobalKey<FormState>();
 
+  // Metin alanları için TextEditingController'lar
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _discountPercentCtrl = TextEditingController(text: '15');
+
+  // Kampanyanın varsayılan geçerlilik aralığı: Bugün ile 30 gün sonrası
   DateTime _validFrom = DateTime.now();
   DateTime _validTo = DateTime.now().add(const Duration(days: 30));
 
@@ -180,6 +190,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
               const Divider(color: AppColors.border),
               const SizedBox(height: AppSpacing.md),
 
+              // Kampanya Başlığı
               AppTextField(
                 label: 'Kampanya Başlığı',
                 hint: 'Örn: Erken Rezervasyon Fırsatı %15',
@@ -189,6 +200,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Açıklama
               AppTextField(
                 label: 'Açıklama',
                 hint: 'Kampanya katılım ve kullanım şartları...',
@@ -199,6 +211,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // İndirim Yüzdesi (%)
               AppTextField(
                 label: 'İndirim Yüzdesi (%)',
                 hint: '15',
@@ -211,13 +224,15 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
                   );
                   if (err != null) return err;
                   final num = int.parse(v!);
-                  if (num <= 0 || num > 90)
+                  if (num <= 0 || num > 90) {
                     return 'İndirim 1 ile 90 arasında olmalıdır.';
+                  }
                   return null;
                 },
               ),
               const SizedBox(height: AppSpacing.md),
 
+              // Geçerlilik Tarihleri Seçimi
               Text('Geçerlilik Tarihleri', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.xs),
               InkWell(
@@ -248,6 +263,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
+              // Yayınla Butonu
               AppButton(label: 'Kampanyayı Yayınla', onPressed: _saveCampaign),
             ],
           ),
@@ -256,6 +272,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
     );
   }
 
+  /// Tarih aralığı seçici diyalog penceresini açar.
   Future<void> _pickRange() async {
     final picked = await showDateRangePicker(
       context: context,
@@ -271,6 +288,7 @@ class _AddCampaignModalState extends State<_AddCampaignModal> {
     }
   }
 
+  /// Kampanyayı doğrulayıp sisteme kaydeden metot.
   Future<void> _saveCampaign() async {
     if (!_formKey.currentState!.validate()) return;
     final company = widget.controller.company;

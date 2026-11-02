@@ -4,6 +4,12 @@ import '../../home/views/main_navigation_view.dart';
 import '../services/auth_service.dart';
 import 'register_view.dart';
 
+/// Ritmo Kullanıcı Giriş Ekranı (Login View).
+///
+/// `project.md` 5.2. Bölüm kurallarına göre tasarlanmıştır:
+/// Demo oturum modu için ön tanımlı değerler içerir.
+/// Gerçek backend olmadan şifre sıfırlama işlemi sahte olarak sunulmaz;
+/// bilgilendirici bir modal ile kullanıcının demo modda olduğu aktarılır.
 class LoginView extends StatefulWidget {
   final AuthService authService;
 
@@ -14,9 +20,13 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
+  // Form doğrulama anahtarı
   final _formKey = GlobalKey<FormState>();
+
+  // Demo oturum kolaylığı için ön tanımlı metin denetleyicileri
   final _emailController = TextEditingController(text: 'demo@ritmo.app');
   final _passwordController = TextEditingController(text: '123456');
+
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -27,6 +37,7 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
+  /// Giriş işlemini doğrular ve gerçekleştirir.
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -40,6 +51,7 @@ class _LoginViewState extends State<LoginView> {
     setState(() => _isLoading = false);
 
     if (success && mounted) {
+      // Başarılı girişte ana gezinme ekranına geçiş yap
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainNavigationView()),
       );
@@ -50,13 +62,18 @@ class _LoginViewState extends State<LoginView> {
     }
   }
 
+  /// project.md kuralı: Gerçek backend olmadan şifre sıfırlama çalışıyormuş gibi gösterilmez.
+  /// Kullanıcıya demo modda olunduğunu açıklayan diyalog sunulur.
   void _showForgotPasswordDialog() {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.cardBg,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Şifre Sıfırlama', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Şifre Sıfırlama',
+          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
+        ),
         content: const Text(
           'Ritmo şu an demo oturum modunda çalışmaktadır. '
           'Gerçek şifre sıfırlama işlemi backend entegrasyonu aşamasında aktif olacaktır. '
@@ -86,7 +103,7 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo ve Karşılama
+                  // Logo ve Karşılama İkonu
                   Center(
                     child: Container(
                       width: 68,
@@ -101,6 +118,8 @@ class _LoginViewState extends State<LoginView> {
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Başlık ve Alt Başlık
                   const Center(
                     child: Text(
                       'Tekrar Hoş Geldin',
@@ -122,7 +141,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Demo Uyarısı Bilgi Kartı
+                  // Demo Oturum Bilgilendirme Kartı
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -137,7 +156,11 @@ class _LoginViewState extends State<LoginView> {
                         Expanded(
                           child: Text(
                             'Demo Oturum: Ön tanımlı e-posta ve şifre ile doğrudan devam edebilirsiniz.',
-                            style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w500),
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ],
@@ -145,7 +168,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 24),
 
-                  // E-posta Alanı
+                  // E-posta Giriş Alanı
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -158,7 +181,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Şifre Alanı
+                  // Şifre Giriş Alanı (Görünürlük değiştirilebilir)
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -178,7 +201,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 8),
 
-                  // Şifremi Unuttum
+                  // Şifremi Unuttum Butonu
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
@@ -201,7 +224,7 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   const SizedBox(height: 20),
 
-                  // Kayıt Ol Yönlendirmesi
+                  // Kayıt Ol Ekranına Yönlendirme
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

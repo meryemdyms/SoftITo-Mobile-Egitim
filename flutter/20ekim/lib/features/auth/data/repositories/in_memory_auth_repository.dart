@@ -10,10 +10,12 @@ import '../../../companies/domain/repositories/company_repository.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 
+/// Bellek üzerinde çalışan, simüle edilmiş kimlik doğrulama repository implementasyonu.
 class InMemoryAuthRepository implements AuthRepository {
   final CustomerProfileRepository _profileRepository;
   final CompanyRepository _companyRepository;
 
+  // Bellekte saklanan kullanıcı listesi
   final List<User> _users = List.from(MockDataSeed.initialUsers);
   final StreamController<User?> _authStateController =
       StreamController<User?>.broadcast();
@@ -37,6 +39,7 @@ class InMemoryAuthRepository implements AuthRepository {
     required String password,
     required UserRole role,
   }) async {
+    // Gerçekçi ağ gecikmesi simülasyonu
     await Future.delayed(const Duration(milliseconds: 300));
 
     final normalizedEmail = email.trim().toLowerCase();
@@ -83,7 +86,7 @@ class InMemoryAuthRepository implements AuthRepository {
 
     _users.add(newUser);
 
-    // Save profile
+    // Müşteri ehliyet profilini otomatik oluşturur ve kaydeder
     final profile = CustomerProfile(
       userId: newId,
       birthDate: birthDate,
@@ -127,6 +130,7 @@ class InMemoryAuthRepository implements AuthRepository {
     );
     _users.add(newUser);
 
+    // Yeni kiralama firmasının vitrin kaydını oluşturur
     final newCompanyId = 'comp_${DateTime.now().millisecondsSinceEpoch}';
     final newCompany = Company(
       id: newCompanyId,
@@ -156,6 +160,7 @@ class InMemoryAuthRepository implements AuthRepository {
     _authStateController.add(null);
   }
 
+  /// Kaynakları serbest bırakır.
   void dispose() {
     _authStateController.close();
   }

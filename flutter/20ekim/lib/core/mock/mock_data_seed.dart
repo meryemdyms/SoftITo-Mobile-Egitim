@@ -9,9 +9,14 @@ import '../../features/vehicles/domain/entities/vehicle.dart';
 import '../../features/bookings/domain/entities/reservation.dart';
 import '../../features/campaigns/domain/entities/campaign.dart';
 
+/// Uygulamanın çevrimdışı / demo çalışması için başlangıç verilerini sağlayan tohum (seed) sınıfı.
+///
+/// Gerçek bir sunucu olmadan test yapabilmek adına kullanıcılar, profiller,
+/// firmalar, araçlar, kampanyalar ve örnek rezervasyonlar içerir.
 class MockDataSeed {
   MockDataSeed._();
 
+  /// Başlangıç kullanıcıları (Müşteri ve Firma hesapları).
   static List<User> get initialUsers => [
     const User(
       id: 'user_cust_1',
@@ -43,6 +48,7 @@ class MockDataSeed {
     ),
   ];
 
+  /// Başlangıç müşteri profilleri (Doğum tarihi, ehliyet no, alış tarihi).
   static Map<String, CustomerProfile> get initialProfiles => {
     'user_cust_1': CustomerProfile(
       userId: 'user_cust_1',
@@ -60,6 +66,7 @@ class MockDataSeed {
     ),
   };
 
+  /// Başlangıç araç kiralama firmaları ve konum bilgileri.
   static List<Company> get initialCompanies => [
     const Company(
       id: 'comp_1',
@@ -89,6 +96,7 @@ class MockDataSeed {
     ),
   ];
 
+  /// Başlangıç araç filosu (Segment, vites, yakıt, yaş ve ehliyet kuralları).
   static List<Vehicle> get initialVehicles => [
     const Vehicle(
       id: 'veh_1',
@@ -99,7 +107,7 @@ class MockDataSeed {
       transmission: TransmissionType.manual,
       fuel: FuelType.gasoline,
       seats: 5,
-      dailyRate: 110000, // 1.100 ₺
+      dailyRate: 110000, // 1.100 ₺ (kuruş bazında)
       images: [
         'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?w=600',
       ],
@@ -200,6 +208,7 @@ class MockDataSeed {
     ),
   ];
 
+  /// Başlangıç indirim kampanyaları.
   static List<Campaign> get initialCampaigns => [
     Campaign(
       id: 'camp_1',
@@ -225,6 +234,7 @@ class MockDataSeed {
     ),
   ];
 
+  /// Örnek başlangıç rezervasyonları.
   static List<Reservation> get initialReservations => [
     Reservation(
       id: 'res_1',

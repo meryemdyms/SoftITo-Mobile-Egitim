@@ -1,7 +1,12 @@
 import 'package:flutter/foundation.dart';
 import '../models/donation_history_model.dart';
 
+/// Donörün kan bağış geçmişini yöneten kontrolcü sınıfı.
+/// Başlangıç mock bağış kayıtlarını yükler, yeni bağış ekleme ve kayıt silme işlevlerini sağlar.
 class DonationHistoryController {
+  /// Kontrolcü örneği oluşturulduğunda varsayılan geçmiş bağış verileriyle durumu ilklendirir.
+  /// [onDonationAdded] callback'i, yeni bir bağış eklendiğinde profil ve istatistik
+  /// modüllerini haberdar etmek için kullanılır.
   DonationHistoryController({this.onDonationAdded})
       : state = ValueNotifier<DonationHistoryState>(
           DonationHistoryState(
@@ -49,9 +54,13 @@ class DonationHistoryController {
           ),
         );
 
+  /// Bağış geçmişi listesini yayınlayan reaktif durum nesnesi.
   final ValueNotifier<DonationHistoryState> state;
+
+  /// Yeni bir bağış başarıyla eklendiğinde tetiklenen geri çağırım fonksiyonu.
   final ValueChanged<DonationRecord>? onDonationAdded;
 
+  /// Sisteme yeni bir kan bağışı kaydı ekler ve listeyi günceller.
   void addDonation({
     required DateTime date,
     required String hospitalName,
@@ -73,15 +82,20 @@ class DonationHistoryController {
 
     final updated = [record, ...state.value.records];
     state.value = state.value.copyWith(records: updated);
+
+    // Diğer ekranları (Profil & İstatistik) bilgilendirir
     onDonationAdded?.call(record);
   }
 
+  /// Belirtilen kimliğe sahip bağış kaydını listeden siler.
   void removeDonation(String id) {
     final updated = state.value.records.where((r) => r.id != id).toList();
     state.value = state.value.copyWith(records: updated);
   }
 
+  /// Kontrolcü sonlandığında state dinleyicisini serbest bırakır.
   void dispose() {
     state.dispose();
   }
 }
+

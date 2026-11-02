@@ -7,6 +7,14 @@ import '../../../app/theme/app_dimensions.dart';
 import '../../../app/theme/app_typography.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
 
+/// Cep Müzem — Açılış Ekranı (SplashView)
+///
+/// project.md Madde 6 gereksinimleri:
+/// - Uygulama logosu ve adı görüntülenir.
+/// - Sakin ve şık bir fade animasyonu çalışır.
+/// - Oturum kontrolü yapılır:
+///   * Oturum açıksa doğrudan ana sayfaya (/explore) yönlendirir.
+///   * Oturum kapalıysa giriş sayfasına (/login) yönlendirir.
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
 
@@ -16,12 +24,16 @@ class SplashView extends StatefulWidget {
 
 class _SplashViewState extends State<SplashView>
     with SingleTickerProviderStateMixin {
+  /// Logo ve başlık geçişi için animasyon denetleyicisi
   late AnimationController _controller;
+
+  /// Saydamlık (Fade) animasyon eğrisi
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    // 900ms süren sakin bir geçiş animasyonu oluşturulur
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
@@ -32,17 +44,20 @@ class _SplashViewState extends State<SplashView>
     );
     _controller.forward();
 
-    // Oturum kontrolü ve yönlendirme
+    // İlk kare çizildikten sonra oturum durumu kontrol edilir ve yönlendirme planlanır
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAuthAndNavigate();
     });
   }
 
+  /// Oturum durumunu denetleyip uygun sayfaya yönlendiren asenkron metot
   Future<void> _checkAuthAndNavigate() async {
+    // Kullanıcının splash ekranını ve atmosferi hissedebilmesi için 1.2 saniye beklenir
     await Future.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
 
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
+    // Oturum durumuna göre rota belirlenir
     if (authVm.isAuthenticated) {
       context.go('/explore');
     } else {
@@ -66,6 +81,7 @@ class _SplashViewState extends State<SplashView>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // 1. Müze Logosu (Zarif dairesel rozet)
               Container(
                 width: 88,
                 height: 88,
@@ -88,6 +104,8 @@ class _SplashViewState extends State<SplashView>
                 ),
               ),
               const SizedBox(height: AppDimensions.space20),
+
+              // 2. Uygulama Adı
               Text(
                 'Cep Müzem',
                 style: AppTypography.pageTitle.copyWith(
@@ -96,6 +114,8 @@ class _SplashViewState extends State<SplashView>
                 ),
               ),
               const SizedBox(height: AppDimensions.space8),
+
+              // 3. Alt Başlık / Slogan
               Text(
                 'Kişisel Dijital Müzeniz',
                 style: AppTypography.caption.copyWith(
@@ -110,3 +130,4 @@ class _SplashViewState extends State<SplashView>
     );
   }
 }
+

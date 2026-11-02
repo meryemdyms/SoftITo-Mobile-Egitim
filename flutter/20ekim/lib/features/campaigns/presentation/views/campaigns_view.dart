@@ -14,6 +14,9 @@ import '../../../companies/domain/repositories/company_repository.dart';
 import '../controllers/campaigns_controller.dart';
 import '../../domain/entities/campaign.dart';
 
+/// Müşterilere ve misafirlere yönelik tüm aktif indirim kampanyalarını listeleyen ekran.
+///
+/// Kampanya detayları, indirim yüzdesi, geçerlilik tarihleri ve ilgili firmanın vitrinine yönlendirme sunar.
 class CampaignsView extends StatefulWidget {
   const CampaignsView({super.key});
 
@@ -31,6 +34,7 @@ class _CampaignsViewState extends State<CampaignsView> {
     _loadCompanies();
   }
 
+  /// Kampanyaların ait olduğu firmaların isimlerini kartta gösterebilmek için yükler.
   Future<void> _loadCompanies() async {
     final companyRepo = context.read<CompanyRepository>();
     final companies = await companyRepo.getAllCompanies();
@@ -81,6 +85,7 @@ class _CampaignsViewState extends State<CampaignsView> {
     );
   }
 
+  /// Kampanya banner kartını oluşturan yardımcı widget.
   Widget _buildCampaignCard(
     BuildContext context,
     Campaign campaign,
@@ -102,7 +107,7 @@ class _CampaignsViewState extends State<CampaignsView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Banner gradient header
+          // Üst Gradient Başlık Bandı ve İndirim Rozeti
           Container(
             padding: AppSpacing.edgeInsetsLg,
             decoration: const BoxDecoration(
@@ -147,7 +152,7 @@ class _CampaignsViewState extends State<CampaignsView> {
             ),
           ),
 
-          // Content body
+          // Kampanya Gövde Detayları
           Padding(
             padding: AppSpacing.edgeInsetsLg,
             child: Column(

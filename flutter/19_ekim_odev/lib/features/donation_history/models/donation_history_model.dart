@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+/// Tek bir kan bağışı kaydını temsil eden değiştirilemez model sınıfı.
 @immutable
 class DonationRecord {
   const DonationRecord({
@@ -13,15 +14,31 @@ class DonationRecord {
     this.notes = '',
   });
 
+  /// Bağış kaydının benzersiz kimliği
   final String id;
+
+  /// Bağışın gerçekleştirildiği tarih
   final DateTime date;
+
+  /// Bağışın yapıldığı hastane veya Kızılay kan merkezi adı
   final String hospitalName;
+
+  /// Bağışın yapıldığı il/ilçe
   final String city;
+
+  /// Bağış türü ('Tam Kan', 'Trombosit', 'Plazma')
   final String donationType;
+
+  /// Bağışlanan ünite miktarı (varsayılan: 1)
   final int units;
+
+  /// İşlem durumu (örn: 'Tamamlandı', 'İnceleniyor')
   final String status;
+
+  /// Ek açıklama veya notlar
   final String notes;
 
+  /// Mevcut kaydı kopyalayıp güncellenmiş yeni bir nesne oluşturur.
   DonationRecord copyWith({
     String? id,
     DateTime? date,
@@ -45,6 +62,7 @@ class DonationRecord {
   }
 }
 
+/// Bağış geçmişi ekranının durumunu (State) saklayan sınıf.
 @immutable
 class DonationHistoryState {
   const DonationHistoryState({
@@ -52,11 +70,16 @@ class DonationHistoryState {
     this.isLoading = false,
   });
 
+  /// Geçmiş bağış kayıtları listesi
   final List<DonationRecord> records;
+
+  /// Verilerin yüklenme durumu
   final bool isLoading;
 
+  /// Tüm geçmiş kayıtlardaki toplam bağışlanan ünite sayısı
   int get totalUnits => records.fold(0, (sum, item) => sum + item.units);
 
+  /// Durum nesnesini kopyalamak için yardımcı metot.
   DonationHistoryState copyWith({
     List<DonationRecord>? records,
     bool? isLoading,
@@ -67,3 +90,4 @@ class DonationHistoryState {
     );
   }
 }
+

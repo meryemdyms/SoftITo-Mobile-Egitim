@@ -14,6 +14,9 @@ import '../controllers/vehicle_search_controller.dart';
 import '../widgets/search_filter_modal.dart';
 import '../widgets/vehicle_card.dart';
 
+/// Müşteri ve misafir ana sayfası / araç arama ve keşif görünümü.
+///
+/// Alış/iade konumu, tarih-saat seçimi ve müsait araçların listelenmesini sağlar.
 class SearchHomeView extends StatelessWidget {
   const SearchHomeView({super.key});
 
@@ -35,7 +38,7 @@ class SearchHomeView extends StatelessWidget {
       ),
       body: CustomScrollView(
         slivers: [
-          // Demo Banner
+          // Demo ve Çevrimdışı Sürüm Bilgilendirme Bandı
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.fromLTRB(
@@ -74,7 +77,7 @@ class SearchHomeView extends StatelessWidget {
             ),
           ),
 
-          // Search Form Card
+          // Arama Formu Kartı (Konum, Alış-İade Tarihleri ve Filtre Butonu)
           SliverToBoxAdapter(
             child: Padding(
               padding: AppSpacing.edgeInsetsLg,
@@ -95,7 +98,7 @@ class SearchHomeView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Location Row
+                    // Konum Bilgisi Satırı
                     Row(
                       children: [
                         const Icon(
@@ -117,7 +120,7 @@ class SearchHomeView extends StatelessWidget {
                       child: Divider(color: AppColors.border, height: 1),
                     ),
 
-                    // Date & Time Row
+                    // Alış ve İade Tarih-Saat Seçicileri
                     Row(
                       children: [
                         Expanded(
@@ -161,7 +164,7 @@ class SearchHomeView extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSpacing.lg),
 
-                    // Filter Quick Action Row
+                    // Hızlı Filtre Butonu
                     Row(
                       children: [
                         Expanded(
@@ -183,7 +186,7 @@ class SearchHomeView extends StatelessWidget {
             ),
           ),
 
-          // Search Results Title
+          // Sonuç Başlığı ve Adet Bilgisi
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -193,7 +196,7 @@ class SearchHomeView extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Uygun Araçlar', style: AppTypography.titleLarge),
+                  const Text('Uygun Araçlar', style: AppTypography.titleLarge),
                   Text(
                     '${searchController.vehicles.length} sonuç',
                     style: AppTypography.bodySmall,
@@ -203,7 +206,7 @@ class SearchHomeView extends StatelessWidget {
             ),
           ),
 
-          // Results List or Loading/Empty
+          // Arama Sonuçları Listesi (Yükleniyor / Boş / Araç Kartları)
           if (searchController.isLoading)
             const SliverFillRemaining(
               child: AppLoading(message: 'Müsait araçlar listeleniyor...'),
@@ -247,6 +250,7 @@ class SearchHomeView extends StatelessWidget {
     );
   }
 
+  /// Tarih kutucuğunu oluşturan yardımcı widget.
   Widget _buildDateBox(
     BuildContext context, {
     required String title,
@@ -281,6 +285,7 @@ class SearchHomeView extends StatelessWidget {
     );
   }
 
+  /// Filtre alt sayfasını (BottomSheet) açar.
   void _openFilters(BuildContext context, VehicleSearchController controller) {
     showModalBottomSheet(
       context: context,
@@ -290,6 +295,7 @@ class SearchHomeView extends StatelessWidget {
     );
   }
 
+  /// Kiralama tarih aralığı seçici takvimini açar.
   Future<void> _pickDateRange(
     BuildContext context,
     VehicleSearchController controller,
@@ -315,7 +321,7 @@ class SearchHomeView extends StatelessWidget {
     );
 
     if (picked != null) {
-      // Maintain selected hours
+      // Seçilen saatleri koruyarak yeni tarihleri atar
       final newStart = DateTime(
         picked.start.year,
         picked.start.month,

@@ -1,9 +1,23 @@
+/// Ritmo Alışkanlık Hatırlatıcı ve Bildirim Tercih Modeli.
+///
+/// `project.md` 11. (Bildirim Sistemi) ve 14. (Veri Modelleri - NotificationPreference)
+/// bölümlerine uygun olarak tanımlanmıştır. Her alışkanlık için kullanıcının belirlediği
+/// hatırlatma saati ve bildirim açık/kapalı durumunu yönetir.
 class NotificationPreferenceModel {
+  /// Tercih kaydının benzersiz kimliği
   final String id;
+
+  /// Bildirimin bağlı olduğu alışkanlığın kimliği
   final String habitId;
+
+  /// Bildirimde kullanıcıya sunulacak alışkanlık adı
   final String habitName;
+
+  /// Hatırlatıcının aktif olup olmadığı
   final bool enabled;
-  final String reminderTime; // Örn: '08:30'
+
+  /// Hatırlatma saati ('HH:mm' formatında, örn: '08:30')
+  final String reminderTime;
 
   const NotificationPreferenceModel({
     required this.id,
@@ -13,6 +27,7 @@ class NotificationPreferenceModel {
     required this.reminderTime,
   });
 
+  /// Modeli yerel depolama için JSON haritasına dönüştürür.
   Map<String, dynamic> toJson() => {
         'id': id,
         'habitId': habitId,
@@ -21,6 +36,7 @@ class NotificationPreferenceModel {
         'reminderTime': reminderTime,
       };
 
+  /// JSON haritasından yeni bir [NotificationPreferenceModel] nesnesi üretir.
   factory NotificationPreferenceModel.fromJson(Map<String, dynamic> json) =>
       NotificationPreferenceModel(
         id: json['id'] as String,
@@ -30,6 +46,7 @@ class NotificationPreferenceModel {
         reminderTime: json['reminderTime'] as String? ?? '09:00',
       );
 
+  /// Mevcut modelin kopyasını güncellenmiş alanlarla oluşturur.
   NotificationPreferenceModel copyWith({
     String? id,
     String? habitId,

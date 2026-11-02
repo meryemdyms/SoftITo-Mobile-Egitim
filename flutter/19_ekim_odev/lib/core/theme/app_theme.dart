@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
-/// Kırmızı Çağrı Material 3 tema konfigürasyonu
+/// Kırmızı Çağrı uygulaması için Material 3 tabanlı açık (light) ve koyu (dark) tema yapılandırması.
+/// Kartlar, AppBar, Butonlar, NavigationBar ve Input alanlarının tasarım kurallarını belirler.
 class AppTheme {
   const AppTheme._();
 
+  /// Uygulamanın aydınlık (Light) tema yapılandırmasını oluşturur ve döndürür.
   static ThemeData get lightTheme {
+    // Aydınlık tema için Material 3 renk şeması
     final colorScheme = ColorScheme(
       brightness: Brightness.light,
       primary: AppColors.primaryCrimson,
@@ -30,6 +33,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.lightBackground,
+      // Kart bileşenlerinin açık tema stili: gölgesiz (flat), hafif çerçeveli ve yuvarlatılmış
       cardTheme: CardThemeData(
         color: AppColors.lightCard,
         elevation: 0,
@@ -39,6 +43,7 @@ class AppTheme {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
+      // Üst başlık çubuğu (AppBar) stili
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.lightSurface,
         foregroundColor: AppColors.lightTextPrimary,
@@ -51,6 +56,7 @@ class AppTheme {
           letterSpacing: -0.5,
         ),
       ),
+      // Alt gezinme çubuğu (NavigationBar) stili ve aktif/pasif etiket renkleri
       navigationBarTheme: NavigationBarThemeData(
         elevation: 3,
         backgroundColor: AppColors.lightSurface,
@@ -70,6 +76,7 @@ class AppTheme {
           );
         }),
       ),
+      // Birincil butonların (ElevatedButton) geniş ve modern görünümü
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryCrimson,
@@ -81,12 +88,14 @@ class AppTheme {
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
+      // Filtre ve seçim etiketleri (Chip) tasarımı
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
           side: const BorderSide(color: AppColors.lightBorder),
         ),
       ),
+      // Metin giriş alanlarının (TextField) dolgulu ve çerçeveli stili
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.lightSurface,
@@ -107,7 +116,9 @@ class AppTheme {
     );
   }
 
+  /// Uygulamanın karanlık (Dark) tema yapılandırmasını oluşturur ve döndürür.
   static ThemeData get darkTheme {
+    // Karanlık tema için yüksek kontrastlı ve göz dostu renk şeması
     final colorScheme = ColorScheme(
       brightness: Brightness.dark,
       primary: AppColors.primaryCrimsonLight,
@@ -132,6 +143,7 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.darkBackground,
+      // Kart bileşenlerinin koyu tema stili
       cardTheme: CardThemeData(
         color: AppColors.darkCard,
         elevation: 0,
@@ -141,6 +153,7 @@ class AppTheme {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       ),
+      // Koyu tema AppBar tasarımı
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkTextPrimary,
@@ -153,6 +166,7 @@ class AppTheme {
           letterSpacing: -0.5,
         ),
       ),
+      // Koyu tema NavigationBar tasarımı
       navigationBarTheme: NavigationBarThemeData(
         elevation: 3,
         backgroundColor: AppColors.darkSurface,
@@ -172,6 +186,7 @@ class AppTheme {
           );
         }),
       ),
+      // Koyu tema birincil buton tasarımı
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryCrimsonLight,
@@ -183,12 +198,14 @@ class AppTheme {
           textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
+      // Koyu tema etiket/çip tasarımı
       chipTheme: ChipThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
           side: const BorderSide(color: AppColors.darkBorder),
         ),
       ),
+      // Koyu tema giriş alanı (TextField) tasarımı
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.darkSurface,
@@ -209,3 +226,4 @@ class AppTheme {
     );
   }
 }
+

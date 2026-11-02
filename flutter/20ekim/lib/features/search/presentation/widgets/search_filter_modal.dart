@@ -9,6 +9,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/app_button.dart';
 import '../controllers/vehicle_search_controller.dart';
 
+/// Araç arama sonuçlarını vites, yakıt, fiyat aralığı ve sıralama seçeneklerine göre filtreleyen alt modal sayfası.
 class SearchFilterModal extends StatefulWidget {
   final VehicleSearchController controller;
 
@@ -52,10 +53,11 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Başlık ve Kapatma Butonu
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Filtreler ve Sıralama',
                     style: AppTypography.titleLarge,
                   ),
@@ -68,8 +70,8 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
               const Divider(color: AppColors.border),
               const SizedBox(height: AppSpacing.md),
 
-              // Sort By
-              Text('Sıralama', style: AppTypography.labelLarge),
+              // Sıralama Kriterleri Seçimi
+              const Text('Sıralama', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.sm,
@@ -81,8 +83,8 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Transmission
-              Text('Vites Türü', style: AppTypography.labelLarge),
+              // Vites Türü Filtresi
+              const Text('Vites Türü', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.sm,
@@ -108,8 +110,8 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Fuel
-              Text('Yakıt Türü', style: AppTypography.labelLarge),
+              // Yakıt Türü Filtresi
+              const Text('Yakıt Türü', style: AppTypography.labelLarge),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.sm,
@@ -136,11 +138,11 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
               ),
               const SizedBox(height: AppSpacing.lg),
 
-              // Max Daily Price Slider
+              // Maksimum Günlük Fiyat Kaydırıcısı (Slider)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     'Maksimum Günlük Ücret',
                     style: AppTypography.labelLarge,
                   ),
@@ -165,7 +167,7 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
               ),
               const SizedBox(height: AppSpacing.xl),
 
-              // Action buttons
+              // Sıfırla ve Uygula Aksiyon Butonları
               Row(
                 children: [
                   Expanded(
@@ -206,6 +208,7 @@ class _SearchFilterModalState extends State<SearchFilterModal> {
     );
   }
 
+  /// Sıralama seçim çipini oluşturan yardımcı widget.
   Widget _buildSortChip(String label, String value) {
     final isSelected = _sortBy == value;
     return ChoiceChip(

@@ -9,9 +9,13 @@ import 'features/donation_stats/views/donation_stats_view.dart';
 import 'features/donor_profile/controllers/donor_profile_controller.dart';
 import 'features/donor_profile/views/donor_profile_view.dart';
 
+/// Uygulamanın ana kabuk (Shell) yapısıdır.
+/// Alt navigasyon çubuğu (Bottom Navigation Bar) ve üst uygulama çubuğunu (AppBar)
+/// barındırarak sayfalar arası geçişi ve ortak controller koordinasyonunu sağlar.
 class AppShell extends StatefulWidget {
   const AppShell({super.key, required this.themeController});
 
+  /// Tema durumunu kontrol eden nesne.
   final ThemeController themeController;
 
   @override
@@ -19,7 +23,10 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
+  /// Aktif olarak seçili olan sekmenin indeksi (0: Çağrılar, 1: Geçmiş, 2: İstatistik, 3: Profil).
   int _currentIndex = 0;
+
+  // Özellik bazlı iş mantığı (business logic) kontrolcüleri.
   late final BloodRequestController _bloodRequestController;
   late final DonationHistoryController _donationHistoryController;
   late final DonationStatsController _donationStatsController;
@@ -28,16 +35,24 @@ class _AppShellState extends State<AppShell> {
   @override
   void initState() {
     super.initState();
+    // Kontrolcüleri ilklendiriyoruz.
     _bloodRequestController = BloodRequestController();
     _donorProfileController = DonorProfileController();
+
+    // Yeni bir bağış eklendiğinde hem profil hem de istatistik durumunun güncellenmesi
+    // için callback mekanizması kuruluyor.
     _donationHistoryController = DonationHistoryController(
       onDonationAdded: (record) {
+        // Yeni bağış tarihini donör profiline işler (son bağış tarihi ve uygunluk güncellenir).
         _donorProfileController.recordDonation(record.date);
+        // İstatistikleri güncel bağış geçmişi listesine göre yeniden hesaplar.
         _donationStatsController.calculateStats(
           _donationHistoryController.state.value.records,
         );
       },
     );
+
+    // İstatistik kontrolcüsünü mevcut bağış kayıtlarıyla başlatır.
     _donationStatsController = DonationStatsController(
       initialRecords: _donationHistoryController.state.value.records,
     );
@@ -45,6 +60,7 @@ class _AppShellState extends State<AppShell> {
 
   @override
   void dispose() {
+    // Bellek sızıntılarını önlemek için tüm kontrolcüler yaşam döngüsü bitiminde serbest bırakılır.
     _bloodRequestController.dispose();
     _donationHistoryController.dispose();
     _donationStatsController.dispose();
@@ -52,10 +68,12 @@ class _AppShellState extends State<AppShell> {
     super.dispose();
   }
 
+  /// Navigasyon çubuğundan bir sekmeye tıklandığında aktif indeksi günceller.
   void _onDestinationSelected(int index) {
     setState(() => _currentIndex = index);
   }
 
+  /// Aktif sekmeye karşılık gelen görünüm (View) widget'ını döndürür.
   Widget _buildBody() {
     switch (_currentIndex) {
       case 0:
@@ -83,6 +101,7 @@ class _AppShellState extends State<AppShell> {
   }
 }
 
+/// Uygulamanın üst başlık çubuğu. Logo, başlık ve tema değiştirme butonunu içerir.
 class _AppShellAppBar extends StatelessWidget implements PreferredSizeWidget {
   const _AppShellAppBar({required this.themeController});
 
@@ -105,6 +124,7 @@ class _AppShellAppBar extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
+        // Tema değişikliğini dinleyerek ikon ve tooltip'i otomatik günceller.
         ValueListenableBuilder<ThemeMode>(
           valueListenable: themeController.themeMode,
           builder: (context, mode, _) {
@@ -121,6 +141,7 @@ class _AppShellAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
+/// Sayfa altındaki modern NavigationBar bileşeni.
 class _AppShellNavBar extends StatelessWidget {
   const _AppShellNavBar({
     required this.currentIndex,
@@ -160,3 +181,4 @@ class _AppShellNavBar extends StatelessWidget {
     );
   }
 }
+

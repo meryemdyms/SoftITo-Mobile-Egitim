@@ -1,36 +1,52 @@
 import 'package:flutter/material.dart';
 
+/// Ürünün stok durumunu görsel bir rozet (badge) olarak gösteren widget.
+///
+/// Stok miktarı 0 olduğunda kırmızı renkte "Tükendi", 0'dan büyük olduğunda
+/// yeşil tonlarında "Stok: X" şeklinde bilgi sunar.
 class StokRozeti extends StatelessWidget {
-    final int stok;
+  /// Gösterilecek mevcut ürün stok adedi.
+  final int stok;
 
-    const StokRozeti({super.key, required this.stok});
+  /// [StokRozeti] için sabit kurucu metot.
+  const StokRozeti({
+    super.key,
+    required this.stok,
+  });
 
-    @override 
-    Widget build(BuildContext context){
-        final tukendiMi = stok==0;
-        final renk =tukendiMi ? Colors.red : Colors.green;
-        final etiket = tukendiMi ? 'Stok Yok' : '$stok Adet';
-        
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-                color: tukendiMi ? Colors.red.shade100 : Colors.green.shade100,
-                borderRadius: BorderRadius.circular(6),
-                border:Border.all(
-                    color:tukendiMi ? Colors.red.shade400 : Colors.green.shade400,
-                    width:0.8,
-                ),
-            ),
-            child:Text(
-                tukendiMi ? "Tükendi" : 'Stok:$stok',
-                style:TextStyle(
-                    color: tukendiMi ? Colors.red.shade900 : Colors.green.shade900,
-                    fontSize:11,
-                    fontWeight: FontWeight.bold,
-                )
+  @override
+  Widget build(BuildContext context) {
+    // Stok miktarının sıfır olup olmadığını kontrol eder.
+    final tukendiMi = stok == 0;
 
-            ),
-        );
+    // Duruma göre arkaplan ve kenarlık renklerini belirler.
+    final arkaPlanRengi = tukendiMi ? Colors.red.shade100 : Colors.green.shade100;
+    final kenarlikRengi = tukendiMi ? Colors.red.shade400 : Colors.green.shade400;
+    final yaziRengi = tukendiMi ? Colors.red.shade900 : Colors.green.shade900;
+    final etiketMetni = tukendiMi ? 'Tükendi' : 'Stok: $stok';
 
-    }
+    return Container(
+      // Rozet içi iç boşluk (padding) ayarı
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        // Duruma özel yumuşak arkaplan rengi
+        color: arkaPlanRengi,
+        // Yuvarlatılmış köşeler
+        borderRadius: BorderRadius.circular(6),
+        // İnce sınır çizgisi
+        border: Border.all(
+          color: kenarlikRengi,
+          width: 0.8,
+        ),
+      ),
+      child: Text(
+        etiketMetni,
+        style: TextStyle(
+          color: yaziRengi,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 }

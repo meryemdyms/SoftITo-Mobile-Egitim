@@ -6,7 +6,10 @@ import 'features/water_tracker/views/water_tracker_view.dart';
 import 'features/workout/controllers/workout_controller.dart';
 import 'features/workout/views/workout_view.dart';
 
+/// Uygulamanın giriş noktası (Entry Point).
 void main() {
+  // Flutter motoru (engine) ile widget ağacı arasındaki köprüyü native servisler
+  // çağrılmadan önce hazır hale getirir.
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const SusadimApp());
 }
@@ -28,6 +31,7 @@ class _SusadimAppState extends State<SusadimApp> {
   @override
   void initState() {
     super.initState();
+    // Dışarıdan bir ThemeController enjekte edilmemişse dahili olarak oluşturulur.
     if (widget.themeController != null) {
       _themeController = widget.themeController!;
     } else {
@@ -38,6 +42,7 @@ class _SusadimAppState extends State<SusadimApp> {
 
   @override
   void dispose() {
+    // Dahili oluşturulan controller'ın bellek sızıntısını (memory leak) önlemek için dispose edilir.
     if (_isInternal) {
       _themeController.dispose();
     }
@@ -46,6 +51,8 @@ class _SusadimAppState extends State<SusadimApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Tema modundaki (Karanlık/Aydınlık/Sistem) değişiklikleri reaktif olarak dinler
+    // ve tüm MaterialApp'in temasını günceller.
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: _themeController.themeMode,
       builder: (context, currentMode, _) {
@@ -76,6 +83,7 @@ class RootNavigationScreen extends StatefulWidget {
 }
 
 class _RootNavigationScreenState extends State<RootNavigationScreen> {
+  // Her iki özellik (Su & Antrenman) için ana controller örnekleri ve aktif sekme dinleyicisi.
   late final WaterTrackerController _waterController;
   late final WorkoutController _workoutController;
   final ValueNotifier<int> _currentTabIndex = ValueNotifier<int>(0);
@@ -89,6 +97,7 @@ class _RootNavigationScreenState extends State<RootNavigationScreen> {
 
   @override
   void dispose() {
+    // Ekran sonlandırıldığında tüm kontrolcü dinleyicileri serbest bırakılır.
     _waterController.dispose();
     _workoutController.dispose();
     _currentTabIndex.dispose();
@@ -97,11 +106,14 @@ class _RootNavigationScreenState extends State<RootNavigationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Sadece aktif sekme indeksi değiştiğinde gövdeyi ve alt navigasyonu günceller.
     return ValueListenableBuilder<int>(
       valueListenable: _currentTabIndex,
       builder: (context, activeIndex, _) {
         return Scaffold(
           body: SafeArea(
+            // IndexedStack: Sekmeler arasında geçiş yapıldığında ekranların durumunu
+            // (scroll konumu, form girdileri vb.) sıfırlamayıp hafızada tutar.
             child: IndexedStack(
               index: activeIndex,
               children: [

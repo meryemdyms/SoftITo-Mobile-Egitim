@@ -22,6 +22,7 @@ class WaterGaugeCard extends StatelessWidget {
         color: context.surfaceColor,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: context.cardBorderColor),
+        // Aktif vurgu rengiyle kart altına yumuşak ışıma efekti (glow)
         boxShadow: [
           BoxShadow(
             color: context.primaryAccent.withAlpha(context.isDarkMode ? 20 : 15),
@@ -41,6 +42,7 @@ class WaterGaugeCard extends StatelessWidget {
     );
   }
 
+  /// Dairesel ilerleme çubuğu ve merkezindeki metrikleri Stack ile üst üste yerleştirir.
   Widget _buildCircularIndicator(BuildContext context, double progress, int percent) {
     return SizedBox(
       height: 180,
@@ -48,6 +50,7 @@ class WaterGaugeCard extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
+          // Arka plan ve doluluk oranı için yuvarlak hatlı CircularProgressIndicator
           SizedBox(
             height: 170,
             width: 170,
@@ -56,9 +59,10 @@ class WaterGaugeCard extends StatelessWidget {
               strokeWidth: 14,
               backgroundColor: context.surfaceElevatedColor,
               valueColor: AlwaysStoppedAnimation<Color>(context.primaryAccent),
-              strokeCap: StrokeCap.round,
+              strokeCap: StrokeCap.round, // Çubuk uçlarını yuvarlatır
             ),
           ),
+          // Çubuğun tam merkezinde gösterilen ikon, tüketilen su ve yüzde oranı
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [

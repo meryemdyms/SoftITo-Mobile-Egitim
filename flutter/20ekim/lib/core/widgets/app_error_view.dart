@@ -5,9 +5,15 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 import 'app_button.dart';
 
+/// Hata durumlarında ekranın ortasında açıklama ve tekrar deneme butonu gösteren widget.
 class AppErrorView extends StatelessWidget {
+  /// Gösterilecek hata mesajı.
   final String message;
+
+  /// Tekrar dene butonuna tıklandığında çalışacak fonksiyon. Null ise buton gizlenir.
   final VoidCallback? onRetry;
+
+  /// Tekrar dene butonu metni (varsayılan: 'Tekrar Dene').
   final String retryLabel;
 
   const AppErrorView({
@@ -26,9 +32,10 @@ class AppErrorView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Kırmızı dairesel hata ikonu kapsayıcısı
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.destructiveBg,
                 shape: BoxShape.circle,
               ),
@@ -39,13 +46,14 @@ class AppErrorView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text('Bir Hata Oluştu', style: AppTypography.titleLarge),
+            const Text('Bir Hata Oluştu', style: AppTypography.titleLarge),
             const SizedBox(height: AppSpacing.sm),
             Text(
               message,
               textAlign: TextAlign.center,
               style: AppTypography.bodyMedium.copyWith(color: AppColors.muted),
             ),
+            // Tekrar deneme butonu
             if (onRetry != null) ...[
               const SizedBox(height: AppSpacing.xl),
               AppButton(

@@ -10,6 +10,7 @@ class WaterQuickAddButtons extends StatelessWidget {
     required this.onAddWater,
   });
 
+  // Sık tüketilen standart su porsiyonları (Bardak, Kupa, Şişe, Matara)
   static const List<_QuickOption> _options = [
     _QuickOption(150, '150 ml', 'Bardak', Icons.local_cafe_rounded),
     _QuickOption(250, '250 ml', 'Kupa', Icons.coffee_rounded),
@@ -27,6 +28,7 @@ class WaterQuickAddButtons extends StatelessWidget {
           style: context.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: 12),
+        // Seçenekleri yatay eksende eşit genişlikte dağıtmak için Row + Expanded kullanılır
         Row(
           children: _options.map((opt) {
             return Expanded(
@@ -41,6 +43,7 @@ class WaterQuickAddButtons extends StatelessWidget {
     );
   }
 
+  /// Tekil hızlı ekleme butonu; Material ve InkWell ile dokunmatik dalga efekti (ripple) sunar
   Widget _buildItem(BuildContext context, _QuickOption opt) {
     final subColor = context.colorScheme.onSurface.withAlpha(160);
 

@@ -5,6 +5,14 @@ import '../../puzzle/views/puzzle_detail_view.dart';
 import '../../puzzle/widgets/puzzle_artwork_widget.dart';
 import '../models/habit_models.dart';
 
+/// Ritmo Alışkanlık Detay Ekranı (Habit Detail View).
+///
+/// `project.md` 5.8. Bölüm kurallarına göre tasarlanmıştır:
+/// - Alışkanlık temel bilgileri ve günlük hedef
+/// - Günlük ilerleme kaydı yapma (Evet/Hayır veya sayısal miktar girişi)
+/// - Mevcut ve en uzun streak serisi istatistikleri
+/// - Sürece ait gizli yapbozun anlık parça durumu ve büyütme seçeneği
+/// - Alışkanlığı arşivleme seçeneği
 class HabitDetailView extends StatefulWidget {
   final HabitModel habit;
 
@@ -23,6 +31,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
     super.dispose();
   }
 
+  /// Hızlı ilerleme kaydeder ve hedef tamamlandığında kullanıcıya kutlama bildirimi gösterir.
   void _recordQuickProgress(double value) async {
     final appScope = AppScope.of(context);
     final isDone = await appScope.habitController.recordProgress(
@@ -43,6 +52,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
     }
   }
 
+  /// Sayısal alışkanlıklar için özel miktar giriş modalını açar.
   void _showAddCustomProgressDialog(HabitScheduleModel schedule, DailyProgressModel? currentProgress) {
     _customValueController.text = (currentProgress?.actualValue ?? 0).toInt().toString();
 
@@ -111,6 +121,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
       appBar: AppBar(
         title: Text(widget.habit.name),
         actions: [
+          // Alışkanlığı arşivleme butonu
           IconButton(
             icon: const Icon(Icons.archive_outlined),
             tooltip: 'Alışkanlığı Arşivle',
@@ -230,7 +241,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Hızlı İşlem Butonları
+                      // Hızlı İşlem Butonları (Ölçüm türüne göre dinamik)
                       if (widget.habit.measurementType == MeasurementType.boolean) ...[
                         ElevatedButton.icon(
                           onPressed: () => _recordQuickProgress(isCompletedToday ? 0.0 : 1.0),
@@ -326,7 +337,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
               ),
               const SizedBox(height: 20),
 
-              // Gizli Yapboz Önizleme Başlığı
+              // Gizli Yapboz Önizleme Başlığı ve Büyütme Butonu
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -353,6 +364,7 @@ class _HabitDetailViewState extends State<HabitDetailView> {
               ),
               const SizedBox(height: 10),
 
+              // Gizli Yapboz Izgara Bileşeni
               if (puzzle != null && artwork != null) ...[
                 PuzzleArtworkWidget(
                   artwork: artwork,

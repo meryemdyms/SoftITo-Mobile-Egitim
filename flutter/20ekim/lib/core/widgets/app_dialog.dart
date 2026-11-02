@@ -5,9 +5,13 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 import 'app_button.dart';
 
+/// Uygulama içi standart onay ve bilgi iletişim pencerelerini (AlertDialog) yöneten yardımcı sınıf.
 class AppDialog {
   AppDialog._();
 
+  /// Kullanıcıdan onay isteyen iki butonlu onay penceresi açar.
+  ///
+  /// Kullanıcı "Onayla" derse `true`, "Vazgeç" derse veya dışarı basarsa `false` döner.
   static Future<bool?> showConfirm(
     BuildContext context, {
     required String title,
@@ -34,6 +38,7 @@ class AppDialog {
         actions: [
           Row(
             children: [
+              // Vazgeç butonu
               Expanded(
                 child: AppButton(
                   label: cancelLabel,
@@ -43,6 +48,7 @@ class AppDialog {
                 ),
               ),
               const SizedBox(width: AppSpacing.sm),
+              // Onayla / İşlemi Gerçekleştir butonu (tehlikeli işlemse kırmızı)
               Expanded(
                 child: AppButton(
                   label: confirmLabel,

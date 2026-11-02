@@ -21,7 +21,12 @@ import '../../../vehicles/domain/entities/vehicle.dart';
 import '../../../vehicles/domain/repositories/vehicle_repository.dart';
 import '../controllers/booking_controller.dart';
 
+/// Rezervasyon tamamlama ve onaylama (Checkout) ekranı.
+///
+/// Seçilen araç, kiralama tarihleri, sürücü bilgileri, ödeme tipi (firmada ödeme)
+/// ve nihai fiyat dökümünü doğrulatarak rezervasyonu oluşturur.
 class BookingCheckoutView extends StatefulWidget {
+  /// Kiralanacak aracın benzersiz kimliği.
   final String vehicleId;
 
   const BookingCheckoutView({super.key, required this.vehicleId});
@@ -42,6 +47,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
     _loadBookingSummary();
   }
 
+  /// Rezervasyon özetini ve sürücü profilini hazırlar.
   Future<void> _loadBookingSummary() async {
     setState(() {
       _isLoading = true;
@@ -124,7 +130,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Vehicle Snapshot Card
+            // Kiralanacak Araç Özet Kartı
             Container(
               padding: AppSpacing.edgeInsetsMd,
               decoration: BoxDecoration(
@@ -168,8 +174,8 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Rental Dates & Locations
-            Text('Kiralama Bilgileri', style: AppTypography.titleMedium),
+            // Kiralama Tarih ve Konum Bilgileri
+            const Text('Kiralama Bilgileri', style: AppTypography.titleMedium),
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: AppSpacing.edgeInsetsMd,
@@ -200,8 +206,8 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Driver Information
-            Text('Sürücü Bilgileri', style: AppTypography.titleMedium),
+            // Sürücü ve Ehliyet Bilgileri
+            const Text('Sürücü Bilgileri', style: AppTypography.titleMedium),
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: AppSpacing.edgeInsetsMd,
@@ -229,7 +235,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Payment Notice
+            // Ödeme Yöntemi Bilgilendirmesi (Firmada Ödeme Modeli)
             Container(
               padding: AppSpacing.edgeInsetsMd,
               decoration: BoxDecoration(
@@ -249,7 +255,10 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Ödeme Yöntemi', style: AppTypography.labelLarge),
+                        const Text(
+                          'Ödeme Yöntemi',
+                          style: AppTypography.labelLarge,
+                        ),
                         Text(
                           AppConstants.paymentTypeLabel,
                           style: AppTypography.bodySmall.copyWith(
@@ -264,8 +273,8 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
             ),
             const SizedBox(height: AppSpacing.lg),
 
-            // Price Breakdown
-            Text('Ücret Özeti', style: AppTypography.titleMedium),
+            // Fiyatlandırma ve İndirim Dökümü
+            const Text('Ücret Özeti', style: AppTypography.titleMedium),
             const SizedBox(height: AppSpacing.sm),
             Container(
               padding: AppSpacing.edgeInsetsMd,
@@ -309,7 +318,10 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Toplam Tutar:', style: AppTypography.titleMedium),
+                      const Text(
+                        'Toplam Tutar:',
+                        style: AppTypography.titleMedium,
+                      ),
                       Text(
                         CurrencyFormatter.formatKurus(price.totalPrice),
                         style: AppTypography.titleLarge.copyWith(
@@ -323,7 +335,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
             ),
             const SizedBox(height: AppSpacing.xl),
 
-            // Confirm Button
+            // Rezervasyonu Onayla Butonu
             AppButton(
               label: 'Rezervasyonu Onayla',
               icon: Icons.check_circle_outline_rounded,
@@ -343,6 +355,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
     );
   }
 
+  /// Bilgi satırını oluşturan yardımcı widget.
   Widget _buildInfoRow(String label, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -356,6 +369,7 @@ class _BookingCheckoutViewState extends State<BookingCheckoutView> {
     );
   }
 
+  /// Rezervasyonu oluşturur ve kullanıcıyı 'Rezervasyonlarım' ekranına yönlendirir.
   Future<void> _confirmBooking(
     BuildContext context,
     Vehicle vehicle,

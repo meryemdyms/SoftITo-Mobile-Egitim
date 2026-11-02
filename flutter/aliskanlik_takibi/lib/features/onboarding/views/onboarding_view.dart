@@ -3,6 +3,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../auth/services/auth_service.dart';
 import '../../auth/views/login_view.dart';
 
+/// Ritmo İlk Kullanım Tanıtım Ekranı (Onboarding View).
+///
+/// `project.md` 5.4. Bölüm gereksinimlerine göre tasarlanmıştır:
+/// Kullanıcıya uygulamanın felsefesini, Gizli Yapboz Sistemini ve
+/// Başarı Koleksiyonunu 3 adımlı, estetik bir sayfa geçişi ile tanıtır.
+/// Atlama (Skip) ve Başlayalım seçenekleri sunar.
 class OnboardingView extends StatefulWidget {
   final AuthService authService;
 
@@ -16,6 +22,7 @@ class _OnboardingViewState extends State<OnboardingView> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
+  // Tanıtım adımları içeriği
   final List<({String title, String desc, IconData icon, Color color})> _pages = [
     (
       title: 'Küçük Adımlar, Büyük Değişimler',
@@ -37,6 +44,7 @@ class _OnboardingViewState extends State<OnboardingView> {
     ),
   ];
 
+  /// Tanıtımı tamamlandı olarak kaydeder ve giriş ekranına yönlendirir.
   void _finishOnboarding() async {
     await widget.authService.setOnboardingCompleted();
     if (!mounted) return;
@@ -54,7 +62,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       body: SafeArea(
         child: Column(
           children: [
-            // Üst Atlama Butonu
+            // Üst Köşe Atlama (Geç) Butonu
             Align(
               alignment: Alignment.topRight,
               child: Padding(
@@ -66,7 +74,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               ),
             ),
 
-            // Sayfalar
+            // Sayfalar (PageView)
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -79,6 +87,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        // İllüstrasyon / İkon Rozeti
                         Container(
                           width: 120,
                           height: 120,
@@ -91,6 +100,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                           ),
                         ),
                         const SizedBox(height: 40),
+
+                        // Başlık
                         Text(
                           p.title,
                           textAlign: TextAlign.center,
@@ -102,6 +113,8 @@ class _OnboardingViewState extends State<OnboardingView> {
                           ),
                         ),
                         const SizedBox(height: 16),
+
+                        // Açıklama Metni
                         Text(
                           p.desc,
                           textAlign: TextAlign.center,
@@ -118,13 +131,13 @@ class _OnboardingViewState extends State<OnboardingView> {
               ),
             ),
 
-            // Alt Gösterge ve İleri Butonu
+            // Alt Kısım: Sayfa Göstergeleri (Dots) ve İleri/Başla Butonu
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Sayfa Göstergeleri
+                  // Sayfa Gösterge Çizgileri
                   Row(
                     children: List.generate(
                       _pages.length,
@@ -141,7 +154,7 @@ class _OnboardingViewState extends State<OnboardingView> {
                     ),
                   ),
 
-                  // Buton
+                  // İlerleme veya Başlama Butonu
                   ElevatedButton(
                     onPressed: () {
                       if (_currentPage < _pages.length - 1) {

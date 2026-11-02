@@ -1,12 +1,30 @@
+/// Kiralama firmalarının sunduğu indirim fırsatlarını ve kampanya iş kurallarını temsil eden varlık (Entity).
 class Campaign {
+  /// Kampanyanın benzersiz kimliği.
   final String id;
+
+  /// Kampanyayı tanımlayan firmanın kimliği.
   final String companyId;
+
+  /// Kampanya başlığı (örn. "Bahar İndirimi %15").
   final String title;
+
+  /// Kampanya açıklaması ve şartları.
   final String description;
-  final int discountPercent; // 0..100
+
+  /// Yüzde olarak indirim oranı (örn. 15 = %15 indirim).
+  final int discountPercent;
+
+  /// Kampanyanın geçerlilik başlangıç tarihi.
   final DateTime validFrom;
+
+  /// Kampanyanın geçerlilik bitiş tarihi.
   final DateTime validTo;
+
+  /// Kampanyanın geçerli olduğu belirli araç ID'leri listesi (null veya boş ise firmanın tüm araçlarında geçerlidir).
   final List<String>? eligibleVehicleIds;
+
+  /// Kampanyanın aktiflik durumu.
   final bool active;
 
   const Campaign({
@@ -21,19 +39,21 @@ class Campaign {
     this.active = true,
   });
 
-  /// Checks if campaign applies to given vehicle and date interval
+  /// Verilen araç ve kiralama tarih aralığı için bu kampanyanın uygulanabilir olup olmadığını denetler.
   bool isEligibleFor(String vehicleId, DateTime startAt, DateTime endAt) {
     if (!active) return false;
-    // Campaign must cover the rental window or be valid when booking is created/started
+    // Kiralama aralığı kampanyanın geçerlilik tarihleri içerisinde olmalıdır
     if (startAt.isBefore(validFrom) || endAt.isAfter(validTo)) {
       return false;
     }
+    // Belirli araç kısıtlaması varsa kontrol edilir
     if (eligibleVehicleIds != null && eligibleVehicleIds!.isNotEmpty) {
       return eligibleVehicleIds!.contains(vehicleId);
     }
     return true;
   }
 
+  /// Belirli alanları güncelleyerek yeni bir [Campaign] nesnesi üretir.
   Campaign copyWith({
     String? id,
     String? companyId,

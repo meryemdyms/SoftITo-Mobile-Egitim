@@ -8,6 +8,11 @@ import '../../../app/theme/app_typography.dart';
 import '../../../shared/widgets/archive_button.dart';
 import '../viewmodels/auth_viewmodel.dart';
 
+/// Cep Müzem — Yeni Küratör Kayıt Ekranı (RegisterView)
+///
+/// project.md Madde 7 kurallarına göre:
+/// - Ad, Soyad, E-posta ve Şifre (en az 6 karakter) zorunlu alanlardır.
+/// - AuthViewModel aracılığıyla hesap oluşturur ve başarılı olunca Keşfet akışına yönlendirir.
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
@@ -16,11 +21,22 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
+  /// Form doğrulama anahtarı
   final _formKey = GlobalKey<FormState>();
+
+  /// Ad alanı metin denetleyicisi
   final _firstNameController = TextEditingController();
+
+  /// Soyad alanı metin denetleyicisi
   final _lastNameController = TextEditingController();
+
+  /// E-posta alanı metin denetleyicisi
   final _emailController = TextEditingController();
+
+  /// Şifre alanı metin denetleyicisi
   final _passwordController = TextEditingController();
+
+  /// Şifre gizleme / gösterme durumu
   bool _obscurePassword = true;
 
   @override
@@ -32,7 +48,9 @@ class _RegisterViewState extends State<RegisterView> {
     super.dispose();
   }
 
+  /// Kayıt ol butonuna basıldığında tetiklenen hesap oluşturma metodu
   Future<void> _handleRegister() async {
+    // Form doğrulanamazsa devam edilmez
     if (!_formKey.currentState!.validate()) return;
 
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
@@ -43,6 +61,7 @@ class _RegisterViewState extends State<RegisterView> {
       password: _passwordController.text.trim(),
     );
 
+    // Kayıt başarılı olduğunda ana akışa yönlendirilir
     if (success && mounted) {
       context.go('/explore');
     }
@@ -50,6 +69,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
+    // AuthViewModel dinlenerek hata ve yüklenme durumları takip edilir
     final authVm = context.watch<AuthViewModel>();
 
     return Scaffold(
@@ -72,6 +92,7 @@ class _RegisterViewState extends State<RegisterView> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // 1. Başlık ve Karşılama Metni
                   Text(
                     'Yeni Küratör Hesabı',
                     style: AppTypography.sectionTitle,
@@ -85,6 +106,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: AppDimensions.space24),
 
+                  // 2. Varsa Hata Bildirim Kutusu
                   if (authVm.errorMessage != null) ...[
                     Container(
                       padding: const EdgeInsets.all(AppDimensions.space12),
@@ -105,7 +127,7 @@ class _RegisterViewState extends State<RegisterView> {
                     const SizedBox(height: AppDimensions.space16),
                   ],
 
-                  // Ad & Soyad
+                  // 3. Ad ve Soyad Alanları (Yan yana iki sütun)
                   Row(
                     children: [
                       Expanded(
@@ -131,7 +153,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
-                  // E-posta
+                  // 4. E-posta Giriş Alanı
                   TextFormField(
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -154,7 +176,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
-                  // Şifre
+                  // 5. Şifre Giriş Alanı
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
@@ -190,6 +212,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: AppDimensions.space24),
 
+                  // 6. Kaydı Tamamla Aksiyon Butonu
                   ArchiveButton(
                     label: 'Kaydı Tamamla',
                     isLoading: authVm.isLoading,
@@ -197,6 +220,7 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                   const SizedBox(height: AppDimensions.space16),
 
+                  // 7. Zaten Hesabım Var (Giriş Yap) Yönlendirmesi
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -221,3 +245,4 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 }
+

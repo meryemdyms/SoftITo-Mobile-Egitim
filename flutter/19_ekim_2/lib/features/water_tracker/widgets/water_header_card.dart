@@ -34,6 +34,8 @@ class WaterHeaderCard extends StatelessWidget {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(12),
+          // Uygulama logosu; dosya bulunamazsa (errorBuilder) uygulama çökmez,
+          // yerine zarif bir damla ikonu kutusu gösterilir (Graceful Degradation).
           child: Image.asset(
             'assets/icons/app_logo.png',
             width: 44,
@@ -76,6 +78,7 @@ class WaterHeaderCard extends StatelessWidget {
     );
   }
 
+  /// Tema değiştirici butonu, seri (streak) rozeti ve sıfırlama butonunu barındıran aksiyon grubu
   Widget _buildActionGroup(BuildContext context) {
     final amberColor = isDarkMode ? AppColors.neonAmber : AppColors.warmAmber;
 
@@ -122,6 +125,7 @@ class WaterHeaderCard extends StatelessWidget {
     );
   }
 
+  /// Yanlışlıkla yapılan tıklamalarda veri kaybını önlemek için onay isteyen diyalog
   void _confirmReset(BuildContext context) {
     showDialog(
       context: context,

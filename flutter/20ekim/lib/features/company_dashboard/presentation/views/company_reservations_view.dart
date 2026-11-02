@@ -15,6 +15,8 @@ import '../../../bookings/domain/entities/reservation.dart';
 import '../../../vehicles/domain/entities/vehicle.dart';
 import '../controllers/company_dashboard_controller.dart';
 
+/// Firmaya gelen tüm rezervasyonların listelendiği ve operasyonel durum geçişlerinin
+/// (Teslimat, İade Alma, İptal) yönetildiği yönetim ekranı.
 class CompanyReservationsView extends StatefulWidget {
   const CompanyReservationsView({super.key});
 
@@ -24,6 +26,7 @@ class CompanyReservationsView extends StatefulWidget {
 }
 
 class _CompanyReservationsViewState extends State<CompanyReservationsView> {
+  // Seçili durum filtresi (null ise tüm rezervasyonlar listelenir)
   ReservationStatus? _filterStatus;
 
   @override
@@ -31,12 +34,14 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     final dashboardCtrl = context.watch<CompanyDashboardController>();
     var reservations = dashboardCtrl.reservations;
 
+    // Filtreleme uygulanmışsa listeyi süz
     if (_filterStatus != null) {
       reservations = reservations
           .where((r) => r.status == _filterStatus)
           .toList();
     }
 
+    // Rezervasyon kartlarında araç adını hızlıca eşleştirebilmek için harita (map) oluştur
     final vehiclesMap = {for (var v in dashboardCtrl.vehicles) v.id: v};
 
     return Scaffold(
@@ -44,7 +49,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
       appBar: AppBar(title: const Text('Rezervasyon Yönetimi')),
       body: Column(
         children: [
-          // Filter Chips
+          // 1. Durum Filtreleme Yatay Çipleri (Filter Chips)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(
@@ -67,7 +72,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
           ),
           const Divider(color: AppColors.border, height: 1),
 
-          // List
+          // 2. Rezervasyon Listesi veya Boş Durum Görünümü
           Expanded(
             child: reservations.isEmpty
                 ? const AppEmptyState(
@@ -97,6 +102,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     );
   }
 
+  /// Durum filtreleme çipi oluşturan yardımcı widget.
   Widget _buildFilterChip(String label, ReservationStatus? status) {
     final isSelected = _filterStatus == status;
     return ChoiceChip(
@@ -114,6 +120,10 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     );
   }
 
+  /// Firma için detaylı rezervasyon kartı bileşeni.
+  ///
+  /// Müşteri ID, tarih aralığı, toplam tutar ve rezervasyonun mevcut durumuna göre
+  /// gerçekleştirilebilecek aksiyon butonlarını (Teslim Et, İade Al, İptal) içerir.
   Widget _buildCompanyReservationCard(
     BuildContext context,
     Reservation reservation,
@@ -177,10 +187,11 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
           ),
           const SizedBox(height: AppSpacing.md),
 
-          // Lifecycle transition action buttons
+          // Yaşam döngüsü durum geçiş butonları (Lifecycle transition buttons)
           Row(
             children: [
               if (reservation.status == ReservationStatus.confirmed) ...[
+                // Onaylı durumdaki rezervasyon müşteriye teslim edilebilir
                 Expanded(
                   child: AppButton(
                     label: 'Teslim Et',
@@ -195,6 +206,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
                   ),
                 ),
                 const SizedBox(width: AppSpacing.sm),
+                // veya zorunlu durumlarda iptal edilebilir
                 Expanded(
                   child: AppButton(
                     label: 'İptal Et',
@@ -205,6 +217,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
                   ),
                 ),
               ] else if (reservation.status == ReservationStatus.active) ...[
+                // Aktif kiralamadaki araç teslim alınıp kiralama tamamlanabilir
                 Expanded(
                   child: AppButton(
                     label: 'İade Al ve Tamamla',
@@ -219,6 +232,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
                   ),
                 ),
               ] else ...[
+                // Tamamlanmış veya iptal edilmiş rezervasyonlar için bilgilendirme
                 Expanded(
                   child: Text(
                     'İşlem tamamlanmıştır (${reservation.status.label}).',
@@ -236,6 +250,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     );
   }
 
+  /// Rezervasyon durumuna uygun renk ve metin içeren rozet (badge).
   Widget _buildStatusBadge(ReservationStatus status) {
     Color bg;
     Color fg;
@@ -271,6 +286,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     );
   }
 
+  /// Rezervasyon durumunu güncelleyen ve kullanıcıya geri bildirim veren fonksiyon.
   Future<void> _updateStatus(
     BuildContext context,
     String reservationId,
@@ -291,6 +307,7 @@ class _CompanyReservationsViewState extends State<CompanyReservationsView> {
     }
   }
 
+  /// Onaylı rezervasyonu iptal etmeden önce onay penceresi gösteren metot.
   Future<void> _cancelReservation(
     BuildContext context,
     String reservationId,

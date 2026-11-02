@@ -1,3 +1,4 @@
+/*
 //kötü kod
 void p(List u){
 
@@ -139,3 +140,4 @@ class LoginViewModel{
         print('giris basarili: $token');
     }
 }
+*/

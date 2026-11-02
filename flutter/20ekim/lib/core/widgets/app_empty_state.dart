@@ -5,11 +5,21 @@ import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 import 'app_button.dart';
 
+/// Liste veya ekranlarda veri bulunamadığında (boş durum) gösterilen görsel ve açıklamalı bileşen.
 class AppEmptyState extends StatelessWidget {
+  /// Boş durum ana başlığı.
   final String title;
+
+  /// Açıklayıcı alt metin.
   final String? description;
+
+  /// Merkezde gösterilecek ikon (varsayılan: inbox_outlined).
   final IconData icon;
+
+  /// Kullanıcıyı yönlendirecek aksiyon butonu metni (opsiyonel).
   final String? actionLabel;
+
+  /// Aksiyon butonuna tıklandığında çalışacak fonksiyon.
   final VoidCallback? onAction;
 
   const AppEmptyState({
@@ -30,9 +40,10 @@ class AppEmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
+            // İkon kapsayıcı dairesel arka plan
             Container(
               padding: const EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.surfaceVariant,
                 shape: BoxShape.circle,
               ),
@@ -54,6 +65,7 @@ class AppEmptyState extends StatelessWidget {
                 ),
               ),
             ],
+            // Opsiyonel aksiyon butonu (örn. "Filtreleri Temizle", "Araç Ekle")
             if (actionLabel != null && onAction != null) ...[
               const SizedBox(height: AppSpacing.xl),
               AppButton(label: actionLabel!, onPressed: onAction, width: 200),

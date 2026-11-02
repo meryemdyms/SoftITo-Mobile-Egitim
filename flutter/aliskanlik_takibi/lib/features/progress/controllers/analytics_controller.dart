@@ -4,13 +4,24 @@ import '../../habits/controllers/habit_controller.dart';
 import '../../habits/models/habit_models.dart';
 import '../models/analysis_models.dart';
 
+/// Ritmo Gelişim ve Analiz Kontrolcüsü (Analytics Controller).
+///
+/// `project.md` 9. (Analiz Sistemi) ve Agent Kuralları 6. Madde
+/// ("Alışkanlık, streak, yapboz ve analiz hesaplamalarını UI içerisinde gerçekleştirme")
+/// gereğince tüm matematiksel ve istatistiksel hesaplamaları bu katmanda yönetir.
 class AnalyticsController extends ChangeNotifier {
+  /// Alışkanlık durumlarını okumak için kullanılan kontrolcü
   final HabitController habitController;
 
   AnalyticsController({required this.habitController});
 
-  /// Belirli bir alışkanlık için kapsamlı analiz raporu üretir
+  /// Belirli bir alışkanlık için kapsamlı analiz raporu üretir.
+  ///
+  /// `project.md` 9.2. Kuralı: Gün tamamlama oranı ile miktar başarı oranını ayrı ayrı hesaplar:
+  /// - Gün Başarısı: Başarılı Gün / Planlanan Gün
+  /// - Miktar Başarısı: Gerçekleşen Miktar / Toplam Hedef Miktar
   AnalysisReportModel generateReportForHabit(String habitId) {
+    // 1. Alışkanlık modelini bul
     final habit = habitController.habits.firstWhere(
       (h) => h.id == habitId,
       orElse: () => HabitModel(
@@ -26,6 +37,7 @@ class AnalyticsController extends ChangeNotifier {
       ),
     );
 
+    // 2. Takvim, süreç, yapboz ve seri bilgilerini al
     final schedule = habitController.getSchedule(habitId);
     final process = habitController.getActiveProcess(habitId);
     final puzzle = process != null ? habitController.getPuzzleForProcess(process.id) : null;
@@ -35,9 +47,10 @@ class AnalyticsController extends ChangeNotifier {
     final successfulDays = streakInfo.successfulDays;
     final missedDays = streakInfo.missedDays;
 
+    // Gün başarı oranı hesaplaması
     final dayCompletionRate = (successfulDays / plannedDays) * 100.0;
 
-    // Toplam hedef ve toplam gerçekleşen miktar hesaplama
+    // 3. Toplam hedef miktar ve kullanıcının ulaştığı gerçekleşen toplam miktarı hesapla
     double totalTarget = 0.0;
     double totalActual = 0.0;
 
@@ -63,6 +76,7 @@ class AnalyticsController extends ChangeNotifier {
       }
     }
 
+    // Miktar başarı oranı hesaplaması (%0 - %100 aralığında sınırlandırılmış)
     final amountCompletionRate = totalTarget > 0
         ? ((totalActual / totalTarget) * 100.0).clamp(0.0, 100.0)
         : 0.0;
@@ -87,11 +101,13 @@ class AnalyticsController extends ChangeNotifier {
     );
   }
 
-  /// Son 7 günün günlük başarı özetini döner (Gelişim grafiği için)
+  /// Son 7 günün günlük başarı özetini döner (Gelişim sütun grafiği için).
+  /// Her gün için planlanan alışkanlık sayısını ve tamamlanan sayısını içerir.
   List<({DateTime date, int completedCount, int totalPlannedCount})> getLast7DaysSummary() {
     final now = DateTime.now();
     final result = <({DateTime date, int completedCount, int totalPlannedCount})>[];
 
+    // Bugünden geriye doğru 7 günü incele
     for (int i = 6; i >= 0; i--) {
       final d = now.subtract(Duration(days: i));
       final dateOnly = DateHelpers.dateOnly(d);

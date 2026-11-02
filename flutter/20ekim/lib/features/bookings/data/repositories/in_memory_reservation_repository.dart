@@ -6,7 +6,11 @@ import '../../../../core/utils/date_formatter.dart';
 import '../../domain/entities/reservation.dart';
 import '../../domain/repositories/reservation_repository.dart';
 
+/// Rezervasyon verilerini bellek içi listede saklayan repository implementasyonu.
+///
+/// Tekil cihaz sınırında atomik oluşturma ve rol bazlı durum geçiş kısıtlamalarını yönetir.
 class InMemoryReservationRepository implements ReservationRepository {
+  // Bellek içi rezervasyon kayıtları
   final List<Reservation> _reservations = List.from(
     MockDataSeed.initialReservations,
   );
@@ -18,14 +22,14 @@ class InMemoryReservationRepository implements ReservationRepository {
   }) async {
     await Future.delayed(const Duration(milliseconds: 200));
 
-    // Ownership check
+    // Sahiplik doğrulaması: Müşteri yalnızca kendi adına rezervasyon yapabilir
     if (actorCustomerId != reservation.customerId) {
       throw const PermissionDeniedException(
         'Yalnızca kendi adınıza rezervasyon oluşturabilirsiniz.',
       );
     }
 
-    // Serialized check to prevent local race condition
+    // Yerel çakışmayı önlemek için son an müsaitlik kontrolü
     final vehicleExisting = _reservations
         .where((r) => r.vehicleId == reservation.vehicleId && r.blocksCalendar)
         .toList();
@@ -42,6 +46,7 @@ class InMemoryReservationRepository implements ReservationRepository {
       }
     }
 
+    // Başarılı oluşturma otomatik confirmed durumuna geçer
     final confirmedReservation = reservation.copyWith(
       status: ReservationStatus.confirmed,
     );
@@ -115,7 +120,7 @@ class InMemoryReservationRepository implements ReservationRepository {
 
     final current = _reservations[index];
 
-    // Ownership & transition permissions
+    // Sahiplik ve durum geçiş matrisi denetimleri (Şartname Kuralı 7)
     if (actorRole == UserRole.customer) {
       if (current.customerId != actorId) {
         throw const PermissionDeniedException(

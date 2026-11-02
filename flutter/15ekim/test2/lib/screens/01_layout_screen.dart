@@ -1,42 +1,51 @@
-
 import 'package:flutter/material.dart';
 
+/// Flutter arayüz düzeni (Layout) ve stil (Styling) tekniklerini gösteren ekran.
 class LayoutStylingScreen extends StatefulWidget {
   const LayoutStylingScreen({super.key});
 
   @override
-  State<LayoutStylingScreen> createState() =>
-      _LayoutStylingScreenState();
+  State<LayoutStylingScreen> createState() => _LayoutStylingScreenState();
 }
 
 class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
+  /// Cüzdan bakiyesinin ekranda görünür olup olmadığını kontrol eden durum bayrağı.
+  /// Kullanıcı göz ikonuna tıkladığında tersine çevrilir 
   bool _isBalanceVisible = true;
+
+  /// Kullanıcının tıkladığı son aksiyonu veya durumu tutan metin.
+  /// Alt kısımda bilgilendirme olarak canlı güncellenir.
   String _lastAction = 'Hazır - Butonlara Tıklayabilirsiniz';
 
   @override
   Widget build(BuildContext context) {
+    // Sayfanın dikeyde kaydırılabilir olmasını sağlamak için SingleChildScrollView kullanılır.
+    // Bu sayede küçük ekranlarda taşma (overflow) hataları önlenir.
     return SingleChildScrollView(
+      // iOS tarzı yumuşak yaylanma kaydırma efekti (BouncingScrollPhysics)
       physics: const BouncingScrollPhysics(),
+      // Ekranın en altına boşluk bırakarak alt çubuğun içeriği kapatmasını önler
       padding: const EdgeInsets.only(bottom: 32),
       child: Column(
+        // Elemanları yatayda sola hizalar
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Profil ve online rozeti
+          // 1. Profil ve online rozeti alanı
           _buildProfileHeader(),
 
-          // Cüzdan kartı
+          // 2. Bakiyenin yer aldığı şık cüzdan kartı
           _buildWalletCard(),
 
-          // Aksiyon butonları
+          // 3. Hızlı aksiyon butonları (Gönder, Ekle, Geçmiş)
           _buildQuickActions(),
 
-          // Gelir ve gider istatistikleri
+          // 4. Gelir ve gider istatistik kutucukları
           _buildFlexStatistics(),
 
-          // Bildirim banner
+          // 5. Bilgilendirme / Kampanya duyuru banner'ı
           _buildNotificationBanner(),
 
-          // Canlı durum bildirimi
+          // 6. Canlı durum bildirimi: En son tıklanan butonu gösterir
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -56,21 +65,26 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 1. PROFİL HEADER
+  
+  // 1. PROFİL HEADER BÖLÜMÜ
+  /// Kullanıcı avatarı, çevrimiçi rozeti ve karşılama metinlerini içeren üst başlık.
   Widget _buildProfileHeader() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
       child: Row(
         children: [
+          // Stack widget'ı, çocuklarını üst üste (katmanlar halinde) yerleştirmeyi sağlar
           Stack(
+            // Rozetin taşabilmesine izin vermek için clipBehavior Clip.none yapılır
             clipBehavior: Clip.none,
             children: [
+              // Profil avatarı dairesel kutusu
               Container(
                 width: 56,
                 height: 56,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0x1F6366F1),
+                  color: const Color(0x1F6366F1), // Yarı saydam mor zemin
                   border: Border.all(
                     color: const Color(0xFF6366F1),
                     width: 2,
@@ -83,7 +97,8 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
                 ),
               ),
 
-              // Online rozeti
+              // Online durumu gösteren yeşil küçük daire rozeti
+              // Positioned ile avatar dairesinin sağ alt köşesine konumlandırılır
               Positioned(
                 right: 0,
                 bottom: 0,
@@ -94,7 +109,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
                     color: Colors.green,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: Colors.white,
+                      color: Colors.white, // Avatar kenarlığından ayıran beyaz çerçeve
                       width: 2,
                     ),
                   ),
@@ -103,8 +118,11 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
             ],
           ),
 
+          // Avatar ile metin arasındaki yatay boşluk
           const SizedBox(width: 16),
 
+          // Karşılama ve isim metinleri
+          // Expanded, metinlerin kalan tüm yatay alanı doldurmasını sağlar
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,16 +151,18 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 2. CÜZDAN KARTI
+  // 2. CÜZDAN KARTI BÖLÜMÜ
+  /// Toplam bakiyeyi ve bakiye gizle/göster butonunu barındıran cüzdan kartı widget'ı.
   Widget _buildWalletCard() {
     return Container(
-      width: double.infinity,
+      width: double.infinity, // Kartın yatayda tam genişlikte olmasını sağlar
       margin: const EdgeInsets.all(20),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF6366F1),
-        borderRadius: BorderRadius.circular(20),
+        color: const Color(0xFF6366F1), 
+        borderRadius: BorderRadius.circular(20), // Köşe yuvarlama
         boxShadow: [
+          // Karta derinlik hissi katan yumuşak gölge
           BoxShadow(
             color: const Color(0xFF6366F1).withValues(alpha: 0.2),
             blurRadius: 16,
@@ -153,6 +173,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Başlık satırı: Cüzdan ikonu ve "Toplam Bakiye" metni
           const Row(
             children: [
               Icon(
@@ -172,8 +193,10 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
 
           const SizedBox(height: 12),
 
+          // Bakiye ve gizleme/gösterme butonu satırı
           Row(
             children: [
+              // Bakiye metni: _isBalanceVisible true ise gerçek tutarı, false ise yıldızlı hali gösterir
               Expanded(
                 child: Text(
                   _isBalanceVisible
@@ -186,6 +209,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
                   ),
                 ),
               ),
+              // Bakiye görünürlüğünü değiştiren buton
               IconButton(
                 onPressed: () {
                   setState(() {
@@ -207,6 +231,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
 
           const SizedBox(height: 20),
 
+          // Kartın alt bilgisi
           const Text(
             'DTM Dijital Cüzdan',
             style: TextStyle(
@@ -219,11 +244,14 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 3. HIZLI AKSİYONLAR
+  
+  // 3. HIZLI AKSİYONLAR BÖLÜMÜ
+  /// Sık kullanılan işlemleri (Gönder, Para Ekle, Geçmiş) yan yana hizalayan bölüm.
   Widget _buildQuickActions() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
+        // Butonları satır üzerinde eşit mesafeyle dağıtır
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildActionButton(Icons.send, 'Gönder'),
@@ -234,24 +262,29 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 4. ORTAK AKSİYON BUTONU
+  // 4. ORTAK AKSİYON BUTONU ŞABLONU
+  /// Tekrar kullanılabilir (reusable) aksiyon butonu bileşeni.
+  /// [icon]: Butonun ikonu, [title]: Altında yer alan açıklayıcı etiket.
   Widget _buildActionButton(
     IconData icon,
     String title,
   ) {
     return Column(
       children: [
+        // İkonun bulunduğu yuvarlak köşeli arka plan kutusu
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFFE0E7FF),
+            color: const Color(0xFFE0E7FF), 
             borderRadius: BorderRadius.circular(16),
           ),
           child: IconButton(
             onPressed: () {
+              // Durumu güncelle
               setState(() {
                 _lastAction = title;
               });
 
+              // Kullanıcıya bildirim çubuğu (SnackBar) göster
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('$title butonuna tıklandı'),
@@ -269,6 +302,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
 
         const SizedBox(height: 8),
 
+        // Butonun altındaki başlık metni
         Text(
           title,
           style: const TextStyle(
@@ -280,12 +314,15 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 5. GELİR-GİDER İSTATİSTİKLERİ
+
+  // 5. GELİR-GİDER İSTATİSTİKLERİ BÖLÜMÜ
+  /// Gelir ve gider kartlarını eşit genişlikte yan yana yerleştiren bölüm.
   Widget _buildFlexStatistics() {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
+          // Gelir Kartı - Expanded ile satırın %50'sini kaplar
           Expanded(
             child: _buildStatisticCard(
               'Gelir',
@@ -297,6 +334,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
 
           const SizedBox(width: 12),
 
+          // Gider Kartı - Expanded ile satırın %50'sini kaplar
           Expanded(
             child: _buildStatisticCard(
               'Gider',
@@ -310,7 +348,11 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 6. ORTAK İSTATİSTİK KARTI
+
+  // 6. ORTAK İSTATİSTİK KARTI ŞABLONU
+  /// Gelir veya gider bilgisini gösteren tekrar kullanılabilir kart bileşeni.
+  /// [title]: Kart başlığı (Gelir/Gider), [amount]: Gösterilecek tutar,
+  /// [icon]: İkon, [color]: Vurgu rengi (Yeşil veya Kırmızı).
   Widget _buildStatisticCard(
     String title,
     String amount,
@@ -320,6 +362,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        // İlgili rengin %10 opaklıkta açık tonu arka plan yapılır
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
       ),
@@ -357,7 +400,9 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
     );
   }
 
-  // 7. BİLDİRİM BANNER
+
+  // 7. BİLDİRİM / KAMPANYA BANNER BÖLÜMÜ
+  /// Ekranın alt kısmında duyuruları ve kampanyaları gösteren bilgilendirme kutusu.
   Widget _buildNotificationBanner() {
     return Container(
       margin: const EdgeInsets.symmetric(
@@ -366,7 +411,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
       ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFFE0E7FF),
+        color: const Color(0xFFE0E7FF), // Açık mor/mavi arka plan
         borderRadius: BorderRadius.circular(12),
       ),
       child: const Row(
@@ -378,6 +423,7 @@ class _LayoutStylingScreenState extends State<LayoutStylingScreen> {
 
           SizedBox(width: 12),
 
+          // Metin uzun olduğunda satırın taşmasını önlemek için Expanded ile sarılmıştır
           Expanded(
             child: Text(
               'Yeni kampanyalar ve fırsatlar sizi bekliyor!',

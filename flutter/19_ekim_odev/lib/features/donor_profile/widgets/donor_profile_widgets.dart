@@ -3,6 +3,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/extensions/date_extensions.dart';
 import '../models/donor_profile_model.dart';
 
+/// Donörün ad, soyad ve ikamet ettiği konum (şehir, ilçe) bilgilerini gösteren metin kolonu.
 class _DonorAvatarInfo extends StatelessWidget {
   const _DonorAvatarInfo({required this.profile});
 
@@ -38,6 +39,7 @@ class _DonorAvatarInfo extends StatelessWidget {
   }
 }
 
+/// Donörün kan grubunu belirgin bir kutu içerisinde gösteren rozet bileşeni.
 class _DonorBloodBadge extends StatelessWidget {
   const _DonorBloodBadge({required this.bloodGroup});
 
@@ -65,7 +67,7 @@ class _DonorBloodBadge extends StatelessWidget {
   }
 }
 
-/// Bağışçının kimlik ve kan grubu özet kartı
+/// Donörün profil fotoğrafı/avatarı, adı, konumu ve kan grubunu özetleyen üst kart.
 class DonorAvatarCard extends StatelessWidget {
   const DonorAvatarCard({super.key, required this.profile});
 
@@ -80,6 +82,7 @@ class DonorAvatarCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
+            // Kullanıcı profil avatarı
             CircleAvatar(
               radius: 32,
               backgroundColor: colorScheme.primaryContainer,
@@ -90,7 +93,9 @@ class DonorAvatarCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
+            // İsim ve konum bilgileri
             Expanded(child: _DonorAvatarInfo(profile: profile)),
+            // Kan grubu etiketi
             _DonorBloodBadge(bloodGroup: profile.bloodGroup),
           ],
         ),
@@ -99,6 +104,7 @@ class DonorAvatarCard extends StatelessWidget {
   }
 }
 
+/// Uygunluk kartının başlık satırı (Durum ikonu, metni ve müsaitlik switch anahtarı).
 class _DonorEligibilityHeader extends StatelessWidget {
   const _DonorEligibilityHeader({
     required this.isEligible,
@@ -128,12 +134,14 @@ class _DonorEligibilityHeader extends StatelessWidget {
           style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
         ),
         const Spacer(),
+        // Acil çağrılarda müsait olma durumunu açıp kapatan anahtar (Switch)
         Switch(value: isAvailable, onChanged: onAvailabilityChanged),
       ],
     );
   }
 }
 
+/// Uygunluk kartının gövde açıklaması ve son bağış tarihi bilgisi.
 class _DonorEligibilityBody extends StatelessWidget {
   const _DonorEligibilityBody({required this.profile});
 
@@ -165,7 +173,7 @@ class _DonorEligibilityBody extends StatelessWidget {
   }
 }
 
-/// Bağış uygunluğu ve durum bildirimi kartı
+/// Bağış uygunluğu, kalan gün süresi ve müsaitlik durumu kontrol kartı.
 class DonorEligibilityCard extends StatelessWidget {
   const DonorEligibilityCard({
     super.key,
@@ -198,6 +206,7 @@ class DonorEligibilityCard extends StatelessWidget {
   }
 }
 
+/// Kan verme veya alma uyumluluk gruplarını çip (badge) olarak listeleyen satır.
 class _CompatibilityGroupRow extends StatelessWidget {
   const _CompatibilityGroupRow({
     required this.title,
@@ -255,7 +264,8 @@ class _CompatibilityGroupRow extends StatelessWidget {
   }
 }
 
-/// Sabit kan grubu uyumluluk rehberi ve gerektiğinde düzeltme seçeneği kartı
+/// Donörün kan grubu uyumluluk tablosunu (kimlere kan verebilir, kimlerden kan alabilir)
+/// gösteren ve hatalı giriş yapıldıysa düzeltme olanağı sunan kart.
 class DonorBloodCompatibilityCard extends StatelessWidget {
   const DonorBloodCompatibilityCard({
     super.key,
@@ -263,9 +273,13 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
     required this.onGroupCorrected,
   });
 
+  /// Görüntülenen kan grubu
   final String bloodGroup;
+
+  /// Kan grubu düzeltildiğinde çalışan callback
   final ValueChanged<String> onGroupCorrected;
 
+  /// Kan grubunu düzeltmek için açılan onay diyalog penceresi.
   void _showCorrectionDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -280,6 +294,7 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
                 'Kan grubu sabit bir biyolojik veridir. Sadece kayıt esnasında hatalı seçtiyseniz düzeltiniz.',
               ),
               const SizedBox(height: 16),
+              // Tüm kan gruplarını ChoiceChip olarak listeler
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
@@ -313,6 +328,7 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    // Uyumluluk tablosundan verileri çeker
     final donateList = AppConstants.canDonateTo[bloodGroup] ?? [bloodGroup];
     final receiveList = AppConstants.canReceiveFrom[bloodGroup] ?? [bloodGroup];
 
@@ -341,6 +357,7 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
                     ],
                   ),
                 ),
+                // Kan grubu düzeltme butonu
                 TextButton.icon(
                   onPressed: () => _showCorrectionDialog(context),
                   icon: const Icon(Icons.edit_outlined, size: 16),
@@ -349,6 +366,7 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
               ],
             ),
             const Divider(height: 24),
+            // Kan verilebilecek gruplar listesi
             _CompatibilityGroupRow(
               title: 'Kan Verebileceğiniz Gruplar',
               icon: Icons.arrow_upward,
@@ -356,6 +374,7 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
               accentColor: colorScheme.primary,
             ),
             const SizedBox(height: 14),
+            // Kan alınabilecek gruplar listesi
             _CompatibilityGroupRow(
               title: 'Kan Alabileceğiniz Gruplar',
               icon: Icons.arrow_downward,
@@ -368,3 +387,4 @@ class DonorBloodCompatibilityCard extends StatelessWidget {
     );
   }
 }
+

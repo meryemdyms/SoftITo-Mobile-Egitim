@@ -3,6 +3,7 @@ import '../constants/app_colors.dart';
 
 /// "Susadım v1" için Dark Obsidian ve Fresh Athletic Light Material 3 temaları.
 class AppTheme {
+  // Statik tema fabrikası; dışarıdan örneklenemez.
   const AppTheme._();
 
   /// Koyu Tema (Dark Obsidian & Neon Spor Salonu)
@@ -11,6 +12,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       scaffoldBackgroundColor: AppColors.darkBackground,
+      // Material 3 renk şeması: Neon camgöbeği (su) ve neon lime (egzersiz) vurgulu
       colorScheme: const ColorScheme.dark(
         primary: AppColors.neonCyan,
         onPrimary: AppColors.darkBackground,
@@ -34,6 +36,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: AppColors.darkTextPrimary),
       ),
+      // Modern düz kart tasarımı: Gölge yerine ince sınır çizgisi (border) kullanımı
       cardTheme: CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
@@ -59,6 +62,7 @@ class AppTheme {
           ),
         ),
       ),
+      // Material 3 alt navigasyon çubuğu ve etkileşim durumları (seçili / pasif)
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
         indicatorColor: AppColors.neonCyan.withAlpha(40),
@@ -131,6 +135,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       scaffoldBackgroundColor: AppColors.lightBackground,
+      // Gündüz kullanımı için optimize edilmiş ferah okyanus ve yeşil renk şeması
       colorScheme: const ColorScheme.light(
         primary: AppColors.oceanBlue,
         onPrimary: Colors.white,
@@ -154,6 +159,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: AppColors.lightTextPrimary),
       ),
+      // Aydınlık mod kartları için açık gri sınır çizgisi (border) ve beyaz zemin
       cardTheme: CardThemeData(
         color: AppColors.lightSurface,
         elevation: 0,

@@ -6,12 +6,20 @@ import '../../../app/theme/app_dimensions.dart';
 import '../../../app/theme/app_typography.dart';
 import '../../../shared/widgets/museum_empty_state.dart';
 
+/// Cep Müzem — Bildirimler Ekranı (NotificationsView)
+///
+/// project.md Madde 14 ve social-notifications skill'i gereksinimleri:
+/// - Ana sayfanın sağ üstündeki zil simgesinden açılır.
+/// - Bildirim türleri: Beğeni, Yorum, Takip, Takip İsteği, Takip Kabulü.
+/// - İlgili bildirime dokunulduğunda ilgili sergiye veya profile yönlendirir.
+/// - Okunmamış bildirimler Antik Bronz nokta göstergesi ve parşömen arka planı ile vurgulanır.
+/// - V1 yalnızca uygulama içi bildirimleri kapsar (Push bildirim V1 kapsamı dışındadır).
 class NotificationsView extends StatelessWidget {
   const NotificationsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Örnek bildirimler
+    // V1 Uygulama içi örnek bildirim veri kümesi
     final notifications = [
       {
         'id': 'notif_1',
@@ -45,11 +53,14 @@ class NotificationsView extends StatelessWidget {
       ),
       body: SafeArea(
         child: notifications.isEmpty
+            // Hiç bildirim yoksa boş durum ekranı gösterilir
             ? const MuseumEmptyState(
                 title: 'Bildirim Yok',
-                message: 'Sergilerinize gelen ziyaretçi notları ve beğeniler burada listelenecektir.',
+                message:
+                    'Sergilerinize gelen ziyaretçi notları ve beğeniler burada listelenecektir.',
                 icon: Icons.notifications_none,
               )
+            // Bildirimler listesi
             : ListView.separated(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.horizontalPadding,
@@ -65,6 +76,7 @@ class NotificationsView extends StatelessWidget {
 
                   return InkWell(
                     onTap: () {
+                      // İlgili bir müze varsa detayına yönlendir
                       if (museumId != null) {
                         context.push('/museum/$museumId');
                       }
@@ -87,6 +99,7 @@ class NotificationsView extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Bildirim Türü Simgesi
                           Container(
                             width: 36,
                             height: 36,
@@ -101,6 +114,8 @@ class NotificationsView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: AppDimensions.space12),
+
+                          // Bildirim Metni ve Zamanı
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,6 +145,8 @@ class NotificationsView extends StatelessWidget {
                               ],
                             ),
                           ),
+
+                          // Okunmamış Bildirim Noktası (Antik Bronz)
                           if (!isRead)
                             Container(
                               width: 8,
@@ -150,3 +167,4 @@ class NotificationsView extends StatelessWidget {
     );
   }
 }
+

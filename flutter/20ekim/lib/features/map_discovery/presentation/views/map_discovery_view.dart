@@ -11,6 +11,9 @@ import '../../../../core/widgets/app_button.dart';
 import '../../../../core/widgets/app_loading.dart';
 import '../controllers/map_discovery_controller.dart';
 
+/// FlutterMap ve OpenStreetMap ile araç kiralama firmalarını harita üzerinde pinlerle gösteren keşif ekranı.
+///
+/// Simüle konum izni, mesafe hesaplama ve seçilen firmanın vitrinine doğrudan geçiş sağlar.
 class MapDiscoveryView extends StatelessWidget {
   const MapDiscoveryView({super.key});
 
@@ -33,6 +36,7 @@ class MapDiscoveryView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Haritada Keşfet'),
         actions: [
+          // Konum İzni Açma / Kapatma Simülasyon Butonu
           TextButton.icon(
             onPressed: mapCtrl.toggleSimulatedLocationPermission,
             icon: Icon(
@@ -58,7 +62,7 @@ class MapDiscoveryView extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // FlutterMap OpenStreetMap
+          // FlutterMap OpenStreetMap Katmanı
           FlutterMap(
             options: MapOptions(
               initialCenter: selected != null
@@ -74,7 +78,7 @@ class MapDiscoveryView extends StatelessWidget {
               ),
               MarkerLayer(
                 markers: [
-                  // User simulated marker if permission granted
+                  // Konum izni verildiğinde kullanıcının mavi pini gösterilir
                   if (mapCtrl.userSimulatedLocation != null)
                     Marker(
                       point: mapCtrl.userSimulatedLocation!,
@@ -95,7 +99,7 @@ class MapDiscoveryView extends StatelessWidget {
                       ),
                     ),
 
-                  // Company markers
+                  // Kiralama firmalarının harita pinleri
                   ...mapCtrl.companies.map((comp) {
                     final isSelected = selected?.id == comp.id;
                     return Marker(
@@ -133,7 +137,7 @@ class MapDiscoveryView extends StatelessWidget {
             ],
           ),
 
-          // OSM Attribution Banner
+          // OpenStreetMap Telif Bildirimi
           Positioned(
             top: 8,
             right: 8,
@@ -150,7 +154,7 @@ class MapDiscoveryView extends StatelessWidget {
             ),
           ),
 
-          // Selected Company Bottom Card
+          // Haritada Seçilen Firmanın Alt Bilgi Kartı (Floating Card)
           if (selected != null)
             Positioned(
               bottom: AppSpacing.lg,

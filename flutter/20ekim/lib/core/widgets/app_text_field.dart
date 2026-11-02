@@ -4,21 +4,53 @@ import '../../app/theme/app_colors.dart';
 import '../../app/theme/app_spacing.dart';
 import '../../app/theme/app_typography.dart';
 
+/// Uygulama genelinde formlarda kullanılan etiketli standart metin giriş alanı bileşeni.
+///
+/// Hata mesajları, ikonlar, çok satırlılık ve tıklanabilirlik özelliklerini kapsar.
 class AppTextField extends StatelessWidget {
+  /// Giriş alanının üzerinde görüntülenecek başlık etiketi.
   final String? label;
+
+  /// Giriş alanı içinde soluk gösterilecek ipucu metni.
   final String? hint;
+
+  /// Metin kontrolcüsü.
   final TextEditingController? controller;
+
+  /// İlk değer (controller kullanılmadığında geçerlidir).
   final String? initialValue;
+
+  /// Form doğrulama fonksiyonu.
   final FormFieldValidator<String>? validator;
+
+  /// Şifre girişleri için metni gizleme durumu.
   final bool obscureText;
+
+  /// Klavye türü (sayısal, e-posta, metin vb.).
   final TextInputType keyboardType;
+
+  /// Klavye eylem butonu (ileri, bitti vb.).
   final TextInputAction textInputAction;
+
+  /// Giriş alanının sol başına eklenecek ikon veya widget.
   final Widget? prefixIcon;
+
+  /// Giriş alanının sağ sonuna eklenecek ikon veya widget.
   final Widget? suffixIcon;
+
+  /// Maksimum satır sayısı.
   final int maxLines;
+
+  /// Salt okunur durumu (tıklanabilir seçim pencereleri için).
   final bool readOnly;
+
+  /// Alana tıklandığında tetiklenecek fonksiyon.
   final VoidCallback? onTap;
+
+  /// Metin değiştiğinde tetiklenecek dinleyici.
   final ValueChanged<String>? onChanged;
+
+  /// Giriş alanının aktiflik durumu.
   final bool enabled;
 
   const AppTextField({
@@ -46,6 +78,7 @@ class AppTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Alan etiketi varsa yukarıda gösterilir
         if (label != null) ...[
           Text(
             label!,
@@ -53,6 +86,7 @@ class AppTextField extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
         ],
+        // Standart TextFormField bileşeni
         TextFormField(
           controller: controller,
           initialValue: initialValue,

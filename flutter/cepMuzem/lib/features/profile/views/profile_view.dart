@@ -11,6 +11,13 @@ import '../../../shared/widgets/museum_card.dart';
 import '../../../shared/widgets/museum_empty_state.dart';
 import '../../auth/viewmodels/auth_viewmodel.dart';
 
+/// Cep Müzem — Küratör Profil Ekranı (ProfileView)
+///
+/// project.md Madde 11 & 12 ve profile-privacy skill'i gereksinimleri:
+/// - Profil fotoğrafı, ad-soyad, e-posta, takipçi ve takip edilen sayıları gösterilir.
+/// - İki sekme bulunur: "Kaydettiklerim" ve "Müzelerim".
+/// - Sağ üstteki buton üzerinden güvenli çıkış (Sign Out) işlemi yapılır.
+/// - Sakin Pinterest düzeyinde sosyal etkileşim felsefesine uygun olarak tasarlanmıştır.
 class ProfileView extends StatefulWidget {
   const ProfileView({super.key});
 
@@ -20,9 +27,16 @@ class ProfileView extends StatefulWidget {
 
 class _ProfileViewState extends State<ProfileView>
     with SingleTickerProviderStateMixin {
+  /// "Kaydettiklerim" ve "Müzelerim" sekmeleri için TabController
   late TabController _tabController;
+
+  /// Kullanıcının yer imine eklediği sergiler
   List<MuseumModel> _savedMuseums = [];
+
+  /// Kullanıcının kendi oluşturduğu müzeler
   List<MuseumModel> _userMuseums = [];
+
+  /// Profil verisi yükleniyor durumu
   bool _isLoading = true;
 
   @override
@@ -38,6 +52,7 @@ class _ProfileViewState extends State<ProfileView>
     super.dispose();
   }
 
+  /// Kullanıcının kaydettiği ve sahip olduğu müzeleri repository'den çeker
   Future<void> _loadProfileData() async {
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
     final museumRepo = Provider.of<MuseumRepository>(context, listen: false);
@@ -55,6 +70,7 @@ class _ProfileViewState extends State<ProfileView>
     }
   }
 
+  /// Oturumu kapatıp kullanıcıyı giriş sayfasına yönlendirir
   Future<void> _handleSignOut(BuildContext context) async {
     final authVm = Provider.of<AuthViewModel>(context, listen: false);
     await authVm.signOut();
@@ -72,6 +88,7 @@ class _ProfileViewState extends State<ProfileView>
       appBar: AppBar(
         title: Text('Küratör Profili', style: AppTypography.pageTitle),
         actions: [
+          // Oturumu Kapat Butonu
           IconButton(
             tooltip: 'Oturumu Kapat',
             icon: const Icon(Icons.logout, color: AppColors.deepWalnut),
@@ -83,7 +100,7 @@ class _ProfileViewState extends State<ProfileView>
       body: SafeArea(
         child: Column(
           children: [
-            // Profil Başlık Kartı
+            // 1. Küratör Profil Başlık Kartı (Fotoğraf, Ad, Sayaçlar)
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppDimensions.horizontalPadding,
@@ -91,6 +108,7 @@ class _ProfileViewState extends State<ProfileView>
               ),
               child: Row(
                 children: [
+                  // Profil Fotoğrafı veya Baş Harf/İkon
                   CircleAvatar(
                     radius: 36,
                     backgroundColor: AppColors.parchment,
@@ -106,6 +124,8 @@ class _ProfileViewState extends State<ProfileView>
                         : null,
                   ),
                   const SizedBox(width: AppDimensions.space16),
+
+                  // Küratör Bilgileri ve Takipçi Sayıları
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +164,7 @@ class _ProfileViewState extends State<ProfileView>
               ),
             ),
 
-            // Tab Bar
+            // 2. Sekme Çubuğu (Kaydettiklerim ve Müzelerim)
             TabBar(
               controller: _tabController,
               indicatorColor: AppColors.deepWalnut,
@@ -159,7 +179,7 @@ class _ProfileViewState extends State<ProfileView>
               ],
             ),
 
-            // Tab View
+            // 3. Sekme İçerikleri (TabBarView)
             Expanded(
               child: _isLoading
                   ? const Center(
@@ -170,11 +190,12 @@ class _ProfileViewState extends State<ProfileView>
                   : TabBarView(
                       controller: _tabController,
                       children: [
-                        // Kaydettiklerim Tabı
+                        // A. Kaydettiklerim Sekmesi
                         _savedMuseums.isEmpty
                             ? const MuseumEmptyState(
                                 title: 'Kaydedilen Müze Yok',
-                                message: 'Beğendiğiniz sergileri yer imine ekleyerek burada saklayabilirsiniz.',
+                                message:
+                                    'Beğendiğiniz sergileri yer imine ekleyerek burada saklayabilirsiniz.',
                                 icon: Icons.bookmark_border,
                               )
                             : ListView.separated(
@@ -202,17 +223,19 @@ class _ProfileViewState extends State<ProfileView>
                                         museumId: museum.id,
                                         userId: user?.id ?? 'demo_user_001',
                                       );
+                                      // Listeyi yenile
                                       _loadProfileData();
                                     },
                                   );
                                 },
                               ),
 
-                        // Müzelerim Tabı
+                        // B. Müzelerim Sekmesi
                         _userMuseums.isEmpty
                             ? MuseumEmptyState(
                                 title: 'Henüz Müze Oluşturulmadı',
-                                message: 'Kendi kişisel koleksiyonunuzu oluşturarak ilk dijital serginizi açın.',
+                                message:
+                                    'Kendi kişisel koleksiyonunuzu oluşturarak ilk dijital serginizi açın.',
                                 icon: Icons.museum_outlined,
                                 actionLabel: 'Müze Oluştur',
                                 onAction: () => context.go('/create'),
@@ -245,3 +268,4 @@ class _ProfileViewState extends State<ProfileView>
     );
   }
 }
+

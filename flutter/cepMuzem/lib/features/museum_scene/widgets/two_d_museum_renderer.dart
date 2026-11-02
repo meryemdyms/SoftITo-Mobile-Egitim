@@ -7,11 +7,22 @@ import '../../../shared/models/museum_item_model.dart';
 import '../../../shared/models/museum_scene_model.dart';
 import '../../../shared/models/room_template_model.dart';
 
-/// 2D Etkileşimli Müze Sahnesi Renderer
-/// V1 standardı: Klasik Galeri (4 Eser Yuvası)
+/// Cep Müzem — 2D Etkileşimli Müze Sahnesi Renderer (TwoDMuseumRenderer)
+///
+/// museum-scene-2d ve project.md kuralları gereği:
+/// - V1'de çalışan 2D simülasyon kullanılır (3D özelliği V1'de gösterilmez).
+/// - 3 kesin oda şablonunu (Klasik Galeri 4 yuva, Taş Koridor 6 yuva, Arşiv Salonu 8 yuva) destekler.
+/// - Slot pozisyonları 0.0 - 1.0 arasında normalize edilmiştir ve sahne boyutuna orantılı olarak piksele dönüştürülür.
+/// - Sıcak taş duvar, ceviz ahşap zemin, spot ışığı ve bronz sergi plaketleri ile tarihi müze atmosferi yaratır.
+/// - Eser çerçevelerine dokunulduğunda [onItemTap] geri çağrısını tetikler.
 class TwoDMuseumRenderer extends StatelessWidget {
+  /// Çizilecek olan müze odası ve eser verileri
   final MuseumRoomModel room;
+
+  /// Varsa o an seçili olan eser (çerçevesi bronz vurguyla aydınlatılır)
   final MuseumItemModel? selectedItem;
+
+  /// Bir esere dokunulduğunda tetiklenen olay
   final ValueChanged<MuseumItemModel> onItemTap;
 
   const TwoDMuseumRenderer({
@@ -23,13 +34,13 @@ class TwoDMuseumRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Şablon tanımını al (varsayılan: classicGallery)
+    // Oda şablon tanımı ID'ye göre getirilir (varsayılan: classicGallery)
     final template = RoomTemplateModel.getById(room.templateId);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final sceneWidth = constraints.maxWidth;
-        // 16:10 orantılı ferah müze salonu en boy oranı
+        // 16:10 orantılı ferah müze salonu en boy oranı (minimum 320, maksimum 500dp)
         final sceneHeight = constraints.maxHeight.isFinite
             ? constraints.maxHeight
             : (sceneWidth * 0.75).clamp(320.0, 500.0);
@@ -38,7 +49,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
           width: sceneWidth,
           height: sceneHeight,
           decoration: BoxDecoration(
-            color: const Color(0xFFEAE3D4), // Sıcak taş duvar rengi
+            color: const Color(0xFFEAE3D4), // Sıcak taş duvar dokusu rengi
             borderRadius: AppDimensions.cardBorderRadius,
             border: Border.all(color: AppColors.museumStone, width: 1.5),
             boxShadow: [
@@ -53,6 +64,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
           child: Stack(
             children: [
               // 1. Zemin ve Duvar Ayrımı (Müze Perspektif / Mimari Hissi)
+              // Alt %32'lik alan ahşap ceviz zemin olarak modellenir
               Positioned(
                 left: 0,
                 right: 0,
@@ -60,7 +72,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                 height: sceneHeight * 0.32,
                 child: Container(
                   decoration: const BoxDecoration(
-                    color: Color(0xFF3E3630), // Ahşap ceviz zemin
+                    color: Color(0xFF3E3630), // Ahşap koyu ceviz zemin
                     border: Border(
                       top: BorderSide(color: AppColors.antiqueBronze, width: 4),
                     ),
@@ -68,7 +80,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                 ),
               ),
 
-              // Salon Üst Korniş / Spot Işık Hüzmesi
+              // 2. Salon Üst Korniş ve Spot Işık Hüzmesi
               Positioned(
                 left: 0,
                 right: 0,
@@ -88,7 +100,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                 ),
               ),
 
-              // Salon Adı Etiketi (Sol Üst)
+              // 3. Salon Adı ve Şablon Bilgi Etiketi (Sol Üst)
               Positioned(
                 left: AppDimensions.space16,
                 top: AppDimensions.space12,
@@ -127,7 +139,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                 ),
               ),
 
-              // 2. Slot Yuvaları ve Eserler
+              // 4. Şablondaki Yuvalar (Slotlar) ve Eser Çerçeveleri
               for (final slot in template.slotDefinitions) ...[
                 _buildSlotAndItem(
                   context: context,
@@ -143,6 +155,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
     );
   }
 
+  /// Belirli bir eser yuvasını (slot) ve varsa içine atanmış eseri çizer
   Widget _buildSlotAndItem({
     required BuildContext context,
     required SlotDefinition slot,
@@ -157,16 +170,18 @@ class TwoDMuseumRenderer extends StatelessWidget {
       item = null;
     }
 
+    // Pozisyon: Eserin kendi konumu veya slotun varsayılan konumu (0.0 - 1.0)
     final posX = item != null ? item.positionX : slot.defaultX;
     final posY = item != null ? item.positionY : slot.defaultY;
 
-    // Normal koordinatı piksele çevir
+    // Normalize koordinatları sahne genişlik/yükseklik pikseline dönüştür
     final centerX = posX * sceneWidth;
     final centerY = posY * sceneHeight;
 
     const frameWidth = 68.0;
     const frameHeight = 94.0;
 
+    // Seçili eser olup olmadığını kontrol et
     final isSelected = item != null && selectedItem?.id == item.id;
 
     return Positioned(
@@ -175,6 +190,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: () {
+          // Dolu bir esere tıklandığında alt paneli açmak için tetikle
           if (item != null) {
             onItemTap(item);
           }
@@ -182,7 +198,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Çerçeve
+            // A. Eser Çerçevesi (Klasik Müze Çerçevesi Efekti)
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: frameWidth,
@@ -215,6 +231,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
+                          // Eser Önizleme Resmi
                           if (item.imageUrls.isNotEmpty)
                             Image.network(
                               item.imageUrls.first,
@@ -238,7 +255,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                                 color: AppColors.antiqueBronze,
                               ),
                             ),
-                          // Varsa sesli not işareti
+                          // Varsa sesli not simgesi rozeti
                           if (item.audioUrl != null)
                             Positioned(
                               top: 2,
@@ -261,6 +278,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
                         ],
                       ),
                     )
+                  // Henüz eser atanmamış boş yuva görünümü
                   : Container(
                       color: AppColors.parchment.withValues(alpha: 0.4),
                       alignment: Alignment.center,
@@ -273,7 +291,7 @@ class TwoDMuseumRenderer extends StatelessWidget {
             ),
             const SizedBox(height: 6),
 
-            // Sergi Etiketi (Plaketi)
+            // B. Sergi Etiketi / Eser Plaketi (Bronz / Taş Müze Etiketi)
             Container(
               constraints: const BoxConstraints(maxWidth: 82),
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -309,3 +327,4 @@ class TwoDMuseumRenderer extends StatelessWidget {
     );
   }
 }
+

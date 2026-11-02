@@ -2,21 +2,53 @@ import '../../../../core/enums/fuel_type.dart';
 import '../../../../core/enums/transmission_type.dart';
 import 'date_range.dart';
 
+/// Platformda kiralanabilir bir aracı / ilanı temsil eden ana varlık (Entity).
+///
+/// Proje mimarisi gereği `Vehicle` tek araç/ilan modelidir; ayrı bir Listing entity'si bulunmaz.
 class Vehicle {
+  /// Aracın benzersiz kimliği.
   final String id;
+
+  /// Aracın ait olduğu araç kiralama firmasının ID'si.
   final String companyId;
+
+  /// Araç markası (örn. "Fiat", "Toyota").
   final String brand;
+
+  /// Araç modeli (örn. "Egea Sedan 1.4 Fire", "Corolla Hybrid").
   final String model;
+
+  /// Model yılı.
   final int year;
+
+  /// Vites türü (otomatik / manuel).
   final TransmissionType transmission;
+
+  /// Yakıt türü (benzin, dizel, hibrit, elektrik).
   final FuelType fuel;
+
+  /// Yolcu koltuk kapasitesi.
   final int seats;
-  final int dailyRate; // in kuruş (minor currency unit: 150000 = 1500 TL)
+
+  /// Günlük kiralama bedeli (kuruş cinsinden tamsayı: 150000 = 1.500 ₺).
+  final int dailyRate;
+
+  /// Araç görsel URL veya asset yolları listesi.
   final List<String> images;
+
+  /// Aracın teslim alınacağı varsayılan ofis/nokta.
   final String pickupLocation;
+
+  /// Aracın ilanda aktif olup olmadığı (firma tarafından pasife alınabilir).
   final bool isActive;
+
+  /// Firmanın bu araç için kapattığı/bloke ettiği tarih aralıkları listesi.
   final List<DateRange> blockedPeriods;
+
+  /// Aracı kiralamak için gereken minimum sürücü yaşı kuralı.
   final int minDriverAge;
+
+  /// Aracı kiralamak için gereken minimum ehliyet süresi (yıl).
   final int minLicenceYears;
 
   const Vehicle({
@@ -37,9 +69,10 @@ class Vehicle {
     this.minLicenceYears = 1,
   });
 
+  /// Marka ve modeli birleştiren tam araç ismi.
   String get fullName => '$brand $model';
 
-  /// Check if requested interval [startAt, endAt) overlaps with any blocked period.
+  /// Talep edilen [startAt, endAt) aralığının aracın bloke dönemleriyle çakışıp çakışmadığını denetler.
   bool isBlockedIn(DateTime startAt, DateTime endAt) {
     for (final period in blockedPeriods) {
       if (period.overlapsWith(startAt, endAt)) {
@@ -49,6 +82,7 @@ class Vehicle {
     return false;
   }
 
+  /// Belirli alanları güncelleyerek yeni bir [Vehicle] nesnesi üretir.
   Vehicle copyWith({
     String? id,
     String? companyId,

@@ -19,7 +19,10 @@ import '../../../search/presentation/controllers/vehicle_search_controller.dart'
 import '../../domain/entities/vehicle.dart';
 import '../../domain/repositories/vehicle_repository.dart';
 
+/// Seçilen aracın teknik özelliklerini, kiralama koşullarını, indirim dökümünü
+/// ve kiralama başlatma aksiyonunu gösteren detay ekranı.
 class VehicleDetailsView extends StatefulWidget {
+  /// Detayı görüntülenecek aracın benzersiz kimliği.
   final String vehicleId;
 
   const VehicleDetailsView({super.key, required this.vehicleId});
@@ -41,6 +44,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
     _loadDetails();
   }
 
+  /// Araç, firma ve arama tarihlerine göre anlık fiyat hesaplama önizlemesini yükler.
   Future<void> _loadDetails() async {
     setState(() {
       _isLoading = true;
@@ -64,6 +68,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
 
       final company = await companyRepo.getCompanyById(vehicle.companyId);
 
+      // Seçili arama tarihlerine göre indirim ve toplam bedel önizlemesi
       final priceResult = await bookingCtrl.calculatePricePreview(
         vehicle: vehicle,
         startAt: searchCtrl.startDateTime,
@@ -112,7 +117,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
       backgroundColor: AppColors.canvas,
       body: CustomScrollView(
         slivers: [
-          // App Bar with Image
+          // Araç Görseli ve Geri Butonu Barındıran Genişletilebilir Üst Bar
           SliverAppBar(
             expandedHeight: 280,
             pinned: true,
@@ -155,14 +160,14 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
             ),
           ),
 
-          // Content
+          // Araç İçerik Bilgileri
           SliverToBoxAdapter(
             child: Padding(
               padding: AppSpacing.edgeInsetsLg,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Title & Year
+                  // Araç Adı, Yıl ve Günlük Fiyat Kartı
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,7 +208,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Company Card
+                  // Aracı Kiralayan Firma Kartı (Tıklanabilir, vitrine gider)
                   if (_company != null)
                     InkWell(
                       onTap: () => context.push('/companies/${_company!.id}'),
@@ -252,8 +257,8 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                     ),
                   const SizedBox(height: AppSpacing.lg),
 
-                  // Specifications Grid
-                  Text('Özellikler', style: AppTypography.titleMedium),
+                  // Teknik Özellikler Grid Izgarası
+                  const Text('Özellikler', style: AppTypography.titleMedium),
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
@@ -296,8 +301,11 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Rental Requirements
-                  Text('Kiralama Koşulları', style: AppTypography.titleMedium),
+                  // Kiralama Kuralları ve Sürücü Koşulları
+                  const Text(
+                    'Kiralama Koşulları',
+                    style: AppTypography.titleMedium,
+                  ),
                   const SizedBox(height: AppSpacing.sm),
                   Container(
                     padding: AppSpacing.edgeInsetsMd,
@@ -327,8 +335,8 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                   ),
                   const SizedBox(height: AppSpacing.xl),
 
-                  // Selected Dates & Price Calculation Summary
-                  Text(
+                  // Seçili Tarih Aralığı ve Fiyatlandırma Hesaplama Özeti
+                  const Text(
                     'Seçili Kiralama Özeti',
                     style: AppTypography.titleMedium,
                   ),
@@ -346,7 +354,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Alış:', style: AppTypography.bodySmall),
+                            const Text('Alış:', style: AppTypography.bodySmall),
                             Text(
                               DateFormatter.formatDateTime(
                                 searchCtrl.startDateTime,
@@ -359,7 +367,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('İade:', style: AppTypography.bodySmall),
+                            const Text('İade:', style: AppTypography.bodySmall),
                             Text(
                               DateFormatter.formatDateTime(
                                 searchCtrl.endDateTime,
@@ -373,7 +381,10 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Süre:', style: AppTypography.bodyMedium),
+                              const Text(
+                                'Süre:',
+                                style: AppTypography.bodyMedium,
+                              ),
                               Text(
                                 '${_priceResult!.dayCount} Gün',
                                 style: AppTypography.labelLarge,
@@ -384,7 +395,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 'Günlük Ücret:',
                                 style: AppTypography.bodyMedium,
                               ),
@@ -400,7 +411,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 'Ara Toplam:',
                                 style: AppTypography.bodyMedium,
                               ),
@@ -446,7 +457,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
+                              const Text(
                                 'Toplam Ödenecek:',
                                 style: AppTypography.titleMedium,
                               ),
@@ -464,13 +475,14 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 100), // padding for bottom CTA
+                  const SizedBox(height: 100), // Alt eylem çubuğu için boşluk
                 ],
               ),
             ),
           ),
         ],
       ),
+      // Sabit Alt Rezervasyon Eylem Çubuğu
       bottomSheet: Container(
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
@@ -492,7 +504,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Toplam Tutar', style: AppTypography.bodySmall),
+                    const Text('Toplam Tutar', style: AppTypography.bodySmall),
                     if (_priceResult != null)
                       Text(
                         CurrencyFormatter.formatKurus(_priceResult!.totalPrice),
@@ -512,7 +524,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
                   icon: Icons.calendar_today_rounded,
                   onPressed: () {
                     if (!authCtrl.isAuthenticated) {
-                      // Guest flow: redirects to login, with sanitized returnTo
+                      // Misafir akışı: Login sayfasına yönlendirilir ve kiralama adımına geri dönülür
                       final returnPath = '/booking/checkout/${vehicle.id}';
                       context.push('/auth/login?returnTo=$returnPath');
                     } else if (authCtrl.isCompany) {
@@ -536,6 +548,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
     );
   }
 
+  /// Özellik kutucuğunu oluşturan yardımcı widget.
   Widget _buildSpecCard(String title, String value, IconData icon) {
     return Container(
       padding: AppSpacing.edgeInsetsMd,
@@ -567,6 +580,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
     );
   }
 
+  /// Kiralama koşulu satırı.
   Widget _buildConditionRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -580,6 +594,7 @@ class _VehicleDetailsViewState extends State<VehicleDetailsView> {
     );
   }
 
+  /// Görsel yüklenemediğinde veya boş olduğunda gösterilen yedek araç ikonu.
   Widget _buildFallbackImage() {
     return Container(
       color: AppColors.surfaceVariant,

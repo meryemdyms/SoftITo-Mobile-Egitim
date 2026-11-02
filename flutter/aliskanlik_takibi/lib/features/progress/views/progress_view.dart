@@ -5,6 +5,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/date_helpers.dart';
 import '../models/analysis_models.dart';
 
+/// Ritmo Gelişim ve Analiz Rapor Ekranı (Progress View).
+///
+/// `project.md` 5.9. (Gelişim) ve 9. (Analiz Sistemi) kurallarına göre tasarlanmıştır:
+/// - Son 7 günlük performans grafiği (özelleştirilmiş estetik barlar)
+/// - Aktif süreçlerin kapsamlı raporları
+/// - Gün Başarı Oranı (% Gün) ve Miktar Başarı Oranı (% Miktar) ikili gösterimi
+/// - Süreç bazında en uzun ve mevcut seri (streak) verileri
 class ProgressView extends StatelessWidget {
   const ProgressView({super.key});
 
@@ -53,7 +60,7 @@ class ProgressView extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
 
-                          // Sade ve Estetik Bar Grafiği (Custom Minimalist Bars)
+                          // Sade ve Estetik Sütun Grafiği (Custom Minimalist Bars)
                           SizedBox(
                             height: 120,
                             child: Row(
@@ -69,6 +76,7 @@ class ProgressView extends StatelessWidget {
                                 return Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
+                                    // Tamamlanan sayı
                                     Text(
                                       '${item.completedCount}',
                                       style: TextStyle(
@@ -78,6 +86,7 @@ class ProgressView extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 6),
+                                    // Dinamik bar yüksekliği
                                     Container(
                                       width: 22,
                                       height: max(ratio * 70, 6.0),
@@ -89,6 +98,7 @@ class ProgressView extends StatelessWidget {
                                       ),
                                     ),
                                     const SizedBox(height: 8),
+                                    // Gün adı (Örn: Pzt, Sal)
                                     Text(
                                       dayStr,
                                       style: TextStyle(
@@ -119,6 +129,7 @@ class ProgressView extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
+                  // Aktif süreç yoksa bilgilendirme kartı
                   if (activeHabits.isEmpty) ...[
                     Card(
                       child: Padding(
@@ -132,6 +143,7 @@ class ProgressView extends StatelessWidget {
                       ),
                     ),
                   ] else ...[
+                    // Her aktif alışkanlık için süreç analizi kartı
                     ...activeHabits.map((habit) {
                       final report = analyticsController.generateReportForHabit(habit.id);
                       return _buildProcessReportCard(report, habit.unit);
@@ -146,6 +158,9 @@ class ProgressView extends StatelessWidget {
     );
   }
 
+  /// Tek bir sürecin analiz rapor kartını oluşturur.
+  ///
+  /// `project.md` 9.2: Gün başarısı ve miktar başarısı ayrı kutularda sergilenir.
   Widget _buildProcessReportCard(AnalysisReportModel report, String unit) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
@@ -155,6 +170,7 @@ class ProgressView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Alışkanlık Adı ve Parça Sayacı Rozeti
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -180,6 +196,7 @@ class ProgressView extends StatelessWidget {
               // Kesin İş Kuralı: Gün Başarı Oranı vs Miktar Başarı Oranı Ayrı Gösterimi
               Row(
                 children: [
+                  // 1. Kutu: Gün Başarısı (Başarılı gün / Planlanan gün)
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.all(12),
@@ -209,6 +226,8 @@ class ProgressView extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
+
+                  // 2. Kutu: Miktar Başarısı (Gerçekleşen / Hedef Miktar)
                   Expanded(
                     child: Container(
                       padding: const EdgeInsets.all(12),

@@ -4,13 +4,28 @@ import '../../../core/theme/app_colors.dart';
 import '../models/puzzle_models.dart';
 import 'artwork_painter.dart';
 
-/// Gizli Yapboz Izgara Görünümü
-/// Görsel güvenliğini tam uygular: Kapalı parçalarda görsel hiçbir şekilde render edilmez.
+/// Gizli Yapboz Izgara Görünümü (Puzzle Artwork Widget).
+///
+/// `project.md` 7.6. Bölüm (Görsel Güvenliği) kurallarını harfiyen uygular:
+/// 1. Kapalı (kilitli) parçalarda görsel hiçbir şekilde çizilmez veya arka planda render edilmez;
+///    böylece ekran görüntüsü veya saydamlık hilesiyle erken keşif imkânsız kılınır.
+/// 2. Yalnızca kazanılan parçalar [ClipRect] ve [OverflowBox] hizalaması ile eserin ilgili
+///    koordinat dilimini (slice) gösterir.
+/// 3. Eser adı ve hikayesi sadece tüm parçalar açıldığında ([showArtworkTitle] = true) gösterilir.
 class PuzzleArtworkWidget extends StatelessWidget {
+  /// Çizilecek gizli sanat eseri
   final ArtworkModel artwork;
+
+  /// Yapboz üst modeli (parça sayısı, açılma sırası vb.)
   final PuzzleModel puzzle;
+
+  /// Parçaların kilit durumlarını içeren liste
   final List<PuzzlePieceModel> pieces;
-  final bool showArtworkTitle; // Sadece tamamlandıysa true
+
+  /// Eser adının gösterilip gösterilmeyeceği (Yalnızca %100 tamamlandıysa true)
+  final bool showArtworkTitle;
+
+  /// Parçaya dokunulduğunda tetiklenecek geri çağırma (isteğe bağlı)
   final VoidCallback? onPieceTapped;
 
   const PuzzleArtworkWidget({
@@ -22,7 +37,13 @@ class PuzzleArtworkWidget extends StatelessWidget {
     this.onPieceTapped,
   });
 
-  /// Parça sayısına göre ideal grid sütun ve satır sayısını hesaplar
+  /// Toplam parça sayısına göre ideal ızgara sütun ve satır sayısını hesaplar.
+  ///
+  /// `project.md` 5.7. standart süreleri:
+  /// - 21 gün -> 7 sütun x 3 satır
+  /// - 30 gün -> 6 sütun x 5 satır
+  /// - 60 gün -> 10 sütun x 6 satır
+  /// - 90 gün -> 10 sütun x 9 satır
   static ({int cols, int rows}) calculateGrid(int totalPieces) {
     if (totalPieces <= 0) return (cols: 1, rows: 1);
     if (totalPieces <= 6) return (cols: 3, rows: 2);
@@ -59,7 +80,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Yapboz Başlığı / Seri Bilgisi
+          // Üst Bilgi Başlığı (Seri adı ve açılan parça oranı)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             color: AppColors.cardBg,
@@ -116,7 +137,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
           ),
           const Divider(height: 1, thickness: 1, color: AppColors.border),
 
-          // Yapboz Kanvası & Izgara
+          // Yapboz Kanvası & Dinamik Izgara
           AspectRatio(
             aspectRatio: 1.15,
             child: LayoutBuilder(
@@ -128,7 +149,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
 
                 return Stack(
                   children: [
-                    // Arka planda parça ızgarası
+                    // Izgara hücreleri
                     for (int r = 0; r < rows; r++)
                       for (int c = 0; c < cols; c++) ...[
                         _buildPieceCell(
@@ -152,6 +173,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
     );
   }
 
+  /// Belirli bir koordinattaki (sütun ve satır) tek bir yapboz parçasını oluşturur.
   Widget _buildPieceCell({
     required int col,
     required int row,
@@ -164,7 +186,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
   }) {
     final index = row * cols + col;
 
-    // Eğer grid boyutu toplam parça sayısından fazlaysa boş bırak
+    // Grid boyutu toplam parça sayısını aşıyorsa boş bırak
     if (index >= puzzle.totalPieces) {
       return Positioned(
         left: col * pieceWidth,
@@ -199,6 +221,7 @@ class PuzzleArtworkWidget extends StatelessWidget {
             width: 0.5,
           ),
         ),
+        // GÖRSEL GÜVENLİĞİ: Sadece kilit açıldıysa resim parçasını çiz, aksi halde opak kilit kutusu göster
         child: isUnlocked
             ? ClipRect(
                 child: OverflowBox(

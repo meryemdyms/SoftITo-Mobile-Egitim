@@ -1,7 +1,14 @@
-/// Ritmo Tarih Yardımcı Fonksiyonları
+/// Ritmo Tarih ve Saat Yardımcı Fonksiyonları.
+///
+/// Uygulama genelinde Türkçe ay/gün isimlerinin biçimlendirilmesi,
+/// saat bilgilerinden arındırılmış saf takvim günü karşılaştırmaları
+/// ve ISO 8601 (YYYY-MM-DD) tarih çevrimleri bu sınıf üzerinden sağlanır.
 class DateHelpers {
+  // Doğrudan örneklenmeyi önlemek için private yapıcı
   DateHelpers._();
 
+  /// 1-tabanlı (1 = Ocak, 12 = Aralık) Türkçe ay isimleri listesi.
+  /// 0. indeks boş bırakılarak ay numarası doğrudan erişilebilir kılınmıştır.
   static const List<String> monthNames = [
     '',
     'Ocak',
@@ -18,6 +25,7 @@ class DateHelpers {
     'Aralık',
   ];
 
+  /// 1-tabanlı (1 = Pazartesi, 7 = Pazar) Türkçe tam gün isimleri listesi.
   static const List<String> dayNames = [
     '',
     'Pazartesi',
@@ -29,6 +37,7 @@ class DateHelpers {
     'Pazar',
   ];
 
+  /// 1-tabanlı Türkçe kısa gün isimleri listesi (Örn: grafik ve takvimler için).
   static const List<String> dayShortNames = [
     '',
     'Pzt',
@@ -40,29 +49,34 @@ class DateHelpers {
     'Paz',
   ];
 
-  /// Sadece Yıl-Ay-Gün bilgisini tutan DateTime (saatsiz)
+  /// Saat, dakika, saniye ve milisaniye bilgilerini sıfırlayarak
+  /// sadece Yıl-Ay-Gün bilgisini içeren saf [DateTime] nesnesi döndürür.
+  ///
+  /// Alışkanlık takip süreçlerinde gün karşılaştırmalarının saat farkından
+  /// etkilenmemesi için zorunlu olarak kullanılır.
   static DateTime dateOnly(DateTime dt) {
     return DateTime(dt.year, dt.month, dt.day);
   }
 
-  /// İki tarihin aynı takvim günü olup olmadığını denetler
+  /// İki [DateTime] nesnesinin aynı takvim gününe (yıl, ay ve gün) denk gelip gelmediğini kontrol eder.
   static bool isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
-  /// "22 Ekim 2026, Perşembe" formatında metin döner
+  /// Tarihi "22 Ekim 2026, Perşembe" gibi tam ve kullanıcı dostu Türkçe formatında biçimlendirir.
   static String formatFull(DateTime dt) {
     final dayName = dayNames[dt.weekday];
     final monthName = monthNames[dt.month];
     return '${dt.day} $monthName ${dt.year}, $dayName';
   }
 
-  /// "22 Ekim" formatında kısa metin
+  /// Tarihi "22 Ekim" formatında kısa gün ve ay olarak biçimlendirir.
   static String formatDayMonth(DateTime dt) {
     return '${dt.day} ${monthNames[dt.month]}';
   }
 
-  /// ISO 8601 YYYY-MM-DD
+  /// Tarih nesnesini standart "YYYY-MM-DD" ISO 8601 formatına dönüştürür.
+  /// Yerel veritabanında günlük ilerleme anahtarı olarak saklanırken kullanılır.
   static String toIsoDate(DateTime dt) {
     final y = dt.year.toString().padLeft(4, '0');
     final m = dt.month.toString().padLeft(2, '0');
@@ -70,7 +84,8 @@ class DateHelpers {
     return '$y-$m-$d';
   }
 
-  /// ISO 8601 string'den Date döner
+  /// "YYYY-MM-DD" formatındaki metin dizgisinden [DateTime] nesnesi üretir.
+  /// Biçim hatalıysa varsayılan olarak şu anki zamanı döndürür.
   static DateTime fromIsoDate(String str) {
     final parts = str.split('-');
     if (parts.length != 3) return DateTime.now();
@@ -81,6 +96,6 @@ class DateHelpers {
     );
   }
 
-  /// Haftanın günleri listesi (1=Pzt, 7=Paz)
+  /// Haftanın gün indeksini döndürür (1 = Pazartesi, 7 = Pazar).
   static int getWeekdayIndex(DateTime dt) => dt.weekday;
 }
