@@ -1,16 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'screens/storage_ve_fcm_ekrani.dart';
 
-void main() {
-  runApp(const MainApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); //firebase servislerini initalize etmiştik diyoruz ki onlardan emin ol sonra bu sayfayı başlat emin olmak için
+  try{
+    await Firebase.initializeApp();
+  }catch(_){}
+  runApp(const SoftitoFcmDemoApplication());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class SoftitoFcmDemoApplication extends StatelessWidget{
+  const SoftitoFcmDemoApplication ({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(body: Center(child: Text('Hello World!'))),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: "Softito FCM Demo Applications",
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(0, 0, 0, 0)),
+        brightness: Brightness.light,
+      ),
+      home: const StorageVeFcmEkrani(),
     );
   }
 }

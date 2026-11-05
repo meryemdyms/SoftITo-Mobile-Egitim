@@ -35,6 +35,14 @@ class FcmBildirimServisi {
 
   }
 
+  Future<String?> tokenAl() async{
+    try{
+      return await _fcm.getToken();
+    }catch(_){
+      return null;
+    }
+  }
+
   Future<void> konuyaAboneOl(String konu) async{
     await _fcm.subscribeToTopic(konu);
   }

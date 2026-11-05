@@ -43,6 +43,10 @@
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
 					<key>UISceneStoryboardFile</key>
 					<string>Main</string>
+					<key>NSCameraUsageDescription</key>
+					<string>Fotoğraf çekebilmek için kamera erişimine izin veriniz.</string>
+					<key>NSPhotoLibraryUsageDescription</key>
+					<string>Galeriden görsel seçebilmek için fotoğraf erişimine izin veriniz.</string>
 				</dict>
 			</array>
 		</dict>
